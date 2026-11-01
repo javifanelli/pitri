@@ -1,0 +1,206 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 870" width="1040" height="870" font-family="Helvetica, Arial, sans-serif">
+<rect width="1040" height="870" fill="#ffffff"/>
+<text x="20" y="34" font-size="22" font-weight="bold" fill="#111">Pitri — conexiones</text>
+<text x="20" y="56" font-size="13" fill="#555">ESP32 DevKit 30 pines (eMakers, CH9102X) · vista desde arriba, antena arriba, USB abajo</text>
+<polyline points="640,638 650,638 650,700 995,700 995,180" fill="none" stroke="#d62728" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="640,606 665,606 665,680 975,680 975,230" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="640,222 670,222 670,180 790,180" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="640,318 690,318 690,230 790,230" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M950,180 H969 a6,6 0 0 1 12,0 H995" fill="none" stroke="#d62728" stroke-width="3" stroke-linecap="round"/>
+<polyline points="950,230 975,230" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="995" cy="180" r="4.5" fill="#d62728"/>
+<circle cx="975" cy="230" r="4.5" fill="#222222"/>
+<polyline points="640,446 700,446 700,370 790,370" fill="none" stroke="#8c564b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="640,478 790,478" fill="none" stroke="#8c564b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="950,370 975,370" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="975" cy="370" r="4.5" fill="#222222"/>
+<polyline points="950,478 975,478" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="975" cy="478" r="4.5" fill="#222222"/>
+<polyline points="640,510 715,510 715,585 790,585" fill="none" stroke="#e377c2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M950,565 H969 a6,6 0 0 1 12,0 H995" fill="none" stroke="#d62728" stroke-width="3" stroke-linecap="round"/>
+<polyline points="950,605 975,605" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="995" cy="565" r="4.5" fill="#d62728"/>
+<circle cx="975" cy="605" r="4.5" fill="#222222"/>
+<polyline points="360,478 250,478" fill="none" stroke="#b8860b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="360,606 250,606" fill="none" stroke="#222222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="360,638 250,638" fill="none" stroke="#ff7f0e" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="360" y="120" width="280" height="558" rx="10" fill="#15171c" stroke="#000" stroke-width="2"/>
+<rect x="455" y="128" width="90" height="42" rx="3" fill="#22252c" stroke="#8892a8"/>
+<polyline points="462,136 470,162 478,136 486,162 494,136 502,162 510,136 518,162 526,136 534,162" fill="none" stroke="#c9a227" stroke-width="2"/>
+<text x="500" y="182" font-size="10" fill="#c8d0e0" text-anchor="middle" font-weight="normal" dominant-baseline="middle">antena WiFi</text>
+<rect x="458" y="212" width="84" height="192" rx="3" fill="#b9bec7" stroke="#80858f"/>
+<text x="500" y="286" font-size="14" fill="#222" text-anchor="middle" font-weight="bold" dominant-baseline="middle">ESP32</text>
+<text x="500" y="314" font-size="12" fill="#222" text-anchor="middle" font-weight="normal" dominant-baseline="middle">WROOM</text>
+<text x="500" y="338" font-size="12" fill="#222" text-anchor="middle" font-weight="normal" dominant-baseline="middle">-32</text>
+<text x="500" y="478" font-size="12" fill="#e0e6f0" text-anchor="middle" font-weight="bold" dominant-baseline="middle">ESP32 DevKit</text>
+<text x="500" y="504" font-size="11" fill="#aab4c8" text-anchor="middle" font-weight="normal" dominant-baseline="middle">30 pines</text>
+<rect x="482" y="540" width="36" height="36" fill="#2a2d33" stroke="#555"/>
+<text x="500" y="592" font-size="9" fill="#aab4c8" text-anchor="middle" font-weight="normal" dominant-baseline="middle">CH9102X</text>
+<rect x="440" y="648" width="20" height="20" rx="3" fill="#ccc" stroke="#777"/>
+<text x="450" y="638" font-size="9" fill="#c8d0e0" text-anchor="middle" font-weight="normal" dominant-baseline="middle">EN</text>
+<rect x="540" y="648" width="20" height="20" rx="3" fill="#ccc" stroke="#777"/>
+<text x="550" y="638" font-size="9" fill="#c8d0e0" text-anchor="middle" font-weight="normal" dominant-baseline="middle">BOOT</text>
+<rect x="475" y="670" width="50" height="26" rx="3" fill="#a0a4ab" stroke="#666"/>
+<text x="500" y="683" font-size="10" fill="#222" text-anchor="middle" font-weight="bold" dominant-baseline="middle">USB</text>
+<circle cx="376" cy="190" r="7" fill="#9a9a9a" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="190" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">EN</text>
+<text x="352" y="190" font-size="11" fill="#777" text-anchor="end" font-weight="normal" dominant-baseline="middle">reset</text>
+<circle cx="376" cy="222" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="222" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">VP·36</text>
+<text x="352" y="222" font-size="11" fill="#2ca02c" text-anchor="end" font-weight="normal" dominant-baseline="middle">ADC1</text>
+<circle cx="376" cy="254" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="254" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">VN·39</text>
+<text x="352" y="254" font-size="11" fill="#2ca02c" text-anchor="end" font-weight="normal" dominant-baseline="middle">ADC1</text>
+<circle cx="376" cy="286" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="286" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D34</text>
+<text x="352" y="286" font-size="11" fill="#2ca02c" text-anchor="end" font-weight="normal" dominant-baseline="middle">ADC1</text>
+<circle cx="376" cy="318" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="318" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D35</text>
+<text x="352" y="318" font-size="11" fill="#2ca02c" text-anchor="end" font-weight="normal" dominant-baseline="middle">ADC1</text>
+<circle cx="376" cy="350" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="350" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D32</text>
+<text x="352" y="350" font-size="11" fill="#2ca02c" text-anchor="end" font-weight="normal" dominant-baseline="middle">ADC1</text>
+<circle cx="376" cy="382" r="7" fill="#2ca02c" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="382" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D33</text>
+<text x="352" y="382" font-size="11" fill="#2ca02c" text-anchor="end" font-weight="normal" dominant-baseline="middle">ADC1</text>
+<circle cx="376" cy="414" r="7" fill="#9467bd" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="414" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D25</text>
+<text x="352" y="414" font-size="11" fill="#9467bd" text-anchor="end" font-weight="normal" dominant-baseline="middle">DAC1</text>
+<circle cx="376" cy="446" r="7" fill="#9467bd" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="446" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D26</text>
+<text x="352" y="446" font-size="11" fill="#9467bd" text-anchor="end" font-weight="normal" dominant-baseline="middle">DAC2</text>
+<circle cx="376" cy="478" r="7" fill="#b8860b" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="478" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold" dominant-baseline="middle">D27</text>
+<circle cx="376" cy="510" r="7" fill="#ffffff" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="510" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D14</text>
+<text x="352" y="510" font-size="11" fill="#777" text-anchor="end" font-weight="normal" dominant-baseline="middle">libre</text>
+<circle cx="376" cy="542" r="7" fill="#9a9a9a" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="542" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D12</text>
+<text x="352" y="542" font-size="11" fill="#777" text-anchor="end" font-weight="normal" dominant-baseline="middle">arranque</text>
+<circle cx="376" cy="574" r="7" fill="#ffffff" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="574" font-size="13" fill="#aab4c8" text-anchor="start" font-weight="normal" dominant-baseline="middle">D13</text>
+<text x="352" y="574" font-size="11" fill="#777" text-anchor="end" font-weight="normal" dominant-baseline="middle">libre</text>
+<circle cx="376" cy="606" r="7" fill="#222222" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="606" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold" dominant-baseline="middle">GND</text>
+<circle cx="376" cy="638" r="7" fill="#ff7f0e" stroke="#ffffff" stroke-width="2"/>
+<text x="390" y="638" font-size="13" fill="#ffffff" text-anchor="start" font-weight="bold" dominant-baseline="middle">VIN</text>
+<circle cx="624" cy="190" r="7" fill="#4a6fa5" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="190" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">D23</text>
+<text x="648" y="190" font-size="11" fill="#4a6fa5" text-anchor="start" font-weight="normal" dominant-baseline="middle">SPI</text>
+<circle cx="624" cy="222" r="7" fill="#17becf" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="222" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">D22</text>
+<circle cx="624" cy="254" r="7" fill="#9a9a9a" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="254" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">TX0</text>
+<text x="648" y="254" font-size="11" fill="#777" text-anchor="start" font-weight="normal" dominant-baseline="middle">USB</text>
+<circle cx="624" cy="286" r="7" fill="#9a9a9a" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="286" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">RX0</text>
+<text x="648" y="286" font-size="11" fill="#777" text-anchor="start" font-weight="normal" dominant-baseline="middle">USB</text>
+<circle cx="624" cy="318" r="7" fill="#1f77b4" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="318" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">D21</text>
+<circle cx="624" cy="350" r="7" fill="#4a6fa5" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="350" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">D19</text>
+<text x="648" y="350" font-size="11" fill="#4a6fa5" text-anchor="start" font-weight="normal" dominant-baseline="middle">SPI</text>
+<circle cx="624" cy="382" r="7" fill="#4a6fa5" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="382" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">D18</text>
+<text x="648" y="382" font-size="11" fill="#4a6fa5" text-anchor="start" font-weight="normal" dominant-baseline="middle">SPI</text>
+<circle cx="624" cy="414" r="7" fill="#4a6fa5" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="414" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">D5</text>
+<text x="648" y="414" font-size="11" fill="#4a6fa5" text-anchor="start" font-weight="normal" dominant-baseline="middle">SPI</text>
+<circle cx="624" cy="446" r="7" fill="#8c564b" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="446" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">TX2·17</text>
+<circle cx="624" cy="478" r="7" fill="#8c564b" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="478" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">RX2·16</text>
+<circle cx="624" cy="510" r="7" fill="#e377c2" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="510" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">D4</text>
+<circle cx="624" cy="542" r="7" fill="#9a9a9a" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="542" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">D2</text>
+<text x="648" y="542" font-size="11" fill="#777" text-anchor="start" font-weight="normal" dominant-baseline="middle">arranque</text>
+<circle cx="624" cy="574" r="7" fill="#9a9a9a" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="574" font-size="13" fill="#aab4c8" text-anchor="end" font-weight="normal" dominant-baseline="middle">D15</text>
+<text x="648" y="574" font-size="11" fill="#777" text-anchor="start" font-weight="normal" dominant-baseline="middle">arranque</text>
+<circle cx="624" cy="606" r="7" fill="#222222" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="606" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">GND</text>
+<circle cx="624" cy="638" r="7" fill="#d62728" stroke="#ffffff" stroke-width="2"/>
+<text x="610" y="638" font-size="13" fill="#ffffff" text-anchor="end" font-weight="bold" dominant-baseline="middle">3V3</text>
+<rect x="790" y="130" width="160" height="150" rx="8" fill="#f4f6f8" stroke="#555" stroke-width="1.5"/>
+<text x="870.0" y="148" font-size="13" fill="#111" text-anchor="middle" font-weight="bold" dominant-baseline="middle">Display OLED 1.3"</text>
+<text x="870.0" y="266" font-size="11" fill="#555" text-anchor="middle" font-weight="normal" dominant-baseline="middle">SH1106 · I2C 0x3C</text>
+<rect x="832" y="164" width="76" height="84" rx="4" fill="#000"/>
+<rect x="843" y="188" width="22" height="30" rx="7" fill="#fff"/>
+<rect x="875" y="188" width="22" height="30" rx="7" fill="#fff"/>
+<rect x="786" y="176" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="798" y="180" font-size="11" fill="#111" text-anchor="start" font-weight="bold" dominant-baseline="middle">SCL</text>
+<rect x="786" y="226" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="798" y="230" font-size="11" fill="#111" text-anchor="start" font-weight="bold" dominant-baseline="middle">SDA</text>
+<rect x="946" y="176" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="942" y="180" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">VCC</text>
+<rect x="946" y="226" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="942" y="230" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">GND</text>
+<rect x="790" y="348" width="160" height="44" rx="8" fill="#f4f6f8" stroke="#555" stroke-width="1.5"/>
+<circle cx="880.0" cy="370" r="11" fill="#d33" stroke="#822" stroke-width="2"/>
+<text x="802" y="370" font-size="12" fill="#111" text-anchor="start" font-weight="bold" dominant-baseline="middle">Botón 2</text>
+<rect x="786" y="366" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<rect x="946" y="366" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<rect x="790" y="456" width="160" height="44" rx="8" fill="#f4f6f8" stroke="#555" stroke-width="1.5"/>
+<circle cx="880.0" cy="478" r="11" fill="#d33" stroke="#822" stroke-width="2"/>
+<text x="802" y="478" font-size="12" fill="#111" text-anchor="start" font-weight="bold" dominant-baseline="middle">Botón 1</text>
+<rect x="786" y="474" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<rect x="946" y="474" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<rect x="790" y="515" width="160" height="120" rx="8" fill="#f4f6f8" stroke="#555" stroke-width="1.5"/>
+<text x="870.0" y="533" font-size="13" fill="#111" text-anchor="middle" font-weight="bold" dominant-baseline="middle">DHT22 / AM2302</text>
+<text x="870.0" y="621" font-size="11" fill="#555" text-anchor="middle" font-weight="normal" dominant-baseline="middle">temperatura y humedad</text>
+<rect x="828" y="541" width="40" height="8" rx="2" fill="#dfe5ea" stroke="#9aa"/>
+<rect x="828" y="555" width="40" height="8" rx="2" fill="#dfe5ea" stroke="#9aa"/>
+<rect x="828" y="569" width="40" height="8" rx="2" fill="#dfe5ea" stroke="#9aa"/>
+<rect x="828" y="583" width="40" height="8" rx="2" fill="#dfe5ea" stroke="#9aa"/>
+<rect x="786" y="581" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="798" y="585" font-size="11" fill="#111" text-anchor="start" font-weight="bold" dominant-baseline="middle">DATA</text>
+<rect x="946" y="561" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="942" y="565" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">VCC (+)</text>
+<rect x="946" y="601" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="942" y="605" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">GND (−)</text>
+<rect x="70" y="438" width="180" height="230" rx="8" fill="#f4f6f8" stroke="#555" stroke-width="1.5"/>
+<text x="160.0" y="456" font-size="13" fill="#111" text-anchor="middle" font-weight="bold" dominant-baseline="middle">Sensor PIR</text>
+<text x="160.0" y="654" font-size="11" fill="#555" text-anchor="middle" font-weight="normal" dominant-baseline="middle">HC-SR501</text>
+<circle cx="150" cy="548" r="38" fill="#fafafa" stroke="#aaa" stroke-width="2"/>
+<circle cx="150" cy="548" r="27" fill="none" stroke="#ccc" stroke-width="1.5"/>
+<circle cx="150" cy="548" r="16" fill="none" stroke="#ccc" stroke-width="1.5"/>
+<circle cx="150" cy="548" r="5" fill="none" stroke="#ccc" stroke-width="1.5"/>
+<rect x="246" y="474" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="242" y="478" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">OUT</text>
+<rect x="246" y="602" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="242" y="606" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">GND</text>
+<rect x="246" y="634" width="8" height="8" fill="#c9a227" stroke="#7a6212"/>
+<text x="242" y="638" font-size="11" fill="#111" text-anchor="end" font-weight="bold" dominant-baseline="middle">VCC (5V)</text>
+<text x="997" y="716" font-size="12" fill="#d62728" text-anchor="end" font-weight="bold" dominant-baseline="middle">3V3</text>
+<text x="969" y="670" font-size="12" fill="#222222" text-anchor="end" font-weight="bold" dominant-baseline="middle">GND</text>
+<text x="305" y="626" font-size="10" fill="#ff7f0e" text-anchor="middle" font-weight="normal" dominant-baseline="middle">VIN = 5V del USB</text>
+<line x1="20" y1="725" x2="1020" y2="725" stroke="#ddd"/>
+<circle cx="30" cy="745" r="7" fill="#d62728" stroke="#666" stroke-width="1"/>
+<text x="44" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">3V3</text>
+<circle cx="155" cy="745" r="7" fill="#ff7f0e" stroke="#666" stroke-width="1"/>
+<text x="169" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">5V (VIN)</text>
+<circle cx="280" cy="745" r="7" fill="#222222" stroke="#666" stroke-width="1"/>
+<text x="294" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">GND</text>
+<circle cx="405" cy="745" r="7" fill="#1f77b4" stroke="#666" stroke-width="1"/>
+<text x="419" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">SDA display</text>
+<circle cx="530" cy="745" r="7" fill="#17becf" stroke="#666" stroke-width="1"/>
+<text x="544" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">SCL display</text>
+<circle cx="655" cy="745" r="7" fill="#b8860b" stroke="#666" stroke-width="1"/>
+<text x="669" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">PIR</text>
+<circle cx="780" cy="745" r="7" fill="#e377c2" stroke="#666" stroke-width="1"/>
+<text x="794" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">DHT22</text>
+<circle cx="905" cy="745" r="7" fill="#8c564b" stroke="#666" stroke-width="1"/>
+<text x="919" y="745" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">Botones</text>
+<circle cx="30" cy="775" r="7" fill="#2ca02c" stroke="#666" stroke-width="1"/>
+<text x="44" y="775" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">ADC1: reservado entrada de audio (funciona con WiFi)</text>
+<circle cx="424" cy="775" r="7" fill="#9467bd" stroke="#666" stroke-width="1"/>
+<text x="438" y="775" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">DAC: reservado salida de audio</text>
+<circle cx="30" cy="805" r="7" fill="#4a6fa5" stroke="#666" stroke-width="1"/>
+<text x="44" y="805" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">SPI: reservado (tarjeta SD / I2S)</text>
+<circle cx="291" cy="805" r="7" fill="#ffffff" stroke="#666" stroke-width="1"/>
+<text x="305" y="805" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">libre</text>
+<circle cx="356" cy="805" r="7" fill="#9a9a9a" stroke="#666" stroke-width="1"/>
+<text x="370" y="805" font-size="12" fill="#222" text-anchor="start" font-weight="normal" dominant-baseline="middle">no usar: USB, reset o arranque</text>
+<text x="30" y="840" font-size="12" fill="#555" text-anchor="start" font-weight="normal" dominant-baseline="middle">Las líneas que se cruzan con un "saltito" NO están conectadas. Los puntos indican unión.</text>
+</svg>

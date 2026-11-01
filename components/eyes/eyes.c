@@ -35,6 +35,7 @@ typedef struct {
     float espiral;            // 0 = ojos normales, 1 = ojos en espiral (mareado)
     float giro;               // cuánto giró la espiral
     float lagrima;            // 0 a 1: por dónde va cayendo la lágrima
+    float zzz;                // 0 a 1: por dónde va subiendo la "Z" cuando duerme
 } cara_t;
 
 static const cara_t CARA_NORMAL = {
@@ -121,6 +122,15 @@ static void dibujar_ojo(float cx, float cy, float ancho, float alto, float abre,
     }
 }
 
+// Una letra Z de tamaño s, con la esquina de arriba a la izquierda en (x, y)
+static void dibujar_z(int x, int y, int s)
+{
+    display_fill_rect(x, y, s, 2, true);             // raya de arriba
+    display_fill_rect(x, y + s - 2, s, 2, true);     // raya de abajo
+    for (int k = 0; k < s; k++)                      // diagonal
+        display_fill_rect(x + s - 1 - k, y + k, 2, 1, true);
+}
+
 static void dibujar(void)
 {
     // Perspectiva: el ojo del lado hacia donde mira se ve un poquito más grande
@@ -133,6 +143,15 @@ static void dibujar(void)
     display_clear();
     dibujar_ojo(cx_izq, cy, cara.ancho, cara.alto * (1 - p), cara.abre_izq, -1);
     dibujar_ojo(cx_der, cy, cara.ancho, cara.alto * (1 + p), cara.abre_der, +1);
+
+    // "Z" que sube y crece desde arriba del ojo derecho
+    if (cara.zzz > 0.01f && cara.zzz < 0.99f) {
+        int s  = 4 + (int)(6 * cara.zzz);
+        int zx = (int)(cx_der + cara.ancho / 2 + 2 + 8 * cara.zzz);
+        int zy = (int)(cy - 6 - 22 * cara.zzz);
+        dibujar_z(zx, zy, s);
+    }
+
     display_flush();
 }
 
@@ -162,6 +181,7 @@ static void animar(cara_t destino, int ms)
         cara.espiral  = mezclar(inicio.espiral,  destino.espiral,  t);
         cara.giro     = mezclar(inicio.giro,     destino.giro,     t);
         cara.lagrima  = mezclar(inicio.lagrima,  destino.lagrima,  t);
+        cara.zzz      = mezclar(inicio.zzz,      destino.zzz,      t);
 
         dibujar();
         xTaskDelayUntil(&ultimo, pdMS_TO_TICKS(CUADRO_MS));
@@ -409,6 +429,54 @@ void eyes_init(void)
 {
     cara = CARA_NORMAL;
     dibujar();
+}
+
+// ─── Dormir ──────────────────────────────────────────────────────────────────
+
+void eyes_dormirse(void)
+{
+    ESP_LOGI(TAG, "Me voy a dormir... zzz");
+    cara_t d = CARA_NORMAL;
+    d.y = 4;
+    d.abre_izq = d.abre_der = 0.3f;
+    animar(d, 1200);                 // se le van cerrando los ojos
+    d.abre_izq = d.abre_der = 0;
+    animar(d, 800);
+}
+
+void eyes_dormido(void)
+{
+    // Respira: los ojos cerrados suben y bajan mientras sube una "Z"
+    static bool inspira = true;
+    cara_t d = cara;
+    d.abre_izq = d.abre_der = 0;
+    d.y = inspira ? 2 : 5;
+
+    if (inspira) {
+        cara.zzz = 0;
+        d.zzz = 1;
+    } else {
+        d.zzz = 0;
+    }
+    animar(d, 1200);
+    cara.zzz = 0;
+    inspira = !inspira;
+}
+
+void eyes_despertar(void)
+{
+    ESP_LOGI(TAG, "¡Me desperté!");
+    cara.zzz = 0;
+    animar(CARA_NORMAL, 120);
+    juego_doble_parpadeo();
+}
+
+void eyes_saludar(void)
+{
+    ESP_LOGI(TAG, "¡Hola! Saludando");
+    animar(CARA_NORMAL, 150);   // deja lo que estaba haciendo y mira al frente
+    juego_sorpresa();
+    juego_contento();
 }
 
 void eyes_jugar(void)

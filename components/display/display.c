@@ -1,5 +1,6 @@
 #include "display.h"
 #include "board_config.h"
+#include "font5x7.h"
 
 #include <string.h>
 #include "driver/i2c_master.h"
@@ -31,6 +32,8 @@ void display_init(void)
 
     esp_lcd_panel_io_handle_t io = NULL;
     esp_lcd_panel_io_i2c_config_t io_cfg = ESP_SH1106_DEFAULT_IO_CONFIG;
+    io_cfg.dev_addr     = DISPLAY_I2C_ADDR;
+    io_cfg.scl_speed_hz = I2C_FRECUENCIA_HZ;
     ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c(bus, &io_cfg, &io));
 
     esp_lcd_panel_sh1106_config_t sh1106_cfg = {};
@@ -128,4 +131,119 @@ void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool 
                 display_set_pixel(x, y, on);
         }
     }
+}
+
+// ─── Texto ────────────────────────────────────────────────────────────────────
+
+#define SEPARACION_LETRAS 1   // columnas vacías entre letra y letra
+#define SEPARACION_RENGLON 2  // filas vacías entre renglón y renglón
+
+// Caracteres especiales (fuera del ASCII)
+#define GLIFO_ABRE_EXCLAMACION   1   // ¡
+#define GLIFO_ABRE_PREGUNTA      2   // ¿
+
+// Lee el próximo caracter del texto (entiende UTF-8 para ¡ y ¿) y avanza el puntero
+static int proximo_caracter(const char **p)
+{
+    const unsigned char *s = (const unsigned char *)*p;
+    if (*s == 0) return 0;
+
+    if (*s < 0x80) {             // ASCII común
+        (*p)++;
+        return *s;
+    }
+    if (s[0] == 0xC2 && s[1] == 0xA1) { *p += 2; return GLIFO_ABRE_EXCLAMACION; }
+    if (s[0] == 0xC2 && s[1] == 0xBF) { *p += 2; return GLIFO_ABRE_PREGUNTA; }
+
+    // Otro caracter UTF-8 que no tenemos: lo salteamos entero y dibujamos '?'
+    (*p)++;
+    while ((**p & 0xC0) == 0x80) (*p)++;
+    return '?';
+}
+
+// Devuelve las 5 columnas de un caracter
+static void columnas_de(int c, uint8_t col[FONT_ANCHO])
+{
+    bool dar_vuelta = false;
+    if (c == GLIFO_ABRE_EXCLAMACION) { c = '!'; dar_vuelta = true; }
+    if (c == GLIFO_ABRE_PREGUNTA)    { c = '?'; dar_vuelta = true; }
+    if (c < FONT_PRIMERO || c > FONT_ULTIMO) c = '?';
+
+    for (int i = 0; i < FONT_ANCHO; i++) {
+        uint8_t b = font5x7[c - FONT_PRIMERO][i];
+        if (dar_vuelta) {        // ¡ y ¿ son ! y ? patas para arriba
+            uint8_t r = 0;
+            for (int k = 0; k < FONT_ALTO; k++)
+                if (b & (1 << k)) r |= 1 << (FONT_ALTO - 1 - k);
+            b = r;
+        }
+        col[i] = b;
+    }
+}
+
+static void dibujar_caracter(int x, int y, int c, int escala, bool on)
+{
+    uint8_t col[FONT_ANCHO];
+    columnas_de(c, col);
+    for (int i = 0; i < FONT_ANCHO; i++)
+        for (int k = 0; k < FONT_ALTO; k++)
+            if (col[i] & (1 << k))
+                display_fill_rect(x + i * escala, y + k * escala, escala, escala, on);
+}
+
+// Ancho del renglón que empieza en p (hasta '\n' o fin)
+static int ancho_renglon(const char *p, int escala)
+{
+    int letras = 0;
+    int c;
+    while ((c = proximo_caracter(&p)) != 0 && c != '\n') letras++;
+    if (letras == 0) return 0;
+    return (letras * (FONT_ANCHO + SEPARACION_LETRAS) - SEPARACION_LETRAS) * escala;
+}
+
+int display_text_width(const char *texto, int escala)
+{
+    int max = 0;
+    const char *p = texto;
+    while (1) {
+        int w = ancho_renglon(p, escala);
+        if (w > max) max = w;
+        const char *salto = strchr(p, '\n');
+        if (!salto) break;
+        p = salto + 1;
+    }
+    return max;
+}
+
+static void dibujar_texto(int x, int y, const char *texto, int escala, bool on, bool centrado)
+{
+    const char *p = texto;
+    int alto_renglon = (FONT_ALTO + SEPARACION_RENGLON) * escala;
+    int cx = centrado ? (LCD_H_RES - ancho_renglon(p, escala)) / 2 : x;
+    int c;
+
+    while ((c = proximo_caracter(&p)) != 0) {
+        if (c == '\n') {
+            y += alto_renglon;
+            cx = centrado ? (LCD_H_RES - ancho_renglon(p, escala)) / 2 : x;
+            continue;
+        }
+        dibujar_caracter(cx, y, c, escala, on);
+        cx += (FONT_ANCHO + SEPARACION_LETRAS) * escala;
+    }
+}
+
+void display_draw_text(int x, int y, const char *texto, int escala, bool on)
+{
+    dibujar_texto(x, y, texto, escala, on, false);
+}
+
+void display_draw_text_centered(const char *texto, int escala, bool on)
+{
+    int renglones = 1;
+    for (const char *p = texto; *p; p++)
+        if (*p == '\n') renglones++;
+
+    int alto = (renglones * (FONT_ALTO + SEPARACION_RENGLON) - SEPARACION_RENGLON) * escala;
+    dibujar_texto(0, (LCD_V_RES - alto) / 2, texto, escala, on, true);
 }

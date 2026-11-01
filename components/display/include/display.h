@@ -19,4 +19,15 @@ void display_fill_circle(int cx, int cy, int r, bool on);
 // Triángulo relleno con esquinas en (x0,y0), (x1,y1), (x2,y2)
 void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool on);
 
+// ─── Texto ────────────────────────────────────────────────────────────────────
+// Letras de 5x7 píxeles. "escala" las agranda: 1 = chiquitas, 2 = el doble...
+// Acepta '\n' para cambiar de renglón y los signos ¡ y ¿.
+
+// Escribe el texto con la esquina de arriba a la izquierda en (x, y)
+void display_draw_text(int x, int y, const char *texto, int escala, bool on);
+// Escribe el texto centrado en la pantalla (cada renglón centrado)
+void display_draw_text_centered(const char *texto, int escala, bool on);
+// Ancho en píxeles del renglón más largo
+int  display_text_width(const char *texto, int escala);
+
 #endif // DISPLAY_H

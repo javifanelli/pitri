@@ -12,6 +12,6 @@ dependencies:
     version: 1.0.2
 direct_dependencies:
 - tny-robotics/sh1106-esp-idf
-manifest_hash: 99b37ebbc2d31775630d003ed327458b5d58b1546ced1c85d074e1fff5423d7f
+manifest_hash: ed6fb5ccabfd4b249ac578599dd671a2c95fa2306b1c483ef320bf9a1cd57013
 target: esp32
 version: 3.0.0
