@@ -30,6 +30,11 @@ typedef struct {
     float ancho, alto;        // tamaño de cada ojo
     float abre_izq, abre_der; // 0 = cerrado, 1 = abierto
     float feliz;              // 0 = normal, 1 = ojitos felices ^ ^
+    float enojo;              // 0 = normal, 1 = re enojado (cejas hacia adentro)
+    float triste;             // 0 = normal, 1 = re triste (cejas hacia afuera)
+    float espiral;            // 0 = ojos normales, 1 = ojos en espiral (mareado)
+    float giro;               // cuánto giró la espiral
+    float lagrima;            // 0 a 1: por dónde va cayendo la lágrima
 } cara_t;
 
 static const cara_t CARA_NORMAL = {
@@ -52,19 +57,67 @@ static void esperar(int ms)
     vTaskDelay(pdMS_TO_TICKS(ms));
 }
 
-static void dibujar_ojo(float cx, float cy, float ancho, float alto, float abre, float feliz)
+// Espiral que gira, para cuando Pitri está mareado
+static void dibujar_espiral(float cx, float cy, float radio, float giro)
 {
+    const float vueltas = 2.5f;
+    const float fin = vueltas * 2 * (float)M_PI;
+    for (float a = 0; a < fin; a += 0.05f) {
+        float r = radio * a / fin;
+        int px = (int)(cx + r * cosf(a + giro));
+        int py = (int)(cy + r * sinf(a + giro));
+        display_fill_rect(px, py, 2, 2, true);   // trazo de 2 píxeles de grosor
+    }
+}
+
+// Una gotita: círculo abajo y punta arriba
+static void dibujar_lagrima(int x, int y)
+{
+    display_fill_circle(x, y, 3, true);
+    display_fill_triangle(x - 3, y, x + 3, y, x, y - 7, true);
+}
+
+// lado: -1 = ojo izquierdo, +1 = ojo derecho
+static void dibujar_ojo(float cx, float cy, float ancho, float alto, float abre, int lado)
+{
+    if (cara.espiral > 0.5f) {
+        dibujar_espiral(cx, cy, fminf(ancho, alto) / 2 - 1, cara.giro);
+        return;
+    }
+
     int h = (int)(OJO_ALTO_CERRADO + (alto - OJO_ALTO_CERRADO) * abre);
     int w = (int)ancho;
     int x = (int)(cx - w / 2.0f);
     int y = (int)(cy - h / 2.0f);
+    int x_adentro = (lado < 0) ? x + w + 2 : x - 2;   // el borde que da a la nariz
+    int x_afuera  = (lado < 0) ? x - 2     : x + w + 2;
 
     display_fill_round_rect(x, y, w, h, OJO_RADIO, true);
 
     // Ojitos felices: tapamos la parte de abajo con una "loma" negra
-    if (feliz > 0.01f && h > OJO_ALTO_CERRADO) {
-        int tapa = (int)(h * 0.6f * feliz);
+    if (cara.feliz > 0.01f && h > OJO_ALTO_CERRADO) {
+        int tapa = (int)(h * 0.6f * cara.feliz);
         display_fill_round_rect(x - 4, y + h - tapa, w + 8, h, (w + 8) / 2, false);
+    }
+
+    // Enojado: un triángulo negro corta la esquina de arriba que da a la nariz
+    if (cara.enojo > 0.01f) {
+        int baja = (int)(h * 0.55f * cara.enojo);
+        display_fill_triangle(x_afuera, y - 2, x_adentro, y - 2, x_adentro, y + baja, false);
+    }
+
+    // Triste: el triángulo corta la esquina de arriba del lado de afuera
+    if (cara.triste > 0.01f) {
+        int baja = (int)(h * 0.5f * cara.triste);
+        display_fill_triangle(x_adentro, y - 2, x_afuera, y - 2, x_afuera, y + baja, false);
+    }
+
+    // Lágrima cayendo desde abajo del ojo hasta salir de la pantalla
+    if (cara.lagrima > 0.01f && cara.lagrima < 0.99f) {
+        int lx = (int)(cx + lado * w * 0.25f);
+        int desde = y + h + 6;
+        int hasta = LCD_V_RES + 8;
+        dibujar_lagrima(lx, desde + (int)((hasta - desde) * cara.lagrima));
     }
 }
 
@@ -78,8 +131,8 @@ static void dibujar(void)
     float cx_der = LCD_H_RES / 2.0f + OJO_SEPARACION / 2.0f + cara.ancho / 2.0f + cara.x;
 
     display_clear();
-    dibujar_ojo(cx_izq, cy, cara.ancho, cara.alto * (1 - p), cara.abre_izq, cara.feliz);
-    dibujar_ojo(cx_der, cy, cara.ancho, cara.alto * (1 + p), cara.abre_der, cara.feliz);
+    dibujar_ojo(cx_izq, cy, cara.ancho, cara.alto * (1 - p), cara.abre_izq, -1);
+    dibujar_ojo(cx_der, cy, cara.ancho, cara.alto * (1 + p), cara.abre_der, +1);
     display_flush();
 }
 
@@ -104,6 +157,11 @@ static void animar(cara_t destino, int ms)
         cara.abre_izq = mezclar(inicio.abre_izq, destino.abre_izq, t);
         cara.abre_der = mezclar(inicio.abre_der, destino.abre_der, t);
         cara.feliz    = mezclar(inicio.feliz,    destino.feliz,    t);
+        cara.enojo    = mezclar(inicio.enojo,    destino.enojo,    t);
+        cara.triste   = mezclar(inicio.triste,   destino.triste,   t);
+        cara.espiral  = mezclar(inicio.espiral,  destino.espiral,  t);
+        cara.giro     = mezclar(inicio.giro,     destino.giro,     t);
+        cara.lagrima  = mezclar(inicio.lagrima,  destino.lagrima,  t);
 
         dibujar();
         xTaskDelayUntil(&ultimo, pdMS_TO_TICKS(CUADRO_MS));
@@ -254,6 +312,74 @@ static void juego_pasear(void)
     mover_a(0, 0, 400);
 }
 
+// Se marea: los ojos se vuelven espirales que giran y la cabeza se bambolea
+static void juego_mareado(void)
+{
+    cara_t d = CARA_NORMAL;
+    d.espiral = 1;
+    animar(d, 60);
+
+    for (int i = 0; i < 30; i++) {
+        d.giro += 0.9f;                       // la espiral sigue girando
+        d.x = 8 * cosf(i * 0.5f);             // y la cara da vueltitas
+        d.y = 5 * sinf(i * 0.5f);
+        animar(d, 60);
+    }
+
+    // Vuelve en sí: cierra los ojos, sacude la cabeza y los abre normales
+    cara = CARA_NORMAL;
+    cara.abre_izq = cara.abre_der = 0;
+    dibujar();
+    for (int i = 0; i < 2; i++) {
+        mover_a(-6, 0, 90);
+        mover_a(6, 0, 90);
+    }
+    animar(CARA_NORMAL, 200);
+    juego_doble_parpadeo();
+}
+
+// Se enoja: cejas para adentro y tiembla de bronca
+static void juego_enojado(void)
+{
+    cara_t d = CARA_NORMAL;
+    d.enojo = 1;
+    d.abre_izq = d.abre_der = 0.8f;
+    d.y = 2;
+    animar(d, 250);
+
+    for (int i = 0; i < 6; i++) {
+        mover_a(-3, 2, 50);
+        mover_a(3, 2, 50);
+    }
+    mover_a(0, 2, 50);
+    esperar(azar(800, 1500));
+    animar(CARA_NORMAL, 300);
+}
+
+// Se pone triste y le caen lágrimas
+static void juego_llorar(void)
+{
+    cara_t d = CARA_NORMAL;
+    d.triste = 1;
+    d.abre_izq = d.abre_der = 0.75f;
+    d.y = 3;
+    animar(d, 400);
+
+    int lagrimas = azar(2, 4);
+    for (int i = 0; i < lagrimas; i++) {
+        cara.lagrima = 0;
+        d.lagrima = 1;
+        animar(d, 700);
+        d.lagrima = 0;
+        mover_a(0, 1, 100);                   // un sollozo
+        mover_a(0, 3, 100);
+    }
+
+    cara.lagrima = 0;
+    esperar(500);
+    animar(CARA_NORMAL, 400);
+}
+
 typedef struct {
     const char *nombre;
     void (*hacer)(void);
@@ -271,6 +397,9 @@ static const juego_t juegos[] = {
     { "sospecha",       juego_sospecha,        1 },
     { "sueño",          juego_sueno,           1 },
     { "pasear",         juego_pasear,          2 },
+    { "mareado",        juego_mareado,         1 },
+    { "enojado",        juego_enojado,         1 },
+    { "llorar",         juego_llorar,          1 },
 };
 #define CANT_JUEGOS ((int)(sizeof(juegos) / sizeof(juegos[0])))
 

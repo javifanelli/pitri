@@ -96,3 +96,36 @@ void display_fill_round_rect(int x, int y, int w, int h, int r, bool on)
             display_set_pixel(i, y + j, on);
     }
 }
+
+void display_fill_circle(int cx, int cy, int r, bool on)
+{
+    for (int j = -r; j <= r; j++)
+        for (int i = -r; i <= r; i++)
+            if (i * i + j * j <= r * r)
+                display_set_pixel(cx + i, cy + j, on);
+}
+
+// Dice de qué lado de la línea (a→b) queda el punto p
+static int lado_de_linea(int ax, int ay, int bx, int by, int px, int py)
+{
+    return (bx - ax) * (py - ay) - (by - ay) * (px - ax);
+}
+
+void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool on)
+{
+    int min_x = x0 < x1 ? (x0 < x2 ? x0 : x2) : (x1 < x2 ? x1 : x2);
+    int max_x = x0 > x1 ? (x0 > x2 ? x0 : x2) : (x1 > x2 ? x1 : x2);
+    int min_y = y0 < y1 ? (y0 < y2 ? y0 : y2) : (y1 < y2 ? y1 : y2);
+    int max_y = y0 > y1 ? (y0 > y2 ? y0 : y2) : (y1 > y2 ? y1 : y2);
+
+    // Un punto está adentro si queda del mismo lado de las tres líneas
+    for (int y = min_y; y <= max_y; y++) {
+        for (int x = min_x; x <= max_x; x++) {
+            int a = lado_de_linea(x0, y0, x1, y1, x, y);
+            int b = lado_de_linea(x1, y1, x2, y2, x, y);
+            int c = lado_de_linea(x2, y2, x0, y0, x, y);
+            if ((a >= 0 && b >= 0 && c >= 0) || (a <= 0 && b <= 0 && c <= 0))
+                display_set_pixel(x, y, on);
+        }
+    }
+}
