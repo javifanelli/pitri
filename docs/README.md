@@ -1,8 +1,16 @@
-# Pitri — Documentación del hardware
+# Pitri — Documentación
 
-- **[CONEXIONES.md](CONEXIONES.md)**: dibujo de cómo se conecta todo, por qué se eligió cada pin y qué pines quedan reservados.
-- En el código, los pines están en
-  [`components/board_config/include/board_config.h`](../components/board_config/include/board_config.h).
+| Documento | Para quién | Qué tiene |
+|---|---|---|
+| [README principal](../README.md) | Todos | Qué es Pitri y qué sabe hacer |
+| [COMO_FUNCIONA.md](COMO_FUNCIONA.md) | Chicos (con partes para grandes) | Cómo dibuja, se mueve, ve y siente |
+| [NUEVO_JUEGO.md](NUEVO_JUEGO.md) | Chicos | Paso a paso para inventar un juego |
+| [CONEXIONES.md](CONEXIONES.md) | Todos | Dibujo de los cables y por qué se eligió cada pin |
+| [PARA_GRANDES.md](PARA_GRANDES.md) | Grandes | Organización del código, compilar, agregar cosas |
+| [DIARIO.md](DIARIO.md) | Todos | Lo que fuimos haciendo y aprendiendo |
+
+En el código, los pines están en
+[`components/board_config/include/board_config.h`](../components/board_config/include/board_config.h).
 
 ## Datasheets
 
