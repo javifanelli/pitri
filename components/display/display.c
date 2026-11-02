@@ -8,6 +8,7 @@
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_sh1106.h"
 #include "esp_log.h"
+#include "esp_timer.h"
 
 static const char *TAG = "DISPLAY";
 
@@ -19,6 +20,11 @@ static uint8_t framebuffer[LCD_H_RES * LCD_V_RES / 8];
 void display_init(void)
 {
     ESP_LOGI(TAG, "Inicializando I2C y SH1106...");
+
+    // El driver escribe 2 líneas por cada cuadro que falla; nosotros
+    // hacemos un resumen en display_flush(), así que lo callamos.
+    esp_log_level_set("lcd_panel.io.i2c", ESP_LOG_NONE);
+    esp_log_level_set("lcd_panel.sh1106", ESP_LOG_NONE);
     i2c_master_bus_config_t i2c_cfg = {
         .clk_source        = I2C_CLK_SRC_DEFAULT,
         .i2c_port          = I2C_HOST,
@@ -56,9 +62,71 @@ void display_clear(void)
     memset(framebuffer, 0, sizeof(framebuffer));
 }
 
+// ─── Manejo de errores de comunicación ────────────────────────────────────────
+#define FALLOS_SEGUIDOS_PARA_REINICIAR 10     // ~0,3 s de cuadros fallidos
+#define RESUMEN_ERRORES_CADA_US        (5 * 1000 * 1000)
+
+static int     fallos_seguidos = 0;
+static int     fallos_desde_resumen = 0;
+static int     reinicios = 0;
+static int64_t ultimo_resumen_us = 0;
+
+// Si el display deja de contestar, lo reinicializamos (por si se le
+// desordenó la configuración por un corte o un falso contacto)
+static void reiniciar_panel(void)
+{
+    reinicios++;
+    ESP_LOGW(TAG, "El display no responde: reiniciándolo (vez %d)", reinicios);
+    if (esp_lcd_panel_reset(panel) == ESP_OK &&
+        esp_lcd_panel_init(panel) == ESP_OK &&
+        esp_lcd_panel_disp_on_off(panel, true) == ESP_OK) {
+        ESP_LOGI(TAG, "Display reiniciado");
+    }
+}
+
+#if DISPLAY_ROTAR_180
+// Da vuelta los 8 bits de un byte (el de arriba pasa a ser el de abajo)
+static uint8_t invertir_bits(uint8_t b)
+{
+    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+    return b;
+}
+
+// Girar 180° es lo mismo que leer el framebuffer de atrás para adelante
+// y dar vuelta cada columna de 8 píxeles
+static uint8_t girado[sizeof(framebuffer)];
+#endif
+
 void display_flush(void)
 {
-    esp_lcd_panel_draw_bitmap(panel, 0, 0, LCD_H_RES, LCD_V_RES, framebuffer);
+#if DISPLAY_ROTAR_180
+    for (int i = 0; i < sizeof(framebuffer); i++)
+        girado[sizeof(framebuffer) - 1 - i] = invertir_bits(framebuffer[i]);
+    const uint8_t *enviar = girado;
+#else
+    const uint8_t *enviar = framebuffer;
+#endif
+
+    esp_err_t err = esp_lcd_panel_draw_bitmap(panel, 0, 0, LCD_H_RES, LCD_V_RES, enviar);
+
+    if (err == ESP_OK) {
+        fallos_seguidos = 0;
+    } else {
+        fallos_seguidos++;
+        fallos_desde_resumen++;
+        if (fallos_seguidos == FALLOS_SEGUIDOS_PARA_REINICIAR) reiniciar_panel();
+    }
+
+    // En vez de una línea por cada error, un resumen cada 5 segundos
+    int64_t ahora = esp_timer_get_time();
+    if (fallos_desde_resumen > 0 && ahora - ultimo_resumen_us >= RESUMEN_ERRORES_CADA_US) {
+        ESP_LOGW(TAG, "%d cuadros no se pudieron enviar por I2C en los últimos segundos "
+                      "(revisar cables SDA/SCL/GND/3V3)", fallos_desde_resumen);
+        fallos_desde_resumen = 0;
+        ultimo_resumen_us = ahora;
+    }
 }
 
 void display_set_pixel(int x, int y, bool on)
@@ -141,6 +209,9 @@ void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool 
 // Caracteres especiales (fuera del ASCII)
 #define GLIFO_ABRE_EXCLAMACION   1   // ¡
 #define GLIFO_ABRE_PREGUNTA      2   // ¿
+#define GLIFO_GRADO              3   // °
+
+static const uint8_t columnas_grado[FONT_ANCHO] = {0x06, 0x09, 0x09, 0x06, 0x00};
 
 // Lee el próximo caracter del texto (entiende UTF-8 para ¡ y ¿) y avanza el puntero
 static int proximo_caracter(const char **p)
@@ -154,6 +225,7 @@ static int proximo_caracter(const char **p)
     }
     if (s[0] == 0xC2 && s[1] == 0xA1) { *p += 2; return GLIFO_ABRE_EXCLAMACION; }
     if (s[0] == 0xC2 && s[1] == 0xBF) { *p += 2; return GLIFO_ABRE_PREGUNTA; }
+    if (s[0] == 0xC2 && s[1] == 0xB0) { *p += 2; return GLIFO_GRADO; }
 
     // Otro caracter UTF-8 que no tenemos: lo salteamos entero y dibujamos '?'
     (*p)++;
@@ -164,6 +236,11 @@ static int proximo_caracter(const char **p)
 // Devuelve las 5 columnas de un caracter
 static void columnas_de(int c, uint8_t col[FONT_ANCHO])
 {
+    if (c == GLIFO_GRADO) {
+        memcpy(col, columnas_grado, FONT_ANCHO);
+        return;
+    }
+
     bool dar_vuelta = false;
     if (c == GLIFO_ABRE_EXCLAMACION) { c = '!'; dar_vuelta = true; }
     if (c == GLIFO_ABRE_PREGUNTA)    { c = '?'; dar_vuelta = true; }

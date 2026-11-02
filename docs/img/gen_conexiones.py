@@ -175,7 +175,7 @@ for y, name in ((B2_Y, 'Botón 2'), (B1_Y, 'Botón 1')):
     text(PX0 + 12, y, name, 12, '#111', 'start', 'bold')
     pad(PX0, y); pad(PX1, y)
 
-box(PX0, DATA_Y - 70, PX1, DATA_Y + 50, 'DHT22 / AM2302', 'temperatura y humedad')
+box(PX0, DATA_Y - 70, PX1, DATA_Y + 50, 'DHT11', 'temperatura y humedad')
 for k in range(4):
     a(f'<rect x="828" y="{DATA_Y - 44 + k * 14}" width="40" height="8" rx="2" fill="#dfe5ea" stroke="#9aa"/>')
 pad(PX0, DATA_Y); text(PX0 + 8, DATA_Y, 'DATA', 11, '#111', 'start', 'bold')
@@ -199,7 +199,7 @@ ly = BOT_3V3 + 45
 a(f'<line x1="20" y1="{ly - 20}" x2="{W - 20}" y2="{ly - 20}" stroke="#ddd"/>')
 rows = [
     [('v33', '3V3'), ('v5', '5V (VIN)'), ('gnd', 'GND'), ('sda', 'SDA display'),
-     ('scl', 'SCL display'), ('pir', 'PIR'), ('dht', 'DHT22'), ('btn', 'Botones')],
+     ('scl', 'SCL display'), ('pir', 'PIR'), ('dht', 'DHT11'), ('btn', 'Botones')],
     [('adc', 'ADC1: reservado entrada de audio (funciona con WiFi)'),
      ('dac', 'DAC: reservado salida de audio')],
     [('spi', 'SPI: reservado (tarjeta SD / I2S)'), ('free', 'libre'),

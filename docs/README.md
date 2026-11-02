@@ -14,6 +14,8 @@
 | Sensor de movimiento HC-SR501 | [HC-SR501_PIR_modulo.pdf](datasheets/HC-SR501_PIR_modulo.pdf) | Alimentación, jumper L/H, potenciómetros de tiempo y sensibilidad |
 | Chip del HC-SR501 (BISS0001) | [BISS0001_PIR_controller.pdf](datasheets/BISS0001_PIR_controller.pdf) | El integrado que procesa la señal del PIR |
 | Sensores PIR en general | [PIR_guia_Adafruit.pdf](datasheets/PIR_guia_Adafruit.pdf) | Guía de Adafruit: cómo funcionan y cómo ajustarlos |
-| Sensor DHT22 / AM2302 | [DHT22_AM2302.pdf](datasheets/DHT22_AM2302.pdf) | Protocolo de 1 cable, tiempos, rangos de medición |
+| Sensor DHT11 (el que usa Pitri) | [DHT11.pdf](datasheets/DHT11.pdf) | Protocolo de 1 cable, tiempos, rangos de medición |
+| Sensor DHT22 / AM2302 (alternativa) | [DHT22_AM2302.pdf](datasheets/DHT22_AM2302.pdf) | Igual que el DHT11 pero más preciso; mismo cableado |
+| Sensores DHT en general | [DHT_guia_Adafruit.pdf](datasheets/DHT_guia_Adafruit.pdf) | Guía de Adafruit: diferencias DHT11/DHT22 y cómo conectarlos |
 
 Los botones son componentes genéricos y no tienen datasheet.

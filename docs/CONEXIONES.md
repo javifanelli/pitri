@@ -23,14 +23,14 @@ Si se cambia un cable, hay que cambiarlo ahí y en este documento.
 | **Sensor PIR HC-SR501** | VCC | **VIN** (5 V del USB) | Con 3,3 V no funciona |
 | | GND | GND | |
 | | OUT | D27 | Da 3,3 V cuando detecta: va directo |
-| **DHT22 / AM2302** | VCC (+) | 3V3 | |
+| **DHT11** | VCC (+) | 3V3 | |
 | | DATA | D4 | Necesita pull-up de 10 kΩ a 3V3 (ver abajo) |
 | | GND (−) | GND | |
 | **Botón 1** | una pata | RX2 (GPIO 16) | La otra pata a GND |
 | **Botón 2** | una pata | TX2 (GPIO 17) | La otra pata a GND |
 
 Todos los GND van juntos (la placa tiene dos pines GND, uno de cada lado). El 3V3 alimenta al
-display y al DHT22; el VIN (5 V) solo al PIR.
+display y al DHT11; el VIN (5 V) solo al PIR.
 
 ## Por qué estos pines
 
@@ -43,7 +43,7 @@ El ESP32 tiene muchos pines, pero no todos sirven para todo. Los criterios fuero
 3. **Usar los pines I2C estándar.** D21 (SDA) y D22 (SCL) son los que usa casi todo el mundo con el ESP32, así los ejemplos de internet coinciden con Pitri.
 4. **Dejar libre el bus SPI** (D18, D19, D23 y D5) por si más adelante agregamos una tarjeta SD para guardar sonidos, o un módulo de audio I2S.
 
-> **Cambio respecto al proyecto dht22:** el display pasó de D19/D18 a D21/D22 y el DHT22 de D23 a D4, para dejar libre el SPI. Los LEDs RGB se sacaron porque por ahora no se usan.
+> **Cambio respecto al proyecto dht22:** el display pasó de D19/D18 a D21/D22 y el sensor de temperatura de D23 a D4, para dejar libre el SPI. El DHT22 se reemplazó por un DHT11; el driver sirve para los dos (mismo cableado; el modelo se elige con `SENSOR_TH_MODELO` en `board_config.h`). Los LEDs RGB se sacaron porque por ahora no se usan.
 
 ## Pines reservados y prohibidos
 
@@ -60,7 +60,7 @@ El ESP32 tiene muchos pines, pero no todos sirven para todo. Los criterios fuero
 ## Consejos para el armado
 
 - **PIR lejos de la antena.** El HC-SR501 es sensible a las ondas del WiFi y puede dar falsas detecciones si está pegado a la antena del ESP32 (la parte de arriba de la placa, con el zigzag dorado). Conviene separarlo unos centímetros, con los cables hacia el lado del USB.
-- **Pull-up del DHT22.** Si el DHT22 viene en una plaquita con 3 patas, la resistencia de 10 kΩ ya viene incluida. Si es el sensor solo, con 4 patas, hay que poner una resistencia de 10 kΩ entre DATA y 3V3. La tercera pata del sensor suelto no se conecta.
+- **Pull-up del DHT11.** Si el DHT11 viene en una plaquita con 3 patas, la resistencia de 10 kΩ ya viene incluida. Si es el sensor solo, con 4 patas, hay que poner una resistencia de 10 kΩ entre DATA y 3V3. La tercera pata del sensor suelto no se conecta.
 - **Botones sin resistencia.** Cada botón va entre su pin y GND. El ESP32 tiene una resistencia interna (pull-up) que se activa desde el código.
 - **Cables del display cortos.** El I2C funciona mejor con cables de menos de 20–30 cm.
 - **Una sola alimentación.** La placa se alimenta por el USB. No conectar otra fuente al pin VIN al mismo tiempo.

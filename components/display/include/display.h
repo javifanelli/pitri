@@ -21,7 +21,7 @@ void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool 
 
 // ─── Texto ────────────────────────────────────────────────────────────────────
 // Letras de 5x7 píxeles. "escala" las agranda: 1 = chiquitas, 2 = el doble...
-// Acepta '\n' para cambiar de renglón y los signos ¡ y ¿.
+// Acepta '\n' para cambiar de renglón y los signos ¡ ¿ °.
 
 // Escribe el texto con la esquina de arriba a la izquierda en (x, y)
 void display_draw_text(int x, int y, const char *texto, int escala, bool on);

@@ -1,12 +1,17 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "esp_log.h"
 #include "esp_random.h"
+#include "esp_timer.h"
 
 #include "pitri_config.h"
+#include "board_config.h"
 #include "display.h"
 #include "eyes.h"
 #include "motion.h"
+#include "dht.h"
 
 static const char *TAG = "PITRI";
 
@@ -20,6 +25,26 @@ static void descansar(int ms)
         }
         vTaskDelay(pdMS_TO_TICKS(50));
     }
+}
+
+// Muestra la temperatura grande y la humedad abajo, y después vuelven los ojos
+static void mostrar_temperatura(void)
+{
+    int16_t t, h;
+    if (!dht_ultima_lectura(&t, &h)) return;   // todavía no hay ninguna lectura
+
+    char temp[32], hum[32];
+    snprintf(temp, sizeof(temp), "%s%d.%d°C", t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10);
+    snprintf(hum, sizeof(hum), "Humedad %d%%", (h + 5) / 10);
+
+    display_clear();
+    display_draw_text((LCD_H_RES - display_text_width(temp, 3)) / 2, 12, temp, 3, true);
+    display_draw_text((LCD_H_RES - display_text_width(hum, 1)) / 2, 48, hum, 1, true);
+    display_flush();
+    vTaskDelay(pdMS_TO_TICKS(MOSTRAR_TEMPERATURA_MS));
+
+    eyes_init();
+    eyes_parpadear();
 }
 
 // Duerme hasta que el sensor vea a alguien
@@ -42,6 +67,7 @@ void app_main(void)
 
     display_init();
     motion_init();
+    dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
 
     // Mensaje de bienvenida
     display_clear();
@@ -52,6 +78,8 @@ void app_main(void)
     eyes_init();
     eyes_saludar();
 
+    int64_t ultima_vez_temperatura_us = esp_timer_get_time();
+
     while (1) {
         if (motion_ms_sin_movimiento() >= TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS) {
             dormir();
@@ -59,6 +87,13 @@ void app_main(void)
 
         // Si alguien llegó mientras jugaba, saluda antes de seguir
         if (motion_alguien_llego()) eyes_saludar();
+
+        // Cada tanto muestra la temperatura
+        if (MOSTRAR_TEMPERATURA_CADA_MS > 0 &&
+            esp_timer_get_time() - ultima_vez_temperatura_us >= (int64_t)MOSTRAR_TEMPERATURA_CADA_MS * 1000) {
+            mostrar_temperatura();
+            ultima_vez_temperatura_us = esp_timer_get_time();
+        }
 
         eyes_jugar();
 

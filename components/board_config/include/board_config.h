@@ -23,7 +23,7 @@
  *  │                      │ GND        │ GND        │                         │
  *  │                      │ OUT        │ D27        │ Salida 3.3V, activa 1   │
  *  ├──────────────────────┼────────────┼────────────┼─────────────────────────┤
- *  │ Sensor DHT22/AM2302  │ VCC (+)    │ 3V3        │ Pull-up 10k DATA→3V3    │
+ *  │ Sensor DHT11         │ VCC (+)    │ 3V3        │ Pull-up 10k DATA→3V3    │
  *  │                      │ DATA       │ D4         │ (los módulos ya la      │
  *  │                      │ GND (-)    │ GND        │  traen)                 │
  *  ├──────────────────────┼────────────┼────────────┼─────────────────────────┤
@@ -52,14 +52,18 @@
 #define DISPLAY_I2C_ADDR  0x3C
 #define LCD_H_RES         128
 #define LCD_V_RES         64
+#define DISPLAY_ROTAR_180 1          // 1 = imagen dada vuelta (según cómo está montado)
 
 // ─── Sensor de movimiento PIR HC-SR501 ────────────────────────────────────────
 #define PIN_PIR           GPIO_NUM_27
 #define PIR_NIVEL_DETECTA 1          // OUT = 1 cuando ve movimiento
 
-// ─── Sensor de temperatura y humedad DHT22 (AM2302) ───────────────────────────
-#define PIN_DHT22         GPIO_NUM_4
-#define DHT22_INTERVALO_MIN_MS 2000  // no leerlo más seguido que cada 2 s
+// ─── Sensor de temperatura y humedad DHT11 / DHT22 ────────────────────────────
+#define DHT_MODELO_DHT11  11
+#define DHT_MODELO_DHT22  22
+#define SENSOR_TH_MODELO  DHT_MODELO_DHT11   // ← cuál está conectado
+#define PIN_DHT           GPIO_NUM_4
+#define DHT_INTERVALO_MIN_MS 2000    // no leerlo más seguido que cada 2 s
 
 // ─── Botones ──────────────────────────────────────────────────────────────────
 #define PIN_BTN_1         GPIO_NUM_16
