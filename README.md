@@ -22,7 +22,7 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 
 | Cuando… | Pitri… |
 |---|---|
-| Se prende | Dice **"¡Hola Sofi!"** y después abre los ojos |
+| Se prende | Dice **"¡Hola Sofi!"**, **"Soy Pitri"** y después abre los ojos |
 | Está tranquilo | Juega solo: mira para los costados, parpadea, guiña un ojo, se marea, se enoja, llora… |
 | Llega alguien | Se sorprende 😮 y se pone contento 😊 |
 | Pasa un rato sin ver a nadie | Se duerme 😴 y le salen "Z" |
@@ -37,7 +37,7 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 | 😑 doble parpadeo | Parpadea dos veces seguidas |
 | 😉 guiño | Cierra un ojo con carita feliz |
 | 😮 sorpresa | Abre los ojos muy grandes |
-| 😊 contento | Ojitos felices ^ ^ y saltitos |
+| 😊 contento | Ojitos felices ^ ^, sonrisa y saltitos |
 | 🔄 girar | Da una vuelta con los ojos |
 | 🤨 sospecha | Entrecierra los ojos y mira de un lado al otro |
 | 😪 sueño | Se le cierran los ojos, duerme un poquito y se despierta |
@@ -45,6 +45,8 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 | 😵‍💫 mareado | Los ojos se vuelven espirales que giran |
 | 😠 enojado | Cejas para adentro y tiembla de bronca |
 | 😢 llorar | Cara triste y le caen lágrimas |
+| 😍 enamorado | Los ojos se vuelven corazones que laten y suben corazoncitos |
+| 😎 verano | Se pone lentes de sol, baila canchero y se los saca guiñando un ojo |
 
 ---
 
@@ -81,7 +83,8 @@ En el archivo [main/pitri_config.h](main/pitri_config.h) hay números que se pue
 sin saber programar. Algunos ejemplos:
 
 ```c
-#define MENSAJE_ARRANQUE  "¡Hola\nSofi!"                 // lo que dice al prenderse
+#define MENSAJE_ARRANQUE    "¡Hola\nSofi!"               // lo que dice al prenderse
+#define MENSAJE_ARRANQUE_2  "Soy\nPitri"                 // y después
 #define TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS  (60 * 1000) // cuándo se duerme
 #define MOSTRAR_TEMPERATURA_CADA_MS  (60 * 1000)          // cada cuánto muestra la temperatura
 ```

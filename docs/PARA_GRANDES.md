@@ -83,7 +83,7 @@ sensor DHT, rotación de pantalla, pines reservados para audio. Ver
 
 ### `eyes` — [eyes.h](../components/eyes/include/eyes.h)
 - Estado de la cara en `cara_t` (posición, tamaño, apertura por ojo, `feliz`, `enojo`,
-  `triste`, `espiral`, `giro`, `lagrima`, `zzz`).
+  `triste`, `espiral`, `giro`, `lagrima`, `zzz`, `corazon`, `corazoncitos`, `lentes`).
 - `animar(destino, ms)` interpola todos los campos con smoothstep a ~33 fps (`CUADRO_MS 30`).
 - Juegos en una tabla `juegos[]` con pesos; `eyes_jugar()` elige uno al azar.
 - API pública: `eyes_init`, `eyes_jugar`, `eyes_parpadear`, `eyes_saludar`,
@@ -111,7 +111,7 @@ sensor DHT, rotación de pantalla, pines reservados para audio. Ver
 ```
 app_main
 ├── display_init, motion_init, dht_iniciar
-├── mensaje de bienvenida (MENSAJE_ARRANQUE)
+├── mensajes de bienvenida (MENSAJE_ARRANQUE y MENSAJE_ARRANQUE_2)
 ├── eyes_init + eyes_saludar
 └── while (1)
     ├── ¿sin movimiento ≥ TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS?  → dormir()

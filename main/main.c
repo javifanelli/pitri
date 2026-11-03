@@ -15,6 +15,16 @@
 
 static const char *TAG = "PITRI";
 
+// Muestra un texto grande en el centro de la pantalla durante MENSAJE_ARRANQUE_MS
+static void mostrar_mensaje(const char *texto)
+{
+    if (texto[0] == '\0') return;   // mensaje vacío: no mostrar nada
+    display_clear();
+    display_draw_text_centered(texto, MENSAJE_ARRANQUE_TAMANO, true);
+    display_flush();
+    vTaskDelay(pdMS_TO_TICKS(MENSAJE_ARRANQUE_MS));
+}
+
 // Espera un rato, pero si alguien llega deja de esperar y saluda
 static void descansar(int ms)
 {
@@ -69,11 +79,9 @@ void app_main(void)
     motion_init();
     dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
 
-    // Mensaje de bienvenida
-    display_clear();
-    display_draw_text_centered(MENSAJE_ARRANQUE, MENSAJE_ARRANQUE_TAMANO, true);
-    display_flush();
-    vTaskDelay(pdMS_TO_TICKS(MENSAJE_ARRANQUE_MS));
+    // Mensajes de bienvenida
+    mostrar_mensaje(MENSAJE_ARRANQUE);
+    mostrar_mensaje(MENSAJE_ARRANQUE_2);
 
     eyes_init();
     eyes_saludar();

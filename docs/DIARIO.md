@@ -14,6 +14,30 @@ Acá anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el
 
 ---
 
+## 2026-11-02 — Pitri sonríe 😊
+
+**Qué hicimos:** Sofía pidió que Pitri tenga una **boca sonriente** cuando está contento. Ahora la sonrisa aparece cada vez que pone ojitos felices: cuando está contento, cuando guiña, cuando saluda y cuando se saca los lentes de sol.
+
+**Qué aprendimos:**
+- Una sonrisa es **un pedazo de círculo**: la parte de abajo.
+- Cuanto más contento está Pitri, más grande es la sonrisa.
+- Simulamos el dibujo y vimos que, con media sonrisa, las puntas tocaban los ojos. Lo arreglamos bajando un poquito la boca cuando está menos contento.
+
+---
+
+## 2026-11-02 — Enamorado y verano 😍😎
+
+**Qué hicimos:** Para empezar noviembre, Sofía pidió tres cosas:
+- Que después de "¡Hola Sofi!" Pitri se presente: **"Soy Pitri"**.
+- Una emoción de **enamorado**: los ojos se vuelven corazones que laten y suben corazoncitos flotando.
+- Una emoción **veraniega**: bajan unos lentes de sol, Pitri baila canchero y después se los saca guiñando un ojo.
+
+**Qué aprendimos:**
+- Un corazón se puede dibujar con **dos círculos y un triángulo**.
+- Antes de cargarlo en Pitri, simulamos el dibujo en la compu y vimos que los ojos asomaban por debajo de los lentes. Lo arreglamos haciendo que Pitri **entrecierre los ojos** cuando se pone los lentes, como alguien tomando sol.
+
+---
+
 ## 2026-11-01 — Documentación
 
 **Qué hicimos:** Escribimos estas guías para que cualquiera pueda entender cómo funciona

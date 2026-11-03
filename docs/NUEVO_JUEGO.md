@@ -54,10 +54,13 @@ Todo lo que se puede cambiar de la cara:
 | `d.x`, `d.y` | -24 a 24, -14 a 14 | Adónde mira |
 | `d.ancho`, `d.alto` | normal: 30 y 36 | Tamaño de los ojos |
 | `d.abre_izq`, `d.abre_der` | 0 = cerrado, 1 = abierto | Cuánto abre cada ojo |
-| `d.feliz` | 0 a 1 | Ojitos felices ^ ^ |
+| `d.feliz` | 0 a 1 | Ojitos felices ^ ^ y sonrisa (desde 0.3) |
 | `d.enojo` | 0 a 1 | Cejas de enojado |
 | `d.triste` | 0 a 1 | Cejas de triste |
 | `d.espiral` | 0 o 1 | Ojos de mareado |
+| `d.corazon` | 0 o 1 | Ojos de corazón (late si cambiás `d.ancho`) |
+| `d.corazoncitos` | 0 a 1 | Corazoncitos que suben (0 = abajo, 1 = arriba) |
+| `d.lentes` | 0 a 1 | Lentes de sol (0 = arriba afuera, 1 = puestos) |
 
 ---
 
@@ -125,7 +128,7 @@ que salga seguido y lo puedas ver enseguida. Cuando ya lo viste, bajalo a 1.
 
 ## 💡 Ideas para inventar
 
-- 😍 **Enamorado:** ojos que laten (se agrandan y achican varias veces)
+- 😎💕 **Canchero enamorado:** ¡lentes de sol y corazoncitos al mismo tiempo!
 - 🥱 **Bostezo:** ojos que se cierran despacito hasta la mitad y se abren de golpe
 - 🤪 **Loco:** un ojo cerrado y el otro mirando para cualquier lado (`d.abre_izq = 0`)
 - 🙄 **Revolear los ojos:** mirar arriba a la derecha, arriba a la izquierda y volver

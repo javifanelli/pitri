@@ -7,6 +7,7 @@
 // Mensaje que muestra al prenderse. '\n' = cambiar de renglón.
 // Entran 5 letras por renglón con MENSAJE_ARRANQUE_TAMANO 3, o 10 con tamaño 2.
 #define MENSAJE_ARRANQUE        "¡Hola\nSofi!"
+#define MENSAJE_ARRANQUE_2      "Soy\nPitri"    // segundo mensaje ("" = no mostrarlo)
 #define MENSAJE_ARRANQUE_TAMANO 3          // 1 = chiquito, 3 = grandote
 #define MENSAJE_ARRANQUE_MS     3000       // cuánto tiempo se ve
 

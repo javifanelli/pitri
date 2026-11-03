@@ -12,7 +12,7 @@ El programa de Pitri es como una lista de instrucciones que se repite **para sie
 ```
 Al prenderse:
    1. Preparar la pantalla y los sensores
-   2. Mostrar "¡Hola Sofi!"
+   2. Mostrar "¡Hola Sofi!" y "Soy Pitri"
    3. Abrir los ojos y saludar
 
 Y después, una y otra vez:
@@ -141,10 +141,12 @@ Las caras distintas se hacen **tapando partes de los ojos con negro**:
 
 | Expresión | Truco |
 |---|---|
-| 😊 Feliz | Una "loma" negra tapa la parte de abajo del ojo → queda como `^` |
+| 😊 Feliz | Una "loma" negra tapa la parte de abajo del ojo → queda como `^`. Y abajo aparece una **sonrisa**: un pedazo de círculo que crece cuanto más contento está |
 | 😠 Enojado | Un triángulo negro corta la esquina de arriba que da a la nariz |
 | 😢 Triste | Un triángulo negro corta la esquina de arriba del lado de afuera |
 | 😵‍💫 Mareado | En vez del ojo se dibuja una espiral que gira |
+| 😍 Enamorado | En vez del ojo se dibuja un **corazón**: dos círculos y un triángulo. Late porque se agranda y se achica |
+| 😎 Verano | Se dibujan unos **lentes** blancos arriba de los ojos, con dos rayitas negras que parecen el brillo del vidrio |
 
 ### ¿Cómo elige qué juego hacer?
 

@@ -36,6 +36,9 @@ typedef struct {
     float giro;               // cuánto giró la espiral
     float lagrima;            // 0 a 1: por dónde va cayendo la lágrima
     float zzz;                // 0 a 1: por dónde va subiendo la "Z" cuando duerme
+    float corazon;            // 0 = ojos normales, 1 = ojos de corazón (enamorado)
+    float corazoncitos;       // 0 a 1: por dónde van subiendo los corazoncitos flotantes
+    float lentes;             // 0 = sin lentes, 1 = lentes de sol puestos (bajan desde arriba)
 } cara_t;
 
 static const cara_t CARA_NORMAL = {
@@ -71,6 +74,67 @@ static void dibujar_espiral(float cx, float cy, float radio, float giro)
     }
 }
 
+// Un corazón con centro en (cx, cy): dos círculos arriba y un triángulo abajo
+//
+//      ██  ██        r = radio de cada círculo
+//     ████████       ancho total = 4 r
+//      ██████        alto total  = 3 r
+//        ██
+static void dibujar_corazon(float cx, float cy, float r)
+{
+    if (r < 1) r = 1;
+    int ri = (int)(r + 0.5f);
+    int y0 = (int)(cy - r * 0.5f);     // altura de los centros de los círculos
+    display_fill_circle((int)(cx - r), y0, ri, true);
+    display_fill_circle((int)(cx + r), y0, ri, true);
+    display_fill_triangle((int)(cx - 2 * r), y0, (int)(cx + 2 * r), y0, (int)cx, (int)(y0 + 2 * r), true);
+}
+
+// Boca sonriente: un pedazo de círculo (la parte de abajo), con trazo de 3 píxeles.
+// (cx, cy) es el centro del círculo y r su radio: más grande = sonrisa más ancha.
+//
+//     ·           ·
+//      ·         ·
+//        · · · ·
+static void dibujar_sonrisa(float cx, float cy, float r)
+{
+    const float desde = 0.2f * (float)M_PI;   // 36°: punta derecha de la sonrisa
+    const float hasta = 0.8f * (float)M_PI;   // 144°: punta izquierda
+    for (float a = desde; a <= hasta; a += 0.04f) {
+        int px = (int)(cx + r * cosf(a));
+        int py = (int)(cy + r * sinf(a));      // en la pantalla, y crece para abajo
+        display_fill_rect(px - 1, py - 1, 3, 3, true);
+    }
+}
+
+// Rayita negra en diagonal (de abajo a la izquierda hacia arriba a la derecha):
+// es el "brillo" del vidrio de los lentes
+static void dibujar_reflejo(int x, int y, int largo, int grosor)
+{
+    for (int k = 0; k < largo; k++)
+        display_fill_rect(x + k, y + largo - k, grosor, 1, false);
+}
+
+// Lentes de sol. "puestos" va de 0 (todavía arriba, fuera de la pantalla) a 1 (en los ojos)
+static void dibujar_lentes(float cx_izq, float cx_der, float cy, float puestos)
+{
+    const int w = OJO_ANCHO + 10, h = 26;
+    int arriba = (int)(cy - 2 - h / 2 - (1 - puestos) * 60);   // bajan desde arriba
+    int xi = (int)(cx_izq - w / 2.0f);
+    int xd = (int)(cx_der - w / 2.0f);
+
+    display_fill_rect(0, arriba + 3, xi, 2, true);                          // patilla izquierda
+    display_fill_rect(xd + w, arriba + 3, LCD_H_RES - (xd + w), 2, true);   // patilla derecha
+    display_fill_rect(xi + w, arriba + 2, xd - (xi + w), 3, true);          // puente
+
+    for (int i = 0; i < 2; i++) {
+        int x = (i == 0) ? xi : xd;
+        display_fill_round_rect(x, arriba, w, h, 8, true);   // vidrio
+        dibujar_reflejo(x + 6, arriba + 5, 12, 3);           // brillo grande
+        dibujar_reflejo(x + 16, arriba + 11, 7, 1);          // brillo chiquito
+    }
+}
+
 // Una gotita: círculo abajo y punta arriba
 static void dibujar_lagrima(int x, int y)
 {
@@ -83,6 +147,11 @@ static void dibujar_ojo(float cx, float cy, float ancho, float alto, float abre,
 {
     if (cara.espiral > 0.5f) {
         dibujar_espiral(cx, cy, fminf(ancho, alto) / 2 - 1, cara.giro);
+        return;
+    }
+
+    if (cara.corazon > 0.5f) {
+        dibujar_corazon(cx, cy, ancho / 4);    // late cuando cambia el ancho
         return;
     }
 
@@ -144,6 +213,28 @@ static void dibujar(void)
     dibujar_ojo(cx_izq, cy, cara.ancho, cara.alto * (1 - p), cara.abre_izq, -1);
     dibujar_ojo(cx_der, cy, cara.ancho, cara.alto * (1 + p), cara.abre_der, +1);
 
+    // Sonrisa cuando está contento: cuanto más feliz, más grande
+    if (cara.feliz > 0.3f) {
+        // Con menos felicidad los ojos se tapan menos (bajan más), así que la
+        // sonrisa va un poco más abajo para no tocarlos
+        float boca_y = cy + 6 + (1 - cara.feliz) * 8;
+        dibujar_sonrisa(LCD_H_RES / 2.0f + cara.x, boca_y, 6 + 8 * cara.feliz);
+    }
+
+    // Corazoncitos que suben flotando: uno a cada costado y uno en el medio
+    if (cara.corazoncitos > 0.01f && cara.corazoncitos < 0.99f) {
+        float t1 = cara.corazoncitos;
+        float t2 = fmodf(cara.corazoncitos + 0.5f, 1.0f);   // el del medio va desfasado
+        dibujar_corazon(8,                 LCD_V_RES + 6 - 80 * t1, 3);
+        dibujar_corazon(LCD_H_RES - 9,     LCD_V_RES + 6 - 80 * t1, 3);
+        dibujar_corazon(LCD_H_RES / 2.0f,  LCD_V_RES + 6 - 80 * t2, 3);
+    }
+
+    // Lentes de sol (van arriba de los ojos)
+    if (cara.lentes > 0.01f) {
+        dibujar_lentes(cx_izq, cx_der, cy, cara.lentes);
+    }
+
     // "Z" que sube y crece desde arriba del ojo derecho
     if (cara.zzz > 0.01f && cara.zzz < 0.99f) {
         int s  = 4 + (int)(6 * cara.zzz);
@@ -182,6 +273,9 @@ static void animar(cara_t destino, int ms)
         cara.giro     = mezclar(inicio.giro,     destino.giro,     t);
         cara.lagrima  = mezclar(inicio.lagrima,  destino.lagrima,  t);
         cara.zzz      = mezclar(inicio.zzz,      destino.zzz,      t);
+        cara.corazon  = mezclar(inicio.corazon,  destino.corazon,  t);
+        cara.corazoncitos = mezclar(inicio.corazoncitos, destino.corazoncitos, t);
+        cara.lentes   = mezclar(inicio.lentes,   destino.lentes,   t);
 
         dibujar();
         xTaskDelayUntil(&ultimo, pdMS_TO_TICKS(CUADRO_MS));
@@ -400,6 +494,60 @@ static void juego_llorar(void)
     animar(CARA_NORMAL, 400);
 }
 
+// Se enamora: los ojos se vuelven corazones que laten y suben corazoncitos
+static void juego_enamorado(void)
+{
+    cara_t d = CARA_NORMAL;
+    d.corazon = 1;
+    animar(d, 100);
+
+    // 12 latidos: grande, chico, grande, chico... balanceándose de lado a lado
+    for (int i = 0; i < 12; i++) {
+        bool grande = (i % 2 == 0);
+        d.ancho = grande ? OJO_ANCHO + 6 : OJO_ANCHO - 2;
+        d.x     = grande ? -4 : 4;
+
+        // los corazoncitos dan una vuelta completa cada 4 latidos
+        if (i % 4 == 0) cara.corazoncitos = 0;
+        d.corazoncitos = (i % 4 + 1) / 4.0f;
+
+        animar(d, grande ? 120 : 200);   // el latido es rápido y el "descanso" más lento
+    }
+
+    cara.corazoncitos = 0;
+    animar(CARA_NORMAL, 150);           // vuelven los ojos normales
+    eyes_parpadear();
+}
+
+// Verano: bajan unos lentes de sol, se mueve canchero y después se los saca
+static void juego_verano(void)
+{
+    cara_t d = CARA_NORMAL;
+    animar(d, 150);                     // mira al frente
+
+    d.lentes = 1;
+    d.abre_izq = d.abre_der = 0.55f;    // entrecierra los ojos, relajado (así no asoman por abajo)
+    animar(d, 500);                     // ¡bajan los lentes!
+    esperar(300);
+
+    for (int i = 0; i < 4; i++) {       // se mueve al ritmo de la música
+        mover_a(-6, 2, 300);
+        mover_a(6, -2, 300);
+    }
+    mover_a(0, 0, 200);
+    esperar(500);
+
+    d = cara;
+    d.lentes = 0;
+    d.abre_izq = d.abre_der = 1;
+    animar(d, 400);                     // se los sube y abre bien los ojos
+
+    d.feliz = 1;                        // y guiña un ojo contento
+    animar(d, 150);
+    cerrar_y_abrir(false, true, 300);
+    animar(CARA_NORMAL, 200);
+}
+
 typedef struct {
     const char *nombre;
     void (*hacer)(void);
@@ -420,6 +568,8 @@ static const juego_t juegos[] = {
     { "mareado",        juego_mareado,         1 },
     { "enojado",        juego_enojado,         1 },
     { "llorar",         juego_llorar,          1 },
+    { "enamorado",      juego_enamorado,       2 },
+    { "verano",         juego_verano,          2 },
 };
 #define CANT_JUEGOS ((int)(sizeof(juegos) / sizeof(juegos[0])))
 
