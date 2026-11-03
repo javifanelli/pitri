@@ -229,6 +229,31 @@ se perdió en el camino y Pitri descarta el mensaje.
 
 ---
 
+## 📶 El WiFi: hablar sin cables
+
+El ESP32 tiene una **antena** (el zigzag dorado de arriba de la placa) con la que puede
+hablar con el **router** de la casa por ondas de radio, igual que un celular. A través del
+router, Pitri puede llegar a **internet**.
+
+Para entrar a una red WiFi hacen falta dos cosas: el **nombre de la red** y la
+**contraseña**. Y acá aprendimos algo importante:
+
+> 🔒 **Los secretos no se publican.** El código de Pitri está en internet para que
+> cualquiera lo pueda ver y aprender. Pero la contraseña del WiFi es un secreto de la casa.
+> Por eso la guardamos en un archivo aparte, `wifi_secretos.h`, que **se queda en nuestra
+> compu y nunca se sube**. En internet solo está una plantilla con datos de mentira.
+> Por la misma razón, Pitri nunca escribe la contraseña ni el nombre de la red en la consola.
+
+Si el WiFi se corta, Pitri lo vuelve a intentar solo: primero al segundo, después a los 2,
+a los 4, a los 8… hasta probar una vez por minuto, para no cansarse (ni cansar al router).
+
+> 🧑‍🔧 **Para grandes:** [wifi.c](../components/wifi/wifi.c) usa el modo *estación*
+> (se conecta a un router), escucha los eventos de conexión, desconexión y obtención de IP,
+> y reintenta con *backoff* exponencial usando un `esp_timer`. Los datos de la red quedan
+> solo en RAM (`WIFI_STORAGE_RAM`), no se graban en la flash.
+
+---
+
 ## 😴 Dormir
 
 El ayudante del sensor de movimiento anota **la hora de la última vez que vio a alguien**.

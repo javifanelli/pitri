@@ -27,6 +27,7 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 | Llega alguien | Se sorprende 😮 y se pone contento 😊 |
 | Pasa un rato sin ver a nadie | Se duerme 😴 y le salen "Z" |
 | Pasa un minuto | Muestra la temperatura y la humedad |
+| Se conecta al WiFi | Dice **"¡Tengo WiFi!"** y se pone contento |
 
 ### Los juegos de Pitri
 
@@ -114,5 +115,6 @@ Cada vez que cambiás algo, hay que **compilar** y **cargar** el programa en Pit
 - [ ] Que los botones hagan algo (¿hacerle cosquillas? ¿darle de comer?)
 - [ ] Que reaccione a la temperatura: que tiemble si hace frío o transpire si hace calor
 - [ ] Que hable o haga sonidos (ya dejamos lugar en la placa para el audio)
-- [ ] Que se conecte al WiFi
+- [x] Que se conecte al WiFi
+- [ ] Que use internet para algo (¿saber la hora? ¿el clima?)
 - [ ] Letras con tilde y ñ en la pantalla

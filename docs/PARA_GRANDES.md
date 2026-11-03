@@ -42,7 +42,8 @@ pitri/
 │   ├── display/           ← pantalla: framebuffer, formas, texto, rotación
 │   ├── eyes/              ← los ojos: animación, expresiones y juegos
 │   ├── motion/            ← sensor de movimiento PIR
-│   └── dht/               ← sensor de temperatura y humedad DHT11/DHT22
+│   ├── dht/               ← sensor de temperatura y humedad DHT11/DHT22
+│   └── wifi/              ← conexión WiFi (datos privados en wifi_secretos.h)
 ├── docs/                  ← documentación, diagrama y datasheets
 └── managed_components/    ← librerías descargadas (no se tocan a mano)
 ```
@@ -109,18 +110,48 @@ sensor DHT, rotación de pantalla, pines reservados para audio. Ver
 - Valores en **décimas** (`int16_t`): evita depender de `printf` con floats.
 - `dht_ultima_lectura()` devuelve la última lectura buena.
 
+### `wifi` — [wifi.h](../components/wifi/include/wifi.h)
+- Modo estación, conexión "de fondo": `wifi_iniciar()` no bloquea.
+- Reintentos con backoff exponencial (1 s → 60 s) y motivo de desconexión en castellano.
+- Credenciales solo en RAM (`WIFI_STORAGE_RAM`). Nunca se loguean ni el SSID ni la contraseña.
+- Si no existe `wifi_secretos.h`, compila igual y Pitri sigue sin WiFi (avisa por consola).
+- `wifi_conectado()` dice si tiene IP.
+
+---
+
+## WiFi
+
+⚠️ **El repo es público. Nunca se suben datos de la casa ni de las personas** (contraseñas,
+nombre de la red, direcciones, nombres completos, etc.).
+
+Para configurar la red:
+
+1. Copiar `components/wifi/wifi_secretos.ejemplo.h` como `components/wifi/wifi_secretos.h`
+   (en la misma carpeta).
+2. Completar `WIFI_NOMBRE_RED` y `WIFI_CONTRASENA` en la copia.
+3. Compilar y cargar. En la consola debería aparecer `WIFI: ¡Conectado a la red WiFi!`.
+
+`wifi_secretos.h` (y cualquier `*secretos*.h`) está en el `.gitignore`. Antes de un commit
+conviene mirar `git status` y confirmar que no aparece. Si alguna vez se sube por error,
+**hay que cambiar la contraseña del WiFi**: borrarlo del repo no alcanza, porque queda en el
+historial de git.
+
+Otros datos que tampoco se suben: `sdkconfig` y `build/` (ya ignorados), porque el binario
+compilado contiene la contraseña.
+
 ---
 
 ## Flujo de `main.c`
 
 ```
 app_main
-├── display_init, motion_init, dht_iniciar
+├── display_init, motion_init, dht_iniciar, wifi_iniciar
 ├── mensajes de bienvenida (MENSAJE_ARRANQUE y MENSAJE_ARRANQUE_2)
 ├── eyes_init + eyes_saludar
 └── while (1)
     ├── ¿sin movimiento ≥ TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS?  → dormir()
     ├── ¿motion_alguien_llego()?                                  → eyes_saludar()
+    ├── ¿primera conexión WiFi?                                   → "¡Tengo WiFi!" + saludo
     ├── ¿pasó MOSTRAR_TEMPERATURA_CADA_MS?                        → mostrar_temperatura()
     ├── eyes_jugar()
     └── descansar(azar)   ← revisa el sensor cada 50 ms
@@ -162,3 +193,6 @@ Ver [NUEVO_JUEGO.md](NUEVO_JUEGO.md).
 | DHT: el sensor no contesta | Revisar el **orden de las patas** del módulo (leer la serigrafía: S/DATA, +, −). Nos pasó |
 | DHT: temperatura absurda con datos "válidos" | Sensor dañado; el driver lee bien los bits |
 | PIR detecta cosas que no existen | Primeros 30 s de calentamiento, o está muy cerca de la antena WiFi |
+| `WIFI: No hay datos de WiFi` | Falta `components/wifi/wifi_secretos.h` (ver [WiFi](#wifi)) |
+| `WIFI: Sin conexión: la red no me deja entrar` | Contraseña incorrecta en `wifi_secretos.h` |
+| `WIFI: Sin conexión: no encuentro la red` | Nombre de red mal escrito, router apagado o red de 5 GHz (el ESP32 solo usa 2,4 GHz) |

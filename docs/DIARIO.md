@@ -14,6 +14,16 @@ Acá anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el
 
 ---
 
+## 2026-11-02 — ¡Pitri tiene WiFi! 📶
+
+**Qué hicimos:** Conectamos a Pitri a la red WiFi de casa. La primera vez que se conecta, dice **"¡Tengo WiFi!"** y se pone contento. Si se corta, lo vuelve a intentar solo.
+
+**Qué aprendimos:**
+- **Los secretos no se publican.** El código de Pitri está en internet, pero la contraseña del WiFi es un secreto de la casa. Por eso vive en un archivo que se queda en nuestra compu y nunca se sube. En internet solo hay una plantilla con datos de mentira.
+- Pitri tampoco escribe la contraseña ni el nombre de la red en la consola, por si alguna vez compartimos lo que aparece ahí.
+
+---
+
 ## 2026-11-02 — Una boca para cada emoción 👄
 
 **Qué hicimos:** ¡A Sofía le encantó la sonrisa! Así que le pusimos boca a **todas** las emociones, cada una con su forma: triste (sonrisa al revés), enojado (zigzag), sorpresa (una O), mareado (una ola que se mueve), enamorado (un 3 de beso), verano (sonrisa de costado), sospecha (rayita torcida) y dormido (una o chiquita).

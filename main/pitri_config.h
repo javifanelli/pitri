@@ -11,6 +11,9 @@
 #define MENSAJE_ARRANQUE_TAMANO 3          // 1 = chiquito, 3 = grandote
 #define MENSAJE_ARRANQUE_MS     3000       // cuánto tiempo se ve
 
+// Mensaje que muestra la primera vez que se conecta al WiFi ("" = no mostrarlo)
+#define MENSAJE_WIFI            "¡Tengo\nWiFi!"
+
 // Si pasa este tiempo sin que el sensor vea a nadie, Pitri se va a dormir
 #define TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS  (60 * 1000)   // 1 minuto
 

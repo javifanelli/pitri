@@ -12,6 +12,7 @@
 #include "eyes.h"
 #include "motion.h"
 #include "dht.h"
+#include "wifi.h"
 
 static const char *TAG = "PITRI";
 
@@ -78,6 +79,7 @@ void app_main(void)
     display_init();
     motion_init();
     dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
+    wifi_iniciar();          // se conecta "de fondo", no hay que esperarlo
 
     // Mensajes de bienvenida
     mostrar_mensaje(MENSAJE_ARRANQUE);
@@ -87,6 +89,7 @@ void app_main(void)
     eyes_saludar();
 
     int64_t ultima_vez_temperatura_us = esp_timer_get_time();
+    bool ya_festejo_wifi = false;
 
     while (1) {
         if (motion_ms_sin_movimiento() >= TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS) {
@@ -95,6 +98,14 @@ void app_main(void)
 
         // Si alguien llegó mientras jugaba, saluda antes de seguir
         if (motion_alguien_llego()) eyes_saludar();
+
+        // La primera vez que se conecta al WiFi, lo festeja
+        if (!ya_festejo_wifi && wifi_conectado()) {
+            ya_festejo_wifi = true;
+            mostrar_mensaje(MENSAJE_WIFI);
+            eyes_init();
+            eyes_saludar();
+        }
 
         // Cada tanto muestra la temperatura
         if (MOSTRAR_TEMPERATURA_CADA_MS > 0 &&
