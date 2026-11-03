@@ -19,8 +19,8 @@
 
 // ─── Temperatura y humedad (DHT11 / DHT22) ───────────────────────────
 #define TIEMPO_ENTRE_LECTURAS_MS       (10 * 1000)  // cada cuánto lee el sensor (mínimo 2 s)
-#define MOSTRAR_TEMPERATURA_CADA_MS    (60 * 1000)  // cada cuánto la muestra en pantalla (0 = nunca)
-#define MOSTRAR_TEMPERATURA_MS         4000         // cuánto tiempo se ve
+#define MOSTRAR_TEMPERATURA_CADA_MS    (5 * 60 * 1000)  // cada cuánto la muestra: 5 minutos (0 = nunca)
+#define MOSTRAR_TEMPERATURA_MS         6000             // cuánto tiempo se ve
 
 // Descanso entre un juego y otro (se elige un valor al azar en este rango)
 #define DESCANSO_MIN_MS  300

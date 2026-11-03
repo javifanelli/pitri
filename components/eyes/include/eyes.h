@@ -22,4 +22,9 @@ void eyes_dormido(void);
 // Abre los ojos de golpe y parpadea
 void eyes_despertar(void);
 
+// La carita se corre a la izquierda y mira hacia la derecha, donde aparece
+// "texto" con letra chica (acepta '\n', hasta 4 renglones de ~8 letras).
+// Se queda "ms" milisegundos y después vuelve a la normalidad.
+void eyes_mostrar_datos(const char *texto, int ms);
+
 #endif // EYES_H

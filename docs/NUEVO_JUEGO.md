@@ -64,8 +64,9 @@ Todo lo que se puede cambiar de la cara:
 | `d.asombro` | 0 a 1 | Boca en forma de "O" |
 | `d.sospecha` | 0 a 1 | Boca torcida |
 | `d.sueno` | 0 a 1 | Boquita de dormido |
+| `d.mira` | -2 a 2 | Hacia dónde mira, aparte de dónde están los ojos (negativo = izquierda) |
 
-La **boca** aparece sola según la emoción: `feliz` pone sonrisa, `triste` la sonrisa al
+La **boca** aparece sola según la emoción (si no hay ninguna, una sonrisita tranquila): `feliz` pone sonrisa, `triste` la sonrisa al
 revés, `enojo` zigzag, `espiral` una ola, `corazon` un beso y `lentes` una sonrisa de
 costado. Si querés solo la boca, sin cambiar los ojos, usá `asombro`, `sospecha` o `sueno`.
 

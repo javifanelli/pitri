@@ -1,3 +1,3 @@
 idf_component_register(SRCS "main.c"
                     INCLUDE_DIRS "."
-                    REQUIRES board_config display eyes motion dht wifi esp_timer)
+                    REQUIRES board_config display eyes motion dht wifi botones esp_timer)

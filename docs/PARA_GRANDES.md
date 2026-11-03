@@ -43,7 +43,8 @@ pitri/
 │   ├── eyes/              ← los ojos: animación, expresiones y juegos
 │   ├── motion/            ← sensor de movimiento PIR
 │   ├── dht/               ← sensor de temperatura y humedad DHT11/DHT22
-│   └── wifi/              ← conexión WiFi (datos privados en wifi_secretos.h)
+│   ├── wifi/              ← conexión WiFi (datos privados en wifi_secretos.h)
+│   └── botones/           ← los 2 botones (con anti-rebote)
 ├── docs/                  ← documentación, diagrama y datasheets
 └── managed_components/    ← librerías descargadas (no se tocan a mano)
 ```
@@ -85,15 +86,21 @@ sensor DHT, rotación de pantalla, pines reservados para audio. Ver
 ### `eyes` — [eyes.h](../components/eyes/include/eyes.h)
 - Estado de la cara en `cara_t` (posición, tamaño, apertura por ojo, `feliz`, `enojo`,
   `triste`, `espiral`, `giro`, `lagrima`, `zzz`, `corazon`, `corazoncitos`, `lentes`,
-  `asombro`, `sospecha`, `sueno`).
-- Boca: `dibujar_boca()` elige el tipo según el peso de emoción más alto (umbral 0,3) y la
+  `asombro`, `sospecha`, `sueno`, `mira`, `datos`).
+- Perspectiva: `p = (x / MAX_X + mira) · 0.12`, limitada a ±0,15. `mira` permite que la cara
+  esté en un lado y mire hacia el otro.
+- `eyes_mostrar_datos(texto, ms)`: achica la cara, la corre a la izquierda mirando a la
+  derecha y hace entrar `texto` (fuente 5×7, escala 1, desde x = 78) deslizándose.
+- Boca: siempre hay una. `dibujar_boca()` elige el tipo según el peso de emoción más alto
+  (umbral 0,3; si ninguno llega, `BOCA_SENCILLA`, que se ubica como si los ojos estuvieran
+  abiertos para no saltar al parpadear) y la
   ubica debajo de los ojos (calcula dónde terminan según apertura, perspectiva, espiral,
   corazón o lentes) sin salirse de la pantalla. Para agregar una boca: un valor en
   `boca_t`, una `CANDIDATA`, su alto en `alto_boca[]` y su `case`.
 - `animar(destino, ms)` interpola todos los campos con smoothstep a ~33 fps (`CUADRO_MS 30`).
 - Juegos en una tabla `juegos[]` con pesos; `eyes_jugar()` elige uno al azar.
 - API pública: `eyes_init`, `eyes_jugar`, `eyes_parpadear`, `eyes_saludar`,
-  `eyes_dormirse`, `eyes_dormido`, `eyes_despertar`.
+  `eyes_dormirse`, `eyes_dormido`, `eyes_despertar`, `eyes_mostrar_datos`.
 - Todas las funciones **bloquean** mientras dura la animación.
 
 ### `motion` — [motion.h](../components/motion/include/motion.h)
@@ -116,6 +123,11 @@ sensor DHT, rotación de pantalla, pines reservados para audio. Ver
 - Credenciales solo en RAM (`WIFI_STORAGE_RAM`). Nunca se loguean ni el SSID ni la contraseña.
 - Si no existe `wifi_secretos.h`, compila igual y Pitri sigue sin WiFi (avisa por consola).
 - `wifi_conectado()` dice si tiene IP.
+
+### `botones` — [botones.h](../components/botones/include/botones.h)
+- Tarea propia que lee `PIN_BTN_1` y `PIN_BTN_2` cada 10 ms, con pull-up interno.
+- Anti-rebote: un cambio vale si se repite 3 lecturas seguidas (30 ms).
+- Loguea `BOTONES: ¡Botón N apretado!` y deja una marca para `botones_se_apreto(n)`.
 
 ---
 
@@ -145,14 +157,14 @@ compilado contiene la contraseña.
 
 ```
 app_main
-├── display_init, motion_init, dht_iniciar, wifi_iniciar
+├── display_init, motion_init, dht_iniciar, wifi_iniciar, botones_iniciar
 ├── mensajes de bienvenida (MENSAJE_ARRANQUE y MENSAJE_ARRANQUE_2)
 ├── eyes_init + eyes_saludar
 └── while (1)
     ├── ¿sin movimiento ≥ TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS?  → dormir()
     ├── ¿motion_alguien_llego()?                                  → eyes_saludar()
     ├── ¿primera conexión WiFi?                                   → "¡Tengo WiFi!" + saludo
-    ├── ¿pasó MOSTRAR_TEMPERATURA_CADA_MS?                        → mostrar_temperatura()
+    ├── ¿pasó MOSTRAR_TEMPERATURA_CADA_MS (5 min)?                → eyes_mostrar_datos()
     ├── eyes_jugar()
     └── descansar(azar)   ← revisa el sensor cada 50 ms
 ```

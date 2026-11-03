@@ -14,6 +14,26 @@ Acá anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el
 
 ---
 
+## 2026-11-02 — Siempre con boca 🙂
+
+**Qué hicimos:** Ahora Pitri **siempre** tiene boca. Cuando está tranquilo (mirando, paseando, parpadeando) lleva una sonrisita chiquita, y cuando siente algo, la boca de esa emoción.
+
+**Qué aprendimos:** La boca va justo abajo de los ojos, pero cuando Pitri parpadea los ojos se achican… ¡y la boca saltaba para arriba! Lo arreglamos haciendo que la sonrisita tranquila se ubique como si los ojos estuvieran siempre abiertos.
+
+---
+
+## 2026-11-02 — Botones y Pitri mirando los datos 🔘👀
+
+**Qué hicimos:**
+- Conectamos los **2 botones**. Por ahora, cuando los apretás, Pitri lo avisa en la consola.
+- Ahora Pitri muestra la temperatura y la humedad **cada 5 minutos**, con letra chica. Su carita se achica, se corre a un costado y **mira los datos**, que entran deslizándose.
+
+**Qué aprendimos:**
+- Los botones **rebotan**: al apretarlos, el metal hace contacto varias veces seguidas. Para no contar de más, Pitri espera a que el botón se quede quieto.
+- Para que Pitri pareciera mirar a un costado sin moverse para ese lado, separamos "dónde están los ojos" de "hacia dónde miran".
+
+---
+
 ## 2026-11-02 — ¡Pitri tiene WiFi! 📶
 
 **Qué hicimos:** Conectamos a Pitri a la red WiFi de casa. La primera vez que se conecta, dice **"¡Tengo WiFi!"** y se pone contento. Si se corta, lo vuelve a intentar solo.

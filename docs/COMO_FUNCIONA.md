@@ -18,7 +18,7 @@ Al prenderse:
 Y después, una y otra vez:
    ¿Hace mucho que no veo a nadie?  →  me duermo hasta que llegue alguien
    ¿Llegó alguien?                  →  ¡lo saludo!
-   ¿Pasó un minuto?                 →  muestro la temperatura
+   ¿Pasaron 5 minutos?              →  miro la temperatura
    Elijo un juego al azar y lo hago
    Descanso un ratito
 ```
@@ -30,7 +30,8 @@ Mientras tanto, hay **ayudantes** que trabajan al mismo tiempo, sin que el progr
 principal se tenga que acordar de ellos:
 
 - uno vigila el **sensor de movimiento** todo el tiempo,
-- otro lee el **sensor de temperatura** cada 10 segundos.
+- otro lee el **sensor de temperatura** cada 10 segundos,
+- y otro vigila los **botones**.
 
 > 🧑‍🔧 **Para grandes:** los "ayudantes" son *tareas* de FreeRTOS, el sistema operativo que
 > trae el ESP32. Cada una tiene su propio `while (1)` y el ESP32 las va alternando muy rápido
@@ -155,6 +156,7 @@ círculo**, **líneas rectas** y **anillos** (un círculo blanco con un agujero 
 
 | Emoción | Boca | Cómo se dibuja |
 |---|---|---|
+| 🙂 Tranquilo | Sonrisita | Un pedacito de círculo, chiquito y finito |
 | 😊 Contento | Sonrisa | La parte de **abajo** de un círculo. Crece cuanto más contento está |
 | 😢 Triste | Sonrisa al revés | La parte de **arriba** de un círculo |
 | 😠 Enojado | Zigzag | Seis rayitas que suben y bajan, como dientes apretados |
@@ -165,8 +167,16 @@ círculo**, **líneas rectas** y **anillos** (un círculo blanco con un agujero 
 | 🤨 Sospecha | Rayita torcida | Una línea cortita inclinada |
 | 😴 Dormido | o chiquita | Un anillo chiquito, como roncando |
 
-Cuando Pitri está tranquilo no tiene boca. Y si tiene dos emociones a la vez (por ejemplo,
+Pitri **siempre** tiene boca: cuando no siente nada especial (mirando, paseando,
+parpadeando), lleva la sonrisita tranquila. Y si tiene dos emociones a la vez (por ejemplo,
 mientras pasa de enamorado a contento), muestra la boca de la emoción **más fuerte**.
+
+### Mirar para un costado
+
+Para que parezca que Pitri mira hacia un lado, el ojo de ese lado se dibuja **un poquito
+más grande**, como cuando girás la cabeza. Normalmente mira hacia donde están sus ojos,
+pero cuando muestra la temperatura hace algo especial: se achica, se corre a la
+**izquierda** y mira hacia la **derecha**, donde aparecen los datos.
 
 ### ¿Cómo elige qué juego hacer?
 
@@ -226,6 +236,30 @@ se perdió en el camino y Pitri descarta el mensaje.
 > `SENSOR_TH_MODELO` en `board_config.h`); cambian el pulso de inicio (18 ms vs 1 ms) y el
 > formato de los números. Como los tiempos son de microsegundos, mientras escucha bloquea
 > las interrupciones, y por eso corre en el otro núcleo del ESP32 que el display.
+
+---
+
+## 🔘 Los botones: un cable que se une a tierra
+
+Cada botón tiene dos patas: una va a un pin del ESP32 y la otra a **GND** (tierra, el "0").
+Adentro del ESP32 hay una resistencia (el *pull-up*) que, cuando nadie toca el botón,
+mantiene el pin en **1**. Al apretar, el botón une el pin con GND y el pin pasa a **0**.
+
+```
+  suelto:   pin ── 1        apretado:   pin ──┐
+                                              └── GND  →  0
+```
+
+### El rebote
+
+Cuando apretás un botón, las chapitas de metal de adentro **rebotan** y durante unos
+milisegundos se tocan y se separan varias veces. Si Pitri no tuviera cuidado, ¡contaría
+varias apretadas! Por eso solo cree que el botón cambió cuando lo ve igual **3 veces
+seguidas** (30 milisegundos).
+
+> 🧑‍🔧 **Para grandes:** [botones.c](../components/botones/botones.c) tiene una tarea que
+> lee los pines cada 10 ms con *debounce* por contador, loguea cada apretada y deja una
+> marca que se consume con `botones_se_apreto(n)`, lista para usar desde `main.c`.
 
 ---
 

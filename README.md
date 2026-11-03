@@ -26,7 +26,8 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 | Está tranquilo | Juega solo: mira para los costados, parpadea, guiña un ojo, se marea, se enoja, llora… |
 | Llega alguien | Se sorprende 😮 y se pone contento 😊 |
 | Pasa un rato sin ver a nadie | Se duerme 😴 y le salen "Z" |
-| Pasa un minuto | Muestra la temperatura y la humedad |
+| Pasan 5 minutos | Se corre a un costado y mira la temperatura y la humedad, que aparecen con letra chica |
+| Apretás un botón | Lo avisa en la consola de la compu (¡pronto va a hacer algo más!) |
 | Se conecta al WiFi | Dice **"¡Tengo WiFi!"** y se pone contento |
 
 ### Los juegos de Pitri
@@ -51,6 +52,7 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 
 ¡Y cada emoción tiene **su propia boca**! Sonrisa cuando está contento, una "O" cuando se
 sorprende, zigzag cuando se enoja, un "3" de beso cuando está enamorado, y muchas más.
+Cuando está tranquilo, lleva una sonrisita chiquita.
 
 ---
 
@@ -62,7 +64,7 @@ sorprende, zigzag cuando se enoja, un "3" de beso cuando está enamorado, y much
 | **Pantalla OLED** | Es la **cara**: ahí se dibujan los ojos |
 | **Sensor PIR** | Son los **ojos de verdad**: detecta cuando alguien se mueve cerca |
 | **Sensor DHT11** | Es la **piel**: siente la temperatura y la humedad del aire |
-| **2 botones** | Todavía no los usamos… ¡ya les vamos a encontrar un trabajo! |
+| **2 botones** | Por ahora solo avisan en la consola cuando los apretás… ¡ya les vamos a encontrar un trabajo! |
 
 Cómo se conecta todo: 👉 [docs/CONEXIONES.md](docs/CONEXIONES.md)
 
@@ -90,7 +92,7 @@ sin saber programar. Algunos ejemplos:
 #define MENSAJE_ARRANQUE    "¡Hola\nSofi!"               // lo que dice al prenderse
 #define MENSAJE_ARRANQUE_2  "Soy\nPitri"                 // y después
 #define TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS  (60 * 1000) // cuándo se duerme
-#define MOSTRAR_TEMPERATURA_CADA_MS  (60 * 1000)          // cada cuánto muestra la temperatura
+#define MOSTRAR_TEMPERATURA_CADA_MS  (5 * 60 * 1000)      // cada cuánto muestra la temperatura
 ```
 
 Y en [components/eyes/eyes.c](components/eyes/eyes.c), arriba de todo, está la forma de

@@ -3,6 +3,7 @@
 #include "board_config.h"
 
 #include <math.h>
+#include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_random.h"
@@ -42,6 +43,8 @@ typedef struct {
     float asombro;            // 0 a 1: boca en forma de "O" (sorpresa)
     float sospecha;           // 0 a 1: boca torcida (sospecha)
     float sueno;              // 0 a 1: boquita de dormido
+    float mira;               // hacia dónde mira, aparte de dónde está (-1 izq, +1 der)
+    float datos;              // 0 a 1: cuánto entraron los datos (texto) desde la derecha
 } cara_t;
 
 static const cara_t CARA_NORMAL = {
@@ -50,6 +53,11 @@ static const cara_t CARA_NORMAL = {
 };
 
 static cara_t cara;
+
+// Texto que se muestra al costado con eyes_mostrar_datos()
+#define DATOS_X 78            // dónde empieza el texto (deja la izquierda para la carita)
+#define DATOS_Y 15            // altura del primer renglón
+static char texto_datos[64];
 
 // ─── Ayudantes ───────────────────────────────────────────────────────────────
 
@@ -233,10 +241,11 @@ static void dibujar_z(int x, int y, int s)
 // ─── La boca ─────────────────────────────────────────────────────────────────
 // Cada emoción tiene su boca. Si hay varias emociones a la vez (por ejemplo,
 // mientras pasa de una cara a otra), gana la más fuerte. Si ninguna llega a
-// 0,3, Pitri no muestra boca (cara tranquila).
+// 0,3, Pitri está tranquilo y lleva una sonrisita sencilla.
 
 typedef enum {
     BOCA_NINGUNA,
+    BOCA_SENCILLA,   // 🙂 tranquilo:  ‿ chiquita
     BOCA_SONRISA,    // 😊 contento:   ‿
     BOCA_TRISTE,     // 😢 triste:     ⁀
     BOCA_ENOJADA,    // 😠 enojado:    /\/\/\  (dientes apretados)
@@ -264,7 +273,7 @@ static void dibujar_boca(float cy, float perspectiva)
     CANDIDATA(cara.sospecha, BOCA_SOSPECHA);
     CANDIDATA(cara.sueno,    BOCA_DORMIDA);
 #undef CANDIDATA
-    if (boca == BOCA_NINGUNA) return;
+    if (boca == BOCA_NINGUNA) boca = BOCA_SENCILLA;   // sin emoción fuerte: boca tranquila
 
     float mx = LCD_H_RES / 2.0f + cara.x;   // la boca sigue a la cara
 
@@ -284,7 +293,9 @@ static void dibujar_boca(float cy, float perspectiva)
     } else if (cara.corazon > 0.5f) {
         mitad_ojo = 1.5f * cara.ancho / 4;              // la punta del corazón
     } else {
-        float abre = fmaxf(cara.abre_izq, cara.abre_der);
+        // La boca sencilla no se mueve cuando parpadea: la ubicamos como si
+        // los ojos estuvieran abiertos
+        float abre = (boca == BOCA_SENCILLA) ? 1 : fmaxf(cara.abre_izq, cara.abre_der);
         float alto = cara.alto * (1 + fabsf(perspectiva));
         mitad_ojo = (OJO_ALTO_CERRADO + (alto - OJO_ALTO_CERRADO) * abre) / 2;
     }
@@ -292,13 +303,17 @@ static void dibujar_boca(float cy, float perspectiva)
 
     // Alto de cada boca, para que no se salga de la pantalla por abajo
     static const int alto_boca[] = {
-        [BOCA_TRISTE] = 7, [BOCA_ENOJADA] = 6, [BOCA_O] = 11, [BOCA_MAREADA] = 6,
+        [BOCA_SENCILLA] = 5, [BOCA_TRISTE] = 7, [BOCA_ENOJADA] = 6, [BOCA_O] = 11, [BOCA_MAREADA] = 6,
         [BOCA_BESO] = 16, [BOCA_CANCHERA] = 6, [BOCA_SOSPECHA] = 5, [BOCA_DORMIDA] = 7,
     };
     float y = fminf(cy + mitad_ojo + 4, LCD_V_RES - 1 - alto_boca[boca]);   // arriba de la boca
 
     // 3. Dibujarla
     switch (boca) {
+    case BOCA_SENCILLA:    // sonrisita chiquita y suave, con trazo finito
+        dibujar_arco(mx, y - 4, 7, 0.25f * (float)M_PI, 0.75f * (float)M_PI, 2);
+        break;
+
     case BOCA_TRISTE:      // la sonrisa dada vuelta: la parte de arriba del círculo
         dibujar_arco(mx, y + 11, 11, 1.2f * (float)M_PI, 1.8f * (float)M_PI, 3);
         break;
@@ -344,8 +359,11 @@ static void dibujar_boca(float cy, float perspectiva)
 
 static void dibujar(void)
 {
-    // Perspectiva: el ojo del lado hacia donde mira se ve un poquito más grande
-    float p = (cara.x / MAX_X) * 0.12f;
+    // Perspectiva: el ojo del lado hacia donde mira se ve un poquito más grande.
+    // Normalmente mira hacia donde están los ojos (x); "mira" la puede cambiar.
+    float p = (cara.x / MAX_X + cara.mira) * 0.12f;
+    if (p >  0.15f) p =  0.15f;
+    if (p < -0.15f) p = -0.15f;
 
     float cy     = LCD_V_RES / 2.0f + cara.y;
     float cx_izq = LCD_H_RES / 2.0f - OJO_SEPARACION / 2.0f - cara.ancho / 2.0f + cara.x;
@@ -357,6 +375,12 @@ static void dibujar(void)
 
     // La boca, según la emoción
     dibujar_boca(cy, p);
+
+    // Datos (texto chico) que entran deslizándose desde la derecha
+    if (cara.datos > 0.01f) {
+        int x = (int)(LCD_H_RES - (LCD_H_RES - DATOS_X) * cara.datos);
+        display_draw_text(x, DATOS_Y, texto_datos, 1, true);
+    }
 
     // Corazoncitos que suben flotando: uno a cada costado y uno en el medio
     if (cara.corazoncitos > 0.01f && cara.corazoncitos < 0.99f) {
@@ -416,6 +440,8 @@ static void animar(cara_t destino, int ms)
         cara.asombro  = mezclar(inicio.asombro,  destino.asombro,  t);
         cara.sospecha = mezclar(inicio.sospecha, destino.sospecha, t);
         cara.sueno    = mezclar(inicio.sueno,    destino.sueno,    t);
+        cara.mira     = mezclar(inicio.mira,     destino.mira,     t);
+        cara.datos    = mezclar(inicio.datos,    destino.datos,    t);
 
         dibujar();
         xTaskDelayUntil(&ultimo, pdMS_TO_TICKS(CUADRO_MS));
@@ -725,6 +751,29 @@ void eyes_init(void)
 {
     cara = CARA_NORMAL;
     dibujar();
+}
+
+// ─── Mostrar datos ───────────────────────────────────────────────────────────
+
+void eyes_mostrar_datos(const char *texto, int ms)
+{
+    snprintf(texto_datos, sizeof(texto_datos), "%s", texto);
+
+    // La carita se achica y se corre a la izquierda, mirando hacia la derecha,
+    // mientras los datos entran deslizándose
+    cara_t d = CARA_NORMAL;
+    d.ancho = 20;
+    d.alto  = 26;
+    d.x     = -28;
+    d.mira  = 2;           // aunque está a la izquierda, mira a la derecha
+    d.datos = 1;
+    animar(d, 500);
+
+    esperar(ms / 2);
+    eyes_parpadear();      // un parpadeo en el medio, para que se vea vivo
+    esperar(ms / 2);
+
+    animar(CARA_NORMAL, 400);   // los datos se van y la carita vuelve al centro
 }
 
 // ─── Dormir ──────────────────────────────────────────────────────────────────

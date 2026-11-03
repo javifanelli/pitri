@@ -13,6 +13,7 @@
 #include "motion.h"
 #include "dht.h"
 #include "wifi.h"
+#include "botones.h"
 
 static const char *TAG = "PITRI";
 
@@ -38,24 +39,17 @@ static void descansar(int ms)
     }
 }
 
-// Muestra la temperatura grande y la humedad abajo, y después vuelven los ojos
+// Pitri se corre a un costado y mira los datos del sensor, que aparecen con letra chica
 static void mostrar_temperatura(void)
 {
     int16_t t, h;
     if (!dht_ultima_lectura(&t, &h)) return;   // todavía no hay ninguna lectura
 
-    char temp[32], hum[32];
-    snprintf(temp, sizeof(temp), "%s%d.%d°C", t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10);
-    snprintf(hum, sizeof(hum), "Humedad %d%%", (h + 5) / 10);
+    char texto[64];
+    snprintf(texto, sizeof(texto), "Temp:\n%s%d.%d°C\nHumedad:\n%d%%",
+             t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10, (h + 5) / 10);
 
-    display_clear();
-    display_draw_text((LCD_H_RES - display_text_width(temp, 3)) / 2, 12, temp, 3, true);
-    display_draw_text((LCD_H_RES - display_text_width(hum, 1)) / 2, 48, hum, 1, true);
-    display_flush();
-    vTaskDelay(pdMS_TO_TICKS(MOSTRAR_TEMPERATURA_MS));
-
-    eyes_init();
-    eyes_parpadear();
+    eyes_mostrar_datos(texto, MOSTRAR_TEMPERATURA_MS);
 }
 
 // Duerme hasta que el sensor vea a alguien
@@ -80,6 +74,7 @@ void app_main(void)
     motion_init();
     dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
     wifi_iniciar();          // se conecta "de fondo", no hay que esperarlo
+    botones_iniciar();       // por ahora solo avisan por consola cuando se aprietan
 
     // Mensajes de bienvenida
     mostrar_mensaje(MENSAJE_ARRANQUE);
