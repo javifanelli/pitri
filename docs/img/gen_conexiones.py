@@ -3,14 +3,14 @@
 Uso:  python docs/img/gen_conexiones.py docs/img/conexiones.svg
 
 Placa: ESP32 DevKit de 30 pines (estilo DOIT DevKit V1), vista desde arriba,
-antena arriba y USB abajo. Si se cambia un pin, actualizar también
+antena arriba y USB abajo. Si se cambia un pin, actualizar tambien
 components/board_config/include/board_config.h
 """
 import sys
 
 OUT = sys.argv[1]
 
-T = 70                      # margen superior (título)
+T = 70                      # margen superior (titulo)
 def py(i): return T + 120 + 32 * i
 
 W = 1040
@@ -20,13 +20,13 @@ board_top = py(0) - 70
 board_bot = py(14) + 40
 GND_X, V33_X = 975, 995     # rieles verticales de la derecha
 BOT_GND, BOT_3V3 = py(14) + 42, py(14) + 62
-PX0, PX1 = 790, 950         # periféricos de la derecha
+PX0, PX1 = 790, 950         # perifericos de la derecha
 
 C = dict(v33='#d62728', v5='#ff7f0e', gnd='#222222', sda='#1f77b4', scl='#17becf',
          pir='#b8860b', dht='#e377c2', btn='#8c564b', adc='#2ca02c', dac='#9467bd',
          spi='#4a6fa5', avoid='#9a9a9a', free='#ffffff')
 
-# Lo que está impreso en la placa, de arriba (antena) hacia abajo (USB)
+# Lo que esta impreso en la placa, de arriba (antena) hacia abajo (USB)
 left = ['EN', 'VP·36', 'VN·39', 'D34', 'D35', 'D32', 'D33', 'D25', 'D26', 'D27', 'D14', 'D12',
         'D13', 'GND', 'VIN']
 right = ['D23', 'D22', 'TX0', 'RX0', 'D21', 'D19', 'D18', 'D5', 'TX2·17', 'RX2·16', 'D4', 'D2',
@@ -42,11 +42,11 @@ rtag = {0: 'SPI', 2: 'USB', 3: 'USB', 5: 'SPI', 6: 'SPI', 7: 'SPI', 11: 'arranqu
 used = {('L', 9), ('L', 13), ('L', 14), ('R', 1), ('R', 4), ('R', 8), ('R', 9), ('R', 10),
         ('R', 13), ('R', 14)}
 
-# Posiciones de los periféricos
+# Posiciones de los perifericos
 disp_top = T + 60
 SCL_Y, SDA_Y = disp_top + 50, disp_top + 100
-B2_Y = py(8) - 76           # botón 2 -> TX2 (GPIO17)
-B1_Y = py(9)                # botón 1 -> RX2 (GPIO16), línea recta
+B2_Y = py(8) - 76           # boton 2 -> TX2 (GPIO17)
+B1_Y = py(9)                # boton 1 -> RX2 (GPIO16), linea recta
 DATA_Y = py(10) + 75        # DHT22
 pir_top, pir_bot = py(9) - 40, py(14) + 30
 H = BOT_3V3 + 170
@@ -111,7 +111,7 @@ wire_hop(PX1, V33_X, DATA_Y - 20, GND_X, C['v33'])
 wire([(PX1, DATA_Y + 20), (GND_X, DATA_Y + 20)], C['gnd'])
 dot(V33_X, DATA_Y - 20, C['v33']); dot(GND_X, DATA_Y + 20, C['gnd'])
 
-# PIR (izquierda, líneas rectas)
+# PIR (izquierda, lineas rectas)
 wire([(BX0, py(9)), (250, py(9))], C['pir'])
 wire([(BX0, py(13)), (250, py(13))], C['gnd'])
 wire([(BX0, py(14)), (250, py(14))], C['v5'])
@@ -159,7 +159,7 @@ def pins(labels, cats, tags, side):
 pins(left, lcat, ltag, 'L')
 pins(right, rcat, rtag, 'R')
 
-# ─── Periféricos ──────────────────────────────────────────────────────────────
+# ─── Perifericos ──────────────────────────────────────────────────────────────
 box(PX0, disp_top, PX1, disp_top + 150, 'Display OLED 1.3"', 'SH1106 · I2C 0x3C')
 a(f'<rect x="832" y="{disp_top + 34}" width="76" height="84" rx="4" fill="#000"/>')
 a(f'<rect x="843" y="{disp_top + 58}" width="22" height="30" rx="7" fill="#fff"/>')
@@ -169,7 +169,7 @@ for y, l in ((SCL_Y, 'SCL'), (SDA_Y, 'SDA')):
 for y, l in ((SCL_Y, 'VCC'), (SDA_Y, 'GND')):
     pad(PX1, y); text(PX1 - 8, y, l, 11, '#111', 'end', 'bold')
 
-for y, name in ((B2_Y, 'Botón 2'), (B1_Y, 'Botón 1')):
+for y, name in ((B2_Y, 'Boton 2'), (B1_Y, 'Boton 1')):
     a(f'<rect x="{PX0}" y="{y - 22}" width="{PX1 - PX0}" height="44" rx="8" fill="#f4f6f8" stroke="#555" stroke-width="1.5"/>')
     a(f'<circle cx="{(PX0 + PX1) / 2 + 10}" cy="{y}" r="11" fill="#d33" stroke="#822" stroke-width="2"/>')
     text(PX0 + 12, y, name, 12, '#111', 'start', 'bold')
@@ -211,7 +211,7 @@ for r, items in enumerate(rows):
         a(f'<circle cx="{xx}" cy="{yy}" r="7" fill="{C[k]}" stroke="#666" stroke-width="1"/>')
         text(xx + 14, yy, lbl, 12, '#222')
         xx += 125 if r == 0 else 30 + len(lbl) * 7
-text(30, ly + 95, 'Las líneas que se cruzan con un "saltito" NO están conectadas. Los puntos indican unión.', 12, '#555')
+text(30, ly + 95, 'Las lineas que se cruzan con un "saltito" NO estan conectadas. Los puntos indican union.', 12, '#555')
 
 a('</svg>')
 open(OUT, 'w', encoding='utf-8').write('\n'.join(o))

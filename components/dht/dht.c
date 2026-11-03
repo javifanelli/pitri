@@ -20,18 +20,18 @@
 #define ESPERA_REINTENTO_MS 2000
 
 /*
- * Cómo hablan el DHT11 y el DHT22 (un solo cable, ver docs/datasheets/):
+ * Como hablan el DHT11 y el DHT22 (un solo cable, ver docs/datasheets/):
  *
- *   1. El ESP32 tira la línea a 0 ("¡despertate!"): 18 ms el DHT11, 1 ms el DHT22
+ *   1. El ESP32 tira la linea a 0 ("¡despertate!"): 18 ms el DHT11, 1 ms el DHT22
  *   2. La suelta y el sensor contesta: 80 µs en 0 y 80 µs en 1
- *   3. Manda 40 bits. Cada bit empieza con 50 µs en 0 y después:
+ *   3. Manda 40 bits. Cada bit empieza con 50 µs en 0 y despues:
  *        - 1 durante ~27 µs  → es un 0
  *        - 1 durante ~70 µs  → es un 1
- *   4. Los 40 bits son 5 bytes: humedad (2), temperatura (2), verificación (1)
+ *   4. Los 40 bits son 5 bytes: humedad (2), temperatura (2), verificacion (1)
  *
- *   Lo único que cambia entre los dos es cómo vienen los números:
+ *   Lo unico que cambia entre los dos es como vienen los numeros:
  *     DHT11: [hum entera] [hum decimal] [temp entera] [temp decimal]
- *     DHT22: [humedad en décimas, 16 bits] [temperatura en décimas, 16 bits]
+ *     DHT22: [humedad en decimas, 16 bits] [temperatura en decimas, 16 bits]
  */
 
 static portMUX_TYPE candado = portMUX_INITIALIZER_UNLOCKED;
@@ -40,7 +40,7 @@ static volatile bool    hay_lectura = false;
 static volatile int16_t ultima_temp = 0;
 static volatile int16_t ultima_hum  = 0;
 
-// Espera a que la línea tenga "nivel". Devuelve cuántos µs tardó, o -1 si se pasó del tiempo.
+// Espera a que la linea tenga "nivel". Devuelve cuantos µs tardo, o -1 si se paso del tiempo.
 static int esperar_nivel(int nivel, int max_us)
 {
     int64_t t0 = esp_timer_get_time();
@@ -50,7 +50,7 @@ static int esperar_nivel(int nivel, int max_us)
     return (int)(esp_timer_get_time() - t0);
 }
 
-// Convierte los 5 bytes en temperatura y humedad (en décimas)
+// Convierte los 5 bytes en temperatura y humedad (en decimas)
 static void convertir(const uint8_t d[5], int16_t *temp, int16_t *hum)
 {
 #if SENSOR_TH_MODELO == DHT_MODELO_DHT11
@@ -73,21 +73,21 @@ esp_err_t dht_leer(int16_t *temperatura_decimas, int16_t *humedad_decimas)
     gpio_set_level(PIN_DHT, 0);
     esp_rom_delay_us(PULSO_DESPERTAR_US);
 
-    // Lo que sigue es muy rápido: que nada nos interrumpa mientras escuchamos
+    // Lo que sigue es muy rapido: que nada nos interrumpa mientras escuchamos
     portENTER_CRITICAL(&candado);
     gpio_set_level(PIN_DHT, 1);
 
-    // 2. Respuesta del sensor. Primero esperamos que la línea suba (la pull-up
+    // 2. Respuesta del sensor. Primero esperamos que la linea suba (la pull-up
     //    tarda unos µs). Si no la vemos subir, puede ser que el sensor ya la haya
     //    tirado a 0 para contestar: seguimos igual.
-    //    Después: 0 de ~80 µs, 1 de ~80 µs y arranca el primer bit.
+    //    Despues: 0 de ~80 µs, 1 de ~80 µs y arranca el primer bit.
     esperar_nivel(1, 40);
     if (esperar_nivel(0, 100) < 0 || esperar_nivel(1, 120) < 0 || esperar_nivel(0, 120) < 0) {
         ok = false;
     }
 
     // 3. Los 40 bits: medimos la parte en 0 y la parte en 1.
-    //    Si la parte en 1 es más larga que la parte en 0, es un 1.
+    //    Si la parte en 1 es mas larga que la parte en 0, es un 1.
     for (int i = 0; i < 40 && ok; i++) {
         int bajo = esperar_nivel(1, 100);
         int alto = (bajo < 0) ? -1 : esperar_nivel(0, 120);
@@ -98,7 +98,7 @@ esp_err_t dht_leer(int16_t *temperatura_decimas, int16_t *humedad_decimas)
 
     if (!ok) return ESP_ERR_TIMEOUT;
 
-    // 4. Verificación: el quinto byte es la suma de los otros cuatro
+    // 4. Verificacion: el quinto byte es la suma de los otros cuatro
     if (((d[0] + d[1] + d[2] + d[3]) & 0xFF) != d[4]) return ESP_ERR_INVALID_CRC;
 
     int16_t temp, hum;
@@ -145,9 +145,9 @@ void dht_iniciar(uint32_t intervalo_ms)
     ESP_ERROR_CHECK(gpio_config(&cfg));
     gpio_set_level(PIN_DHT, 1);
 
-    // Mientras lee, bloquea las interrupciones ~5 ms en su núcleo. Lo ponemos
-    // en el último núcleo (el 1 en el ESP32) para no molestar al display, que
-    // usa interrupciones de I2C en el núcleo 0.
+    // Mientras lee, bloquea las interrupciones ~5 ms en su nucleo. Lo ponemos
+    // en el ultimo nucleo (el 1 en el ESP32) para no molestar al display, que
+    // usa interrupciones de I2C en el nucleo 0.
     xTaskCreatePinnedToCore(tarea_lecturas, "dht", 3072, (void *)(uintptr_t)intervalo_ms, 4, NULL,
                             portNUM_PROCESSORS - 1);
 }

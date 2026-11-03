@@ -14,25 +14,168 @@
 #include "dht.h"
 #include "wifi.h"
 #include "botones.h"
+#include "menu.h"
+#include "reloj.h"
 
 static const char *TAG = "PITRI";
 
-// Muestra un texto grande en el centro de la pantalla durante MENSAJE_ARRANQUE_MS
-static void mostrar_mensaje(const char *texto)
+// ─── Modos ───────────────────────────────────────────────────────────────────
+// En el modo normal Pitri hace sus juegos. En los otros, hace de personajes.
+
+typedef enum {
+    MODO_NORMAL,
+    MODO_HALLOWEEN,
+    MODO_NAVIDAD,
+    MODO_ANIMALES,
+    CANT_MODOS
+} modo_t;
+
+static const char *const nombres_modos[CANT_MODOS] = {
+    "Normal", "Halloween", "Navidad", "Animales",
+};
+
+// Los 3 personajes de cada modo
+static const eyes_disfraz_t personajes[CANT_MODOS][3] = {
+    [MODO_HALLOWEEN] = { DISFRAZ_VAMPIRO,   DISFRAZ_FANTASMA, DISFRAZ_CALABAZA },
+    [MODO_NAVIDAD]   = { DISFRAZ_PAPA_NOEL, DISFRAZ_ARBOLITO, DISFRAZ_GALLETA  },
+    [MODO_ANIMALES]  = { DISFRAZ_GALLINA,   DISFRAZ_CERDO,    DISFRAZ_TORTUGA  },
+};
+
+static modo_t modo = MODO_NORMAL;
+static eyes_disfraz_t ultimo_personaje = DISFRAZ_NINGUNO;
+
+// Elige un personaje del modo actual, distinto del ultimo que hizo
+static eyes_disfraz_t elegir_personaje(void)
 {
-    if (texto[0] == '\0') return;   // mensaje vacío: no mostrar nada
-    display_clear();
-    display_draw_text_centered(texto, MENSAJE_ARRANQUE_TAMANO, true);
-    display_flush();
-    vTaskDelay(pdMS_TO_TICKS(MENSAJE_ARRANQUE_MS));
+    if (modo == MODO_NORMAL) return DISFRAZ_NINGUNO;   // el modo normal no tiene personajes
+
+    eyes_disfraz_t p;
+    do {
+        p = personajes[modo][esp_random() % 3];
+    } while (p == ultimo_personaje);
+    ultimo_personaje = p;
+    return p;
 }
 
-// Espera un rato, pero si alguien llega deja de esperar y saluda
+// ─── Pantallas de texto ──────────────────────────────────────────────────────
+
+// Muestra un texto centrado en la pantalla durante "ms" milisegundos
+static void mostrar_texto(const char *texto, int tamano, int ms)
+{
+    if (texto[0] == '\0') return;   // texto vacio: no mostrar nada
+    display_clear();
+    display_draw_text_centered(texto, tamano, true);
+    display_flush();
+    vTaskDelay(pdMS_TO_TICKS(ms));
+}
+
+static void mostrar_mensaje(const char *texto)
+{
+    mostrar_texto(texto, MENSAJE_ARRANQUE_TAMANO, MENSAJE_ARRANQUE_MS);
+}
+
+// ─── El menu ─────────────────────────────────────────────────────────────────
+//   Menu:  Modo / Hora / Salir
+//   Modo:  Normal / Halloween / Navidad / Animales / Volver
+
+// Para que los ojos corten lo que estan haciendo apenas se aprieta el boton 1
+static bool boton_menu_apretado(void)
+{
+    return botones_pendiente(1);
+}
+
+static void cambiar_modo(modo_t nuevo)
+{
+    modo = nuevo;
+    ultimo_personaje = DISFRAZ_NINGUNO;
+    ESP_LOGI(TAG, "Modo %s", nombres_modos[modo]);
+
+    char texto[32];
+    snprintf(texto, sizeof(texto), "Modo\n%s", nombres_modos[modo]);
+    mostrar_texto(texto, 2, 1500);
+}
+
+// Muestra la hora grande, el dia y la fecha durante MOSTRAR_HORA_MS.
+// Si se aprieta cualquier boton, sale antes.
+static void mostrar_hora(void)
+{
+    static const char *const dias[7] = {
+        "Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado",
+    };
+
+    struct tm t;
+    if (!reloj_hora(&t)) {
+        mostrar_texto(wifi_conectado() ? "Buscando\nla hora..." : "Sin WiFi\nno tengo\nhora", 2, 2500);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Mostrando la hora");
+    botones_se_apreto(1);
+    botones_se_apreto(2);
+
+    for (int ms = 0; ms < MOSTRAR_HORA_MS; ms += 250) {
+        if (botones_se_apreto(1) || botones_se_apreto(2)) break;
+        reloj_hora(&t);
+
+        // Los dos puntos titilan: aparecen un segundo si y otro no
+        char hora[32], fecha[40];
+        snprintf(hora, sizeof(hora), "%02d%c%02d", t.tm_hour, (t.tm_sec % 2) ? ' ' : ':', t.tm_min);
+        snprintf(fecha, sizeof(fecha), "%02d/%02d/%04d", t.tm_mday, t.tm_mon + 1, t.tm_year + 1900);
+
+        display_clear();
+        display_draw_text((LCD_H_RES - display_text_width(hora, 3)) / 2, 4, hora, 3, true);
+        display_draw_text((LCD_H_RES - display_text_width(dias[t.tm_wday], 2)) / 2, 32, dias[t.tm_wday], 2, true);
+        display_draw_text((LCD_H_RES - display_text_width(fecha, 1)) / 2, 53, fecha, 1, true);
+        display_flush();
+
+        vTaskDelay(pdMS_TO_TICKS(250));
+    }
+}
+
+static void abrir_menu(void)
+{
+    static const char *const opciones_menu[] = { "Modo", "Hora", "Salir" };
+    static const char *const opciones_modo[] = { "Normal", "Halloween", "Navidad", "Animales", "Volver" };
+    const int opcion_modo = 0, opcion_hora = 1;
+    const int volver = 4;
+
+    ESP_LOGI(TAG, "Abriendo el menu");
+    while (1) {
+        int elegida = menu_elegir("Menu", opciones_menu, 3, 0, -1, MENU_ESPERA_MAX_MS);
+
+        if (elegida == opcion_hora) {
+            mostrar_hora();
+            break;                                  // despues vuelve a la pantalla principal
+        }
+        if (elegida != opcion_modo) break;          // "Salir" o se cerro solo
+
+        int m = menu_elegir("Modo", opciones_modo, 5, modo, modo, MENU_ESPERA_MAX_MS);
+        if (m == volver) continue;                  // vuelve al menu anterior
+        if (m >= 0) cambiar_modo((modo_t)m);
+        break;
+    }
+
+    botones_se_apreto(1);   // apretadas sueltas no cuentan
+    botones_se_apreto(2);
+    eyes_init();            // vuelve la cara de Pitri (en el modo que estaba)
+}
+
+// ─── Comportamiento ──────────────────────────────────────────────────────────
+
+// Cuando llega alguien: en modo normal saluda, en los otros hace un personaje
+static void recibir_visita(void)
+{
+    if (modo == MODO_NORMAL) eyes_saludar();
+    else                     eyes_actuar(elegir_personaje());
+}
+
+// Espera un rato, pero corta si alguien llega o si aprietan el boton del menu
 static void descansar(int ms)
 {
     for (int t = 0; t < ms; t += 50) {
+        if (botones_pendiente(1)) return;
         if (motion_alguien_llego()) {
-            eyes_saludar();
+            recibir_visita();
             return;
         }
         vTaskDelay(pdMS_TO_TICKS(50));
@@ -43,27 +186,34 @@ static void descansar(int ms)
 static void mostrar_temperatura(void)
 {
     int16_t t, h;
-    if (!dht_ultima_lectura(&t, &h)) return;   // todavía no hay ninguna lectura
+    if (!dht_ultima_lectura(&t, &h)) return;   // todavia no hay ninguna lectura
 
     char texto[64];
     snprintf(texto, sizeof(texto), "Temp:\n%s%d.%d°C\nHumedad:\n%d%%",
              t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10, (h + 5) / 10);
 
+    eyes_sacar_disfraz();
     eyes_mostrar_datos(texto, MOSTRAR_TEMPERATURA_MS);
 }
 
-// Duerme hasta que el sensor vea a alguien
+// Duerme hasta que el sensor vea a alguien (o hasta que aprieten el boton del menu)
 static void dormir(void)
 {
     ESP_LOGI(TAG, "Pasaron %d s sin movimiento", TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS / 1000);
+    eyes_sacar_disfraz();
     eyes_dormirse();
 
-    while (!motion_alguien_llego()) {
+    bool llego_alguien = false;
+    while (!botones_pendiente(1)) {
+        if (motion_alguien_llego()) {
+            llego_alguien = true;
+            break;
+        }
         eyes_dormido();
     }
 
     eyes_despertar();
-    eyes_saludar();
+    if (llego_alguien) recibir_visita();
 }
 
 void app_main(void)
@@ -74,12 +224,14 @@ void app_main(void)
     motion_init();
     dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
     wifi_iniciar();          // se conecta "de fondo", no hay que esperarlo
-    botones_iniciar();       // por ahora solo avisan por consola cuando se aprietan
+    reloj_iniciar(ZONA_HORARIA);   // cuando haya WiFi, pone la hora (todavia no la mostramos)
+    botones_iniciar();       // boton 1 = menu, boton 2 = moverse en el menu
 
     // Mensajes de bienvenida
     mostrar_mensaje(MENSAJE_ARRANQUE);
     mostrar_mensaje(MENSAJE_ARRANQUE_2);
 
+    eyes_set_interrupcion(boton_menu_apretado);
     eyes_init();
     eyes_saludar();
 
@@ -87,12 +239,20 @@ void app_main(void)
     bool ya_festejo_wifi = false;
 
     while (1) {
-        if (motion_ms_sin_movimiento() >= TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS) {
-            dormir();
+        // Boton 1: abre el menu (el boton 2 solo sirve adentro del menu)
+        botones_se_apreto(2);
+        if (botones_se_apreto(1)) {
+            abrir_menu();
+            continue;
         }
 
-        // Si alguien llegó mientras jugaba, saluda antes de seguir
-        if (motion_alguien_llego()) eyes_saludar();
+        if (motion_ms_sin_movimiento() >= TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS) {
+            dormir();
+            continue;
+        }
+
+        // Si alguien llego mientras jugaba, lo recibe antes de seguir
+        if (motion_alguien_llego()) recibir_visita();
 
         // La primera vez que se conecta al WiFi, lo festeja
         if (!ya_festejo_wifi && wifi_conectado()) {
@@ -109,7 +269,9 @@ void app_main(void)
             ultima_vez_temperatura_us = esp_timer_get_time();
         }
 
-        eyes_jugar();
+        // Juega (modo normal) o hace un personaje (los otros modos)
+        if (modo == MODO_NORMAL) eyes_jugar();
+        else                     eyes_actuar(elegir_personaje());
 
         // Un descansito entre juego y juego, y a veces un parpadeo
         descansar(DESCANSO_MIN_MS + esp_random() % (DESCANSO_MAX_MS - DESCANSO_MIN_MS));

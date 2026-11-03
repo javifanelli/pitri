@@ -9,9 +9,9 @@
 static const char *TAG = "BOTONES";
 
 /*
- * Cómo se lee un botón:
- *   - Cada botón está entre su pin y GND. Con el pull-up interno, el pin lee 1
- *     cuando el botón está suelto y 0 cuando está apretado (BTN_NIVEL_APRETADO).
+ * Como se lee un boton:
+ *   - Cada boton esta entre su pin y GND. Con el pull-up interno, el pin lee 1
+ *     cuando el boton esta suelto y 0 cuando esta apretado (BTN_NIVEL_APRETADO).
  *   - Al apretar, el metal "rebota" y durante unos milisegundos el pin salta
  *     entre 0 y 1. Para no contar varias apretadas, solo creemos un cambio
  *     cuando se mantiene igual durante CAMBIO_FIRME lecturas seguidas.
@@ -25,7 +25,7 @@ static volatile bool se_apreto[CANT_BOTONES];
 
 static void tarea_botones(void *arg)
 {
-    bool apretado[CANT_BOTONES] = { false };    // lo que creemos que está pasando
+    bool apretado[CANT_BOTONES] = { false };    // lo que creemos que esta pasando
     int  lecturas_distintas[CANT_BOTONES] = { 0 };
 
     while (1) {
@@ -33,12 +33,12 @@ static void tarea_botones(void *arg)
             bool ahora = gpio_get_level(pines[i]) == BTN_NIVEL_APRETADO;
 
             if (ahora == apretado[i]) {
-                lecturas_distintas[i] = 0;          // nada cambió
+                lecturas_distintas[i] = 0;          // nada cambio
             } else if (++lecturas_distintas[i] >= CAMBIO_FIRME) {
-                apretado[i] = ahora;                // cambió de verdad (no es rebote)
+                apretado[i] = ahora;                // cambio de verdad (no es rebote)
                 lecturas_distintas[i] = 0;
                 if (ahora) {
-                    ESP_LOGI(TAG, "¡Botón %d apretado!", i + 1);
+                    ESP_LOGI(TAG, "¡Boton %d apretado!", i + 1);
                     se_apreto[i] = true;
                 }
             }
@@ -60,6 +60,12 @@ void botones_iniciar(void)
 
     xTaskCreate(tarea_botones, "botones", 2560, NULL, 5, NULL);
     ESP_LOGI(TAG, "Botones listos (GPIO %d y %d)", PIN_BTN_1, PIN_BTN_2);
+}
+
+bool botones_pendiente(int numero)
+{
+    if (numero < 1 || numero > CANT_BOTONES) return false;
+    return se_apreto[numero - 1];
 }
 
 bool botones_se_apreto(int numero)

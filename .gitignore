@@ -1,4 +1,4 @@
-# ─── Datos privados: NUNCA se suben al repo (es público) ─────────────────────
+# ─── Datos privados: NUNCA se suben al repo (es publico) ─────────────────────
 # Nombre de la red WiFi, contraseñas, etc. Ver docs/PARA_GRANDES.md#wifi
 wifi_secretos.h
 *secretos*.h

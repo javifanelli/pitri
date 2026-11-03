@@ -14,15 +14,15 @@ static const char *TAG = "DISPLAY";
 
 static esp_lcd_panel_handle_t panel = NULL;
 
-// Formato del SH1106: cada byte es una columna de 8 píxeles verticales ("página").
+// Formato del SH1106: cada byte es una columna de 8 pixeles verticales ("pagina").
 static uint8_t framebuffer[LCD_H_RES * LCD_V_RES / 8];
 
 void display_init(void)
 {
     ESP_LOGI(TAG, "Inicializando I2C y SH1106...");
 
-    // El driver escribe 2 líneas por cada cuadro que falla; nosotros
-    // hacemos un resumen en display_flush(), así que lo callamos.
+    // El driver escribe 2 lineas por cada cuadro que falla; nosotros
+    // hacemos un resumen en display_flush(), asi que lo callamos.
     esp_log_level_set("lcd_panel.io.i2c", ESP_LOG_NONE);
     esp_log_level_set("lcd_panel.sh1106", ESP_LOG_NONE);
     i2c_master_bus_config_t i2c_cfg = {
@@ -62,7 +62,7 @@ void display_clear(void)
     memset(framebuffer, 0, sizeof(framebuffer));
 }
 
-// ─── Manejo de errores de comunicación ────────────────────────────────────────
+// ─── Manejo de errores de comunicacion ────────────────────────────────────────
 #define FALLOS_SEGUIDOS_PARA_REINICIAR 10     // ~0,3 s de cuadros fallidos
 #define RESUMEN_ERRORES_CADA_US        (5 * 1000 * 1000)
 
@@ -72,11 +72,11 @@ static int     reinicios = 0;
 static int64_t ultimo_resumen_us = 0;
 
 // Si el display deja de contestar, lo reinicializamos (por si se le
-// desordenó la configuración por un corte o un falso contacto)
+// desordeno la configuracion por un corte o un falso contacto)
 static void reiniciar_panel(void)
 {
     reinicios++;
-    ESP_LOGW(TAG, "El display no responde: reiniciándolo (vez %d)", reinicios);
+    ESP_LOGW(TAG, "El display no responde: reiniciandolo (vez %d)", reinicios);
     if (esp_lcd_panel_reset(panel) == ESP_OK &&
         esp_lcd_panel_init(panel) == ESP_OK &&
         esp_lcd_panel_disp_on_off(panel, true) == ESP_OK) {
@@ -94,8 +94,8 @@ static uint8_t invertir_bits(uint8_t b)
     return b;
 }
 
-// Girar 180° es lo mismo que leer el framebuffer de atrás para adelante
-// y dar vuelta cada columna de 8 píxeles
+// Girar 180° es lo mismo que leer el framebuffer de atras para adelante
+// y dar vuelta cada columna de 8 pixeles
 static uint8_t girado[sizeof(framebuffer)];
 #endif
 
@@ -119,10 +119,10 @@ void display_flush(void)
         if (fallos_seguidos == FALLOS_SEGUIDOS_PARA_REINICIAR) reiniciar_panel();
     }
 
-    // En vez de una línea por cada error, un resumen cada 5 segundos
+    // En vez de una linea por cada error, un resumen cada 5 segundos
     int64_t ahora = esp_timer_get_time();
     if (fallos_desde_resumen > 0 && ahora - ultimo_resumen_us >= RESUMEN_ERRORES_CADA_US) {
-        ESP_LOGW(TAG, "%d cuadros no se pudieron enviar por I2C en los últimos segundos "
+        ESP_LOGW(TAG, "%d cuadros no se pudieron enviar por I2C en los ultimos segundos "
                       "(revisar cables SDA/SCL/GND/3V3)", fallos_desde_resumen);
         fallos_desde_resumen = 0;
         ultimo_resumen_us = ahora;
@@ -151,12 +151,12 @@ void display_fill_round_rect(int x, int y, int w, int h, int r, bool on)
     if (r > h / 2) r = h / 2;
 
     for (int j = 0; j < h; j++) {
-        // Distancia vertical al centro de la esquina más cercana
+        // Distancia vertical al centro de la esquina mas cercana
         int dy = 0;
         if (j < r)              dy = r - j;
         else if (j >= h - r)    dy = j - (h - r - 1);
 
-        // Cuánto "se mete" la fila por la curva de la esquina
+        // Cuanto "se mete" la fila por la curva de la esquina
         int inset = 0;
         if (dy > 0) {
             int dx = 0;
@@ -176,7 +176,7 @@ void display_fill_circle(int cx, int cy, int r, bool on)
                 display_set_pixel(cx + i, cy + j, on);
 }
 
-// Dice de qué lado de la línea (a→b) queda el punto p
+// Dice de que lado de la linea (a→b) queda el punto p
 static int lado_de_linea(int ax, int ay, int bx, int by, int px, int py)
 {
     return (bx - ax) * (py - ay) - (by - ay) * (px - ax);
@@ -189,7 +189,7 @@ void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool 
     int min_y = y0 < y1 ? (y0 < y2 ? y0 : y2) : (y1 < y2 ? y1 : y2);
     int max_y = y0 > y1 ? (y0 > y2 ? y0 : y2) : (y1 > y2 ? y1 : y2);
 
-    // Un punto está adentro si queda del mismo lado de las tres líneas
+    // Un punto esta adentro si queda del mismo lado de las tres lineas
     for (int y = min_y; y <= max_y; y++) {
         for (int x = min_x; x <= max_x; x++) {
             int a = lado_de_linea(x0, y0, x1, y1, x, y);
@@ -203,8 +203,8 @@ void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool 
 
 // ─── Texto ────────────────────────────────────────────────────────────────────
 
-#define SEPARACION_LETRAS 1   // columnas vacías entre letra y letra
-#define SEPARACION_RENGLON 2  // filas vacías entre renglón y renglón
+#define SEPARACION_LETRAS 1   // columnas vacias entre letra y letra
+#define SEPARACION_RENGLON 2  // filas vacias entre renglon y renglon
 
 // Caracteres especiales (fuera del ASCII)
 #define GLIFO_ABRE_EXCLAMACION   1   // ¡
@@ -212,21 +212,19 @@ void display_fill_triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool 
 #define GLIFO_GRADO              3   // °
 
 static const uint8_t columnas_grado[FONT_ANCHO] = {0x06, 0x09, 0x09, 0x06, 0x00};
-
-// Lee el próximo caracter del texto (entiende UTF-8 para ¡ y ¿) y avanza el puntero
+// Lee el proximo caracter del texto (entiende UTF-8 para ¡ y ¿) y avanza el puntero
 static int proximo_caracter(const char **p)
 {
     const unsigned char *s = (const unsigned char *)*p;
     if (*s == 0) return 0;
 
-    if (*s < 0x80) {             // ASCII común
+    if (*s < 0x80) {             // ASCII comun
         (*p)++;
         return *s;
     }
     if (s[0] == 0xC2 && s[1] == 0xA1) { *p += 2; return GLIFO_ABRE_EXCLAMACION; }
     if (s[0] == 0xC2 && s[1] == 0xBF) { *p += 2; return GLIFO_ABRE_PREGUNTA; }
     if (s[0] == 0xC2 && s[1] == 0xB0) { *p += 2; return GLIFO_GRADO; }
-
     // Otro caracter UTF-8 que no tenemos: lo salteamos entero y dibujamos '?'
     (*p)++;
     while ((**p & 0xC0) == 0x80) (*p)++;
@@ -240,7 +238,6 @@ static void columnas_de(int c, uint8_t col[FONT_ANCHO])
         memcpy(col, columnas_grado, FONT_ANCHO);
         return;
     }
-
     bool dar_vuelta = false;
     if (c == GLIFO_ABRE_EXCLAMACION) { c = '!'; dar_vuelta = true; }
     if (c == GLIFO_ABRE_PREGUNTA)    { c = '?'; dar_vuelta = true; }
@@ -268,7 +265,7 @@ static void dibujar_caracter(int x, int y, int c, int escala, bool on)
                 display_fill_rect(x + i * escala, y + k * escala, escala, escala, on);
 }
 
-// Ancho del renglón que empieza en p (hasta '\n' o fin)
+// Ancho del renglon que empieza en p (hasta '\n' o fin)
 static int ancho_renglon(const char *p, int escala)
 {
     int letras = 0;

@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-// Fuente clásica de 5x7 píxeles, caracteres ASCII del 32 (' ') al 126 ('~').
-// Cada letra son 5 columnas; en cada byte, el bit 0 es el píxel de arriba.
+// Fuente clasica de 5x7 pixeles, caracteres ASCII del 32 (' ') al 126 ('~').
+// Cada letra son 5 columnas; en cada byte, el bit 0 es el pixel de arriba.
 
 #define FONT_PRIMERO  32
 #define FONT_ULTIMO   126

@@ -9,11 +9,11 @@
 
 static const char *TAG = "MOVIMIENTO";
 
-// El HC-SR501 tarda casi un minuto en "calentarse" después de encenderse
+// El HC-SR501 tarda casi un minuto en "calentarse" despues de encenderse
 // y en ese tiempo puede avisar movimientos que no existen. Los ignoramos.
 #define CALENTAMIENTO_MS 30000
 
-// Cada cuánto se mira el sensor
+// Cada cuanto se mira el sensor
 #define REVISAR_CADA_MS  50
 
 static volatile bool    llego_alguien = false;
@@ -47,7 +47,7 @@ static void tarea_vigilar(void *arg)
 
         if (ahora && !antes) {
             if (calentando()) {
-                ESP_LOGI(TAG, "Movimiento detectado (ignorado: el sensor se está calentando)");
+                ESP_LOGI(TAG, "Movimiento detectado (ignorado: el sensor se esta calentando)");
             } else {
                 ESP_LOGI(TAG, "¡Movimiento detectado!");
                 llego_alguien = true;
@@ -70,7 +70,7 @@ void motion_init(void)
     gpio_config_t cfg = {
         .pin_bit_mask = 1ULL << PIN_PIR,
         .mode         = GPIO_MODE_INPUT,
-        .pull_down_en = GPIO_PULLDOWN_ENABLE,   // si el sensor está desconectado, lee 0
+        .pull_down_en = GPIO_PULLDOWN_ENABLE,   // si el sensor esta desconectado, lee 0
         .pull_up_en   = GPIO_PULLUP_DISABLE,
         .intr_type    = GPIO_INTR_DISABLE,
     };
