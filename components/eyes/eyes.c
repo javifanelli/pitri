@@ -39,6 +39,9 @@ typedef struct {
     float corazon;            // 0 = ojos normales, 1 = ojos de corazón (enamorado)
     float corazoncitos;       // 0 a 1: por dónde van subiendo los corazoncitos flotantes
     float lentes;             // 0 = sin lentes, 1 = lentes de sol puestos (bajan desde arriba)
+    float asombro;            // 0 a 1: boca en forma de "O" (sorpresa)
+    float sospecha;           // 0 a 1: boca torcida (sospecha)
+    float sueno;              // 0 a 1: boquita de dormido
 } cara_t;
 
 static const cara_t CARA_NORMAL = {
@@ -90,6 +93,39 @@ static void dibujar_corazon(float cx, float cy, float r)
     display_fill_triangle((int)(cx - 2 * r), y0, (int)(cx + 2 * r), y0, (int)cx, (int)(y0 + 2 * r), true);
 }
 
+// ─── Herramientas para dibujar bocas ─────────────────────────────────────────
+
+// Pedazo de círculo con centro (cx, cy) y radio r, desde el ángulo "desde" hasta
+// "hasta" (en radianes; 0 = derecha, π/2 = abajo, π = izquierda, 3π/2 = arriba,
+// porque en la pantalla y crece para abajo). "grosor" = ancho del trazo.
+static void dibujar_arco(float cx, float cy, float r, float desde, float hasta, int grosor)
+{
+    for (float a = desde; a <= hasta; a += 0.04f) {
+        int px = (int)(cx + r * cosf(a));
+        int py = (int)(cy + r * sinf(a));
+        display_fill_rect(px - grosor / 2, py - grosor / 2, grosor, grosor, true);
+    }
+}
+
+// Línea recta de (x0, y0) a (x1, y1), con trazo de "grosor" píxeles
+static void dibujar_linea(float x0, float y0, float x1, float y1, int grosor)
+{
+    float dx = x1 - x0, dy = y1 - y0;
+    int pasos = (int)fmaxf(fabsf(dx), fabsf(dy));
+    if (pasos < 1) pasos = 1;
+    for (int i = 0; i <= pasos; i++) {
+        float t = (float)i / pasos;
+        display_fill_rect((int)(x0 + dx * t), (int)(y0 + dy * t), grosor, grosor, true);
+    }
+}
+
+// Anillo: círculo blanco con un agujero negro en el medio
+static void dibujar_anillo(int cx, int cy, int r_afuera, int r_adentro)
+{
+    display_fill_circle(cx, cy, r_afuera, true);
+    display_fill_circle(cx, cy, r_adentro, false);
+}
+
 // Boca sonriente: un pedazo de círculo (la parte de abajo), con trazo de 3 píxeles.
 // (cx, cy) es el centro del círculo y r su radio: más grande = sonrisa más ancha.
 //
@@ -98,13 +134,7 @@ static void dibujar_corazon(float cx, float cy, float r)
 //        · · · ·
 static void dibujar_sonrisa(float cx, float cy, float r)
 {
-    const float desde = 0.2f * (float)M_PI;   // 36°: punta derecha de la sonrisa
-    const float hasta = 0.8f * (float)M_PI;   // 144°: punta izquierda
-    for (float a = desde; a <= hasta; a += 0.04f) {
-        int px = (int)(cx + r * cosf(a));
-        int py = (int)(cy + r * sinf(a));      // en la pantalla, y crece para abajo
-        display_fill_rect(px - 1, py - 1, 3, 3, true);
-    }
+    dibujar_arco(cx, cy, r, 0.2f * (float)M_PI, 0.8f * (float)M_PI, 3);   // de 36° a 144°
 }
 
 // Rayita negra en diagonal (de abajo a la izquierda hacia arriba a la derecha):
@@ -200,6 +230,118 @@ static void dibujar_z(int x, int y, int s)
         display_fill_rect(x + s - 1 - k, y + k, 2, 1, true);
 }
 
+// ─── La boca ─────────────────────────────────────────────────────────────────
+// Cada emoción tiene su boca. Si hay varias emociones a la vez (por ejemplo,
+// mientras pasa de una cara a otra), gana la más fuerte. Si ninguna llega a
+// 0,3, Pitri no muestra boca (cara tranquila).
+
+typedef enum {
+    BOCA_NINGUNA,
+    BOCA_SONRISA,    // 😊 contento:   ‿
+    BOCA_TRISTE,     // 😢 triste:     ⁀
+    BOCA_ENOJADA,    // 😠 enojado:    /\/\/\  (dientes apretados)
+    BOCA_O,          // 😮 sorpresa:   O
+    BOCA_MAREADA,    // 😵‍💫 mareado:    ~~~~  (se mueve)
+    BOCA_BESO,       // 😍 enamorado:  3
+    BOCA_CANCHERA,   // 😎 verano:     __/   (sonrisa de costado)
+    BOCA_SOSPECHA,   // 🤨 sospecha:   rayita torcida
+    BOCA_DORMIDA,    // 😴 dormido:    o
+} boca_t;
+
+static void dibujar_boca(float cy, float perspectiva)
+{
+    // 1. ¿Qué boca va? La de la emoción más fuerte
+    float mas_fuerte = 0.3f;
+    boca_t boca = BOCA_NINGUNA;
+#define CANDIDATA(peso, tipo) if ((peso) > mas_fuerte) { mas_fuerte = (peso); boca = (tipo); }
+    CANDIDATA(cara.feliz,    BOCA_SONRISA);
+    CANDIDATA(cara.triste,   BOCA_TRISTE);
+    CANDIDATA(cara.enojo,    BOCA_ENOJADA);
+    CANDIDATA(cara.asombro,  BOCA_O);
+    CANDIDATA(cara.espiral,  BOCA_MAREADA);
+    CANDIDATA(cara.corazon,  BOCA_BESO);
+    CANDIDATA(cara.lentes,   BOCA_CANCHERA);
+    CANDIDATA(cara.sospecha, BOCA_SOSPECHA);
+    CANDIDATA(cara.sueno,    BOCA_DORMIDA);
+#undef CANDIDATA
+    if (boca == BOCA_NINGUNA) return;
+
+    float mx = LCD_H_RES / 2.0f + cara.x;   // la boca sigue a la cara
+
+    // La sonrisa tiene su propia cuenta (crece con la felicidad)
+    if (boca == BOCA_SONRISA) {
+        // Con menos felicidad los ojos se tapan menos (bajan más), así que la
+        // sonrisa va un poco más abajo para no tocarlos
+        float boca_y = cy + 6 + (1 - cara.feliz) * 8;
+        dibujar_sonrisa(mx, boca_y, 6 + 8 * cara.feliz);
+        return;
+    }
+
+    // 2. ¿Dónde terminan los ojos? La boca va justo abajo
+    float mitad_ojo;
+    if (cara.espiral > 0.5f) {
+        mitad_ojo = fminf(cara.ancho, cara.alto) / 2;
+    } else if (cara.corazon > 0.5f) {
+        mitad_ojo = 1.5f * cara.ancho / 4;              // la punta del corazón
+    } else {
+        float abre = fmaxf(cara.abre_izq, cara.abre_der);
+        float alto = cara.alto * (1 + fabsf(perspectiva));
+        mitad_ojo = (OJO_ALTO_CERRADO + (alto - OJO_ALTO_CERRADO) * abre) / 2;
+    }
+    if (cara.lentes > 0.5f) mitad_ojo = fmaxf(mitad_ojo, 11);   // abajo de los lentes
+
+    // Alto de cada boca, para que no se salga de la pantalla por abajo
+    static const int alto_boca[] = {
+        [BOCA_TRISTE] = 7, [BOCA_ENOJADA] = 6, [BOCA_O] = 11, [BOCA_MAREADA] = 6,
+        [BOCA_BESO] = 16, [BOCA_CANCHERA] = 6, [BOCA_SOSPECHA] = 5, [BOCA_DORMIDA] = 7,
+    };
+    float y = fminf(cy + mitad_ojo + 4, LCD_V_RES - 1 - alto_boca[boca]);   // arriba de la boca
+
+    // 3. Dibujarla
+    switch (boca) {
+    case BOCA_TRISTE:      // la sonrisa dada vuelta: la parte de arriba del círculo
+        dibujar_arco(mx, y + 11, 11, 1.2f * (float)M_PI, 1.8f * (float)M_PI, 3);
+        break;
+
+    case BOCA_ENOJADA:     // zigzag de dientes apretados
+        for (int i = 0; i < 6; i++) {
+            float x0 = mx - 12 + i * 4;
+            dibujar_linea(x0, y + (i % 2 ? 4 : 1), x0 + 4, y + (i % 2 ? 1 : 4), 2);
+        }
+        break;
+
+    case BOCA_O:           // una "O" que crece con el asombro
+        dibujar_anillo((int)mx, (int)(y + 5), 3 + (int)(2 * cara.asombro), 1 + (int)(2 * cara.asombro));
+        break;
+
+    case BOCA_MAREADA:     // ola que se mueve al mismo tiempo que giran las espirales
+        for (int dx = -12; dx <= 12; dx++)
+            display_fill_rect((int)mx + dx, (int)(y + 2 + 2 * sinf(dx * 0.5f + cara.giro)), 2, 2, true);
+        break;
+
+    case BOCA_BESO:        // un "3": dos pancitas una arriba de la otra
+        dibujar_arco(mx - 2, y + 4, 4, -0.5f * (float)M_PI, 0.5f * (float)M_PI, 2);
+        dibujar_arco(mx - 2, y + 11, 4, -0.5f * (float)M_PI, 0.5f * (float)M_PI, 2);
+        break;
+
+    case BOCA_CANCHERA:    // recta y con una punta que sube: sonrisa de costado
+        dibujar_linea(mx - 8, y + 4, mx + 3, y + 4, 2);
+        dibujar_linea(mx + 3, y + 4, mx + 9, y, 2);
+        break;
+
+    case BOCA_SOSPECHA:    // rayita cortita y torcida
+        dibujar_linea(mx - 6, y + 3, mx + 6, y + 1, 2);
+        break;
+
+    case BOCA_DORMIDA:     // "o" chiquita, como roncando
+        dibujar_anillo((int)mx, (int)(y + 3), 3, 1);
+        break;
+
+    default:
+        break;
+    }
+}
+
 static void dibujar(void)
 {
     // Perspectiva: el ojo del lado hacia donde mira se ve un poquito más grande
@@ -213,13 +355,8 @@ static void dibujar(void)
     dibujar_ojo(cx_izq, cy, cara.ancho, cara.alto * (1 - p), cara.abre_izq, -1);
     dibujar_ojo(cx_der, cy, cara.ancho, cara.alto * (1 + p), cara.abre_der, +1);
 
-    // Sonrisa cuando está contento: cuanto más feliz, más grande
-    if (cara.feliz > 0.3f) {
-        // Con menos felicidad los ojos se tapan menos (bajan más), así que la
-        // sonrisa va un poco más abajo para no tocarlos
-        float boca_y = cy + 6 + (1 - cara.feliz) * 8;
-        dibujar_sonrisa(LCD_H_RES / 2.0f + cara.x, boca_y, 6 + 8 * cara.feliz);
-    }
+    // La boca, según la emoción
+    dibujar_boca(cy, p);
 
     // Corazoncitos que suben flotando: uno a cada costado y uno en el medio
     if (cara.corazoncitos > 0.01f && cara.corazoncitos < 0.99f) {
@@ -276,6 +413,9 @@ static void animar(cara_t destino, int ms)
         cara.corazon  = mezclar(inicio.corazon,  destino.corazon,  t);
         cara.corazoncitos = mezclar(inicio.corazoncitos, destino.corazoncitos, t);
         cara.lentes   = mezclar(inicio.lentes,   destino.lentes,   t);
+        cara.asombro  = mezclar(inicio.asombro,  destino.asombro,  t);
+        cara.sospecha = mezclar(inicio.sospecha, destino.sospecha, t);
+        cara.sueno    = mezclar(inicio.sueno,    destino.sueno,    t);
 
         dibujar();
         xTaskDelayUntil(&ultimo, pdMS_TO_TICKS(CUADRO_MS));
@@ -354,10 +494,14 @@ static void juego_sorpresa(void)
     cara_t d = cara;
     d.ancho = OJO_ANCHO + 6;
     d.alto  = OJO_ALTO + 10;
+    d.y     = -8;            // sube un poco la cara para que entre la boca en "O"
+    d.asombro = 1;
     animar(d, 120);
     esperar(azar(500, 900));
     d.ancho = OJO_ANCHO;
     d.alto  = OJO_ALTO;
+    d.y     = 0;
+    d.asombro = 0;
     animar(d, 250);
 }
 
@@ -393,6 +537,7 @@ static void juego_sospecha(void)
 {
     cara_t d = CARA_NORMAL;
     d.abre_izq = d.abre_der = 0.35f;
+    d.sospecha = 1;
     animar(d, 200);
     mover_a(-MAX_X, 0, 500);
     esperar(300);
@@ -407,6 +552,7 @@ static void juego_sueno(void)
     cara_t d = CARA_NORMAL;
     d.y = 4;
     d.abre_izq = d.abre_der = 0.3f;
+    d.sueno = 1;
     animar(d, 1200);
     d.abre_izq = d.abre_der = 0.0f;
     animar(d, 800);
@@ -589,6 +735,7 @@ void eyes_dormirse(void)
     cara_t d = CARA_NORMAL;
     d.y = 4;
     d.abre_izq = d.abre_der = 0.3f;
+    d.sueno = 1;
     animar(d, 1200);                 // se le van cerrando los ojos
     d.abre_izq = d.abre_der = 0;
     animar(d, 800);

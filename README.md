@@ -48,6 +48,9 @@ Lo armamos entre Sofía y su papá, de a poquito, y cada vez le vamos enseñando
 | 😍 enamorado | Los ojos se vuelven corazones que laten y suben corazoncitos |
 | 😎 verano | Se pone lentes de sol, baila canchero y se los saca guiñando un ojo |
 
+¡Y cada emoción tiene **su propia boca**! Sonrisa cuando está contento, una "O" cuando se
+sorprende, zigzag cuando se enoja, un "3" de beso cuando está enamorado, y muchas más.
+
 ---
 
 ## 🧩 De qué está hecho Pitri

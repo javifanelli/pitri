@@ -61,6 +61,13 @@ Todo lo que se puede cambiar de la cara:
 | `d.corazon` | 0 o 1 | Ojos de corazón (late si cambiás `d.ancho`) |
 | `d.corazoncitos` | 0 a 1 | Corazoncitos que suben (0 = abajo, 1 = arriba) |
 | `d.lentes` | 0 a 1 | Lentes de sol (0 = arriba afuera, 1 = puestos) |
+| `d.asombro` | 0 a 1 | Boca en forma de "O" |
+| `d.sospecha` | 0 a 1 | Boca torcida |
+| `d.sueno` | 0 a 1 | Boquita de dormido |
+
+La **boca** aparece sola según la emoción: `feliz` pone sonrisa, `triste` la sonrisa al
+revés, `enojo` zigzag, `espiral` una ola, `corazon` un beso y `lentes` una sonrisa de
+costado. Si querés solo la boca, sin cambiar los ojos, usá `asombro`, `sospecha` o `sueno`.
 
 ---
 

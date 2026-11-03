@@ -148,6 +148,26 @@ Las caras distintas se hacen **tapando partes de los ojos con negro**:
 | 😍 Enamorado | En vez del ojo se dibuja un **corazón**: dos círculos y un triángulo. Late porque se agranda y se achica |
 | 😎 Verano | Se dibujan unos **lentes** blancos arriba de los ojos, con dos rayitas negras que parecen el brillo del vidrio |
 
+### La boca
+
+Cada emoción tiene su boca, y todas se dibujan con tres herramientas: **pedazos de
+círculo**, **líneas rectas** y **anillos** (un círculo blanco con un agujero negro).
+
+| Emoción | Boca | Cómo se dibuja |
+|---|---|---|
+| 😊 Contento | Sonrisa | La parte de **abajo** de un círculo. Crece cuanto más contento está |
+| 😢 Triste | Sonrisa al revés | La parte de **arriba** de un círculo |
+| 😠 Enojado | Zigzag | Seis rayitas que suben y bajan, como dientes apretados |
+| 😮 Sorpresa | O | Un anillo |
+| 😵‍💫 Mareado | Ola | Una onda que se mueve al mismo ritmo que las espirales |
+| 😍 Enamorado | 3 | Dos pedazos de círculo, uno arriba del otro |
+| 😎 Verano | Sonrisa de costado | Una línea recta con una punta que sube |
+| 🤨 Sospecha | Rayita torcida | Una línea cortita inclinada |
+| 😴 Dormido | o chiquita | Un anillo chiquito, como roncando |
+
+Cuando Pitri está tranquilo no tiene boca. Y si tiene dos emociones a la vez (por ejemplo,
+mientras pasa de enamorado a contento), muestra la boca de la emoción **más fuerte**.
+
 ### ¿Cómo elige qué juego hacer?
 
 Cada juego tiene un **peso**. Es como poner papelitos en una bolsa: el juego "mirar" tiene

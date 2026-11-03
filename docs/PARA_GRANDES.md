@@ -83,7 +83,12 @@ sensor DHT, rotación de pantalla, pines reservados para audio. Ver
 
 ### `eyes` — [eyes.h](../components/eyes/include/eyes.h)
 - Estado de la cara en `cara_t` (posición, tamaño, apertura por ojo, `feliz`, `enojo`,
-  `triste`, `espiral`, `giro`, `lagrima`, `zzz`, `corazon`, `corazoncitos`, `lentes`).
+  `triste`, `espiral`, `giro`, `lagrima`, `zzz`, `corazon`, `corazoncitos`, `lentes`,
+  `asombro`, `sospecha`, `sueno`).
+- Boca: `dibujar_boca()` elige el tipo según el peso de emoción más alto (umbral 0,3) y la
+  ubica debajo de los ojos (calcula dónde terminan según apertura, perspectiva, espiral,
+  corazón o lentes) sin salirse de la pantalla. Para agregar una boca: un valor en
+  `boca_t`, una `CANDIDATA`, su alto en `alto_boca[]` y su `case`.
 - `animar(destino, ms)` interpola todos los campos con smoothstep a ~33 fps (`CUADRO_MS 30`).
 - Juegos en una tabla `juegos[]` con pesos; `eyes_jugar()` elige uno al azar.
 - API pública: `eyes_init`, `eyes_jugar`, `eyes_parpadear`, `eyes_saludar`,

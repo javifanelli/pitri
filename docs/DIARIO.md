@@ -14,6 +14,17 @@ Acá anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el
 
 ---
 
+## 2026-11-02 — Una boca para cada emoción 👄
+
+**Qué hicimos:** ¡A Sofía le encantó la sonrisa! Así que le pusimos boca a **todas** las emociones, cada una con su forma: triste (sonrisa al revés), enojado (zigzag), sorpresa (una O), mareado (una ola que se mueve), enamorado (un 3 de beso), verano (sonrisa de costado), sospecha (rayita torcida) y dormido (una o chiquita).
+
+**Qué aprendimos:**
+- Con solo tres herramientas (pedazos de círculo, líneas y anillos) se pueden dibujar un montón de bocas distintas.
+- Para que la boca en "O" entrara debajo de los ojos gigantes de la sorpresa, hubo que **subir un poco la cara**.
+- En la simulación, la boca de beso salió tan chiquita que parecía una rayita: la agrandamos hasta que se vio el "3".
+
+---
+
 ## 2026-11-02 — Pitri sonríe 😊
 
 **Qué hicimos:** Sofía pidió que Pitri tenga una **boca sonriente** cuando está contento. Ahora la sonrisa aparece cada vez que pone ojitos felices: cuando está contento, cuando guiña, cuando saluda y cuando se saca los lentes de sol.
