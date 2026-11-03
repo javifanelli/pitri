@@ -386,6 +386,9 @@ static void dibujar(void)
         dibujar_boca(cy, p);
     }
 
+    // La comida que le estan dando (si esta comiendo)
+    dibujar_comida_en_cara();
+
     // Datos (texto chico) que entran deslizandose desde la derecha
     if (cara.datos > 0.01f) {
         int x = (int)(LCD_H_RES - (LCD_H_RES - DATOS_X) * cara.datos);
@@ -455,6 +458,8 @@ void animar(cara_t destino, int ms)
         cara.mira     = mezclar(inicio.mira,     destino.mira,     t);
         cara.datos    = mezclar(inicio.datos,    destino.datos,    t);
         cara.fase     = mezclar(inicio.fase,     destino.fase,     t);
+        cara.comida_x = mezclar(inicio.comida_x, destino.comida_x, t);
+        cara.comida_y = mezclar(inicio.comida_y, destino.comida_y, t);
 
         dibujar();
         xTaskDelayUntil(&ultimo, pdMS_TO_TICKS(CUADRO_MS));
@@ -765,8 +770,39 @@ void eyes_init(void)
 {
     empezar_accion();
     disfraz_actual = DISFRAZ_NINGUNO;   // vuelve a ser Pitri, sin disfraz
+    comida_reiniciar();
     cara = CARA_NORMAL;
     dibujar();
+}
+
+// ─── Estoy lleno ─────────────────────────────────────────────────────────────
+
+void eyes_decir_que_no(void)
+{
+    empezar_accion();
+    disfraz_actual = DISFRAZ_NINGUNO;
+    comida_reiniciar();
+
+    cara_t d = CARA_NORMAL;
+    d.sospecha = 1;                     // boca torcida: "mmm, no"
+    animar(d, 200);
+
+    for (int i = 0; i < 3; i++) {       // mueve la cabeza: no, no, no
+        mover_a(-10, 0, 110);
+        mover_a(10, 0, 110);
+    }
+    mover_a(0, 0, 110);
+
+    // Se corre a un costado y lo dice con letras (como cuando muestra los datos)
+    snprintf(texto_datos, sizeof(texto_datos), "No,\ngracias!\nEstoy\nlleno");
+    d.ancho = 20;
+    d.alto  = 26;
+    d.x     = -28;
+    d.mira  = 2;
+    d.datos = 1;
+    animar(d, 400);
+    esperar(2000);
+    animar(CARA_NORMAL, 400);
 }
 
 // ─── Mostrar datos ───────────────────────────────────────────────────────────

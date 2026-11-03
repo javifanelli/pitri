@@ -27,6 +27,9 @@
 #define ZONA_HORARIA  "ART3"
 #define MOSTRAR_HORA_MS  5000      // cuanto se ve la hora al elegirla en el menu
 
+// ─── Comida ───────────────────────────────────────────────────────────────
+#define COMIDAS_POR_HORA  3        // cuantas veces puede comer en una hora
+
 // ─── Menu (boton 1 lo abre, boton 2 baja, boton 1 elige) ────────────────────
 #define MENU_ESPERA_MAX_MS  (20 * 1000)   // si nadie toca nada, se cierra solo
 

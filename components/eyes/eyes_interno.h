@@ -43,11 +43,13 @@ typedef struct {
     float mira;               // hacia donde mira, aparte de donde esta (-1 izq, +1 der)
     float datos;              // 0 a 1: cuanto entraron los datos (texto) desde la derecha
     float fase;               // reloj de los disfraces: cada +1 es una vuelta de su animacion
+    float comida_x, comida_y; // donde esta la comida que le estan dando (centro)
 } cara_t;
 
 extern const cara_t CARA_NORMAL;
 extern cara_t cara;                     // la cara de este momento
 extern eyes_disfraz_t disfraz_actual;   // que personaje esta haciendo (o ninguno)
+extern eyes_comida_t comida_actual;     // que esta comiendo (o nada)
 
 // ─── Herramientas de eyes.c ──────────────────────────────────────────────────
 int  azar(int min, int max);                  // numero al azar entre min y max
@@ -60,5 +62,9 @@ void empezar_accion(void);                    // las funciones publicas la llama
 // ─── Herramientas de disfraces.c ─────────────────────────────────────────────
 bool disfraz_tapa_cara(void);                 // ¿el disfraz reemplaza los ojos y la boca?
 void dibujar_disfraz(float cy);               // dibuja lo que agrega el disfraz
+
+// ─── Herramientas de comida.c ────────────────────────────────────────────────
+void dibujar_comida_en_cara(void);            // la comida que esta comiendo (si hay)
+void comida_reiniciar(void);                  // saca la comida y el texto de la pantalla
 
 #endif // EYES_INTERNO_H

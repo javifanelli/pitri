@@ -103,8 +103,13 @@ sensor DHT, rotacion de pantalla, pines reservados para audio. Ver
 - Juegos en una tabla `juegos[]` con pesos; `eyes_jugar()` elige uno al azar.
 - API publica: `eyes_init`, `eyes_jugar`, `eyes_parpadear`, `eyes_saludar`,
   `eyes_dormirse`, `eyes_dormido`, `eyes_despertar`, `eyes_mostrar_datos`, `eyes_actuar`,
-  `eyes_sacar_disfraz`, `eyes_set_interrupcion`.
-- Archivos: `eyes.c` (cara, animacion, emociones, juegos), `disfraces.c` (personajes) y
+  `eyes_sacar_disfraz`, `eyes_set_interrupcion`, `eyes_dibujar_comida`, `eyes_comer`,
+  `eyes_decir_que_no`.
+- Comida: `comida_actual` + `cara.comida_x/y` (interpolados por `animar`) dibujan la comida
+  durante la animacion; `comida_reiniciar()` la saca (lo llama `eyes_init`).
+  `eyes_dibujar_comida(c, cx, cy, tamano, mordidas)` es solo dibujo (lo usa el menu).
+- Archivos: `eyes.c` (cara, animacion, emociones, juegos), `disfraces.c` (personajes),
+  `comida.c` (dibujos de comida y animacion de comer) y
   `eyes_interno.h` (lo que comparten: `cara_t`, `cara`, `animar`, `mover_a`, `esperar`...).
 - Disfraces: `disfraz_actual` decide que se dibuja. Los que `tapa_cara` reemplazan todo el
   dibujo; los otros dibujan los ojos de Pitri y agregan sus partes en lugar de la boca.
@@ -144,8 +149,11 @@ sensor DHT, rotacion de pantalla, pines reservados para audio. Ver
 ### `menu` — [menu.h](../components/menu/include/menu.h)
 - `menu_elegir(titulo, opciones, cantidad, elegida, destacada, espera_max_ms)`: bloquea
   hasta que se elige (boton 1) y devuelve el indice, o -1 si pasa `espera_max_ms` sin tocar.
-- Boton 2 avanza (circular). 3 filas visibles con letra escala 2, ventana que se corre y
-  flechitas ▲▼ si hay mas. `destacada` muestra un puntito (se usa para el modo actual).
+- Boton 2 avanza (circular). Con titulo: 3 filas visibles; con titulo `""` (menu
+  principal): sin titulo y 4 filas. Letra escala 2, ventana que se corre y flechitas ▲▼ si
+  hay mas. `destacada` muestra un puntito (se usa para el modo actual).
+- `menu_elegir_dibujos(titulo, cantidad, dibujar_opcion, elegida, espera_max_ms)`: una
+  opcion por pantalla, dibujada por el callback, con puntitos de posicion arriba a la derecha.
 
 ### `reloj` — [reloj.h](../components/reloj/include/reloj.h)
 - `reloj_iniciar(zona)`: configura `TZ` y lanza una tarea que espera WiFi e inicia
@@ -199,7 +207,9 @@ app_main
 El boton 1 corta cualquier animacion al instante (ver interrupcion en `eyes`). La llegada
 de alguien, en cambio, todavia espera a que termine el juego actual (hasta ~5 s).
 
-Menu principal: Modo / Hora / Salir. Modos: `modo_t` en `main.c`, con una tabla de 3
+Menu principal: Modo / Comer / Hora / Salir. Comer: Torta / Papas fritas / Hamburguesa /
+Atras. El limite de comidas (`COMIDAS_POR_HORA`) es una ventana movil de 60 minutos con
+`esp_timer` (no necesita la hora de internet) y se reinicia al apagar. Modos: `modo_t` en `main.c`, con una tabla de 3
 personajes por modo. El modo no se guarda:
 al reiniciar, Pitri arranca en Normal.
 

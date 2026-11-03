@@ -163,6 +163,21 @@ Para el dibujo, `mx` es el centro de la cara (se mueve con `cara.x`) y `cy` la a
 los ojos. `cara.fase` es un "reloj" para cosas que se mueven solas (como las orejas del
 cerdo): si en la actuacion le sumas 0.25 en cada paso, da una vuelta cada 4 pasos.
 
+---
+
+## 🍕 Inventa una comida
+
+Las comidas estan en [components/eyes/comida.c](../components/eyes/comida.c). Para
+agregar una, por ejemplo una **pizza**:
+
+1. En [eyes.h](../components/eyes/include/eyes.h), agrega `COMIDA_PIZZA` a la lista de comidas.
+2. En `comida.c`, escribi `dibujar_pizza()` copiando otra comida: un triangulo (la
+   porcion), una linea gruesa arriba (el borde) y circulitos negros (el salame). Acordate
+   de multiplicar todas las medidas por `s`.
+3. Agregala en `eyes_dibujar_comida()` y en `medio_ancho()`.
+4. En [main.c](../main/main.c), agregala a `comidas[]` y `nombres_comidas[]`, y cambia
+   `CANT_COMIDAS` de 3 a 4.
+
 ### ¿No anda?
 
 - **Si al compilar sale un error:** fijate que cada linea termine con `;` y que cada `{`

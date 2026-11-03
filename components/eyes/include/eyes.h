@@ -53,6 +53,26 @@ void eyes_actuar(eyes_disfraz_t personaje);
 // Se saca el disfraz y vuelve a ser Pitri
 void eyes_sacar_disfraz(void);
 
+// ─── Comida ──────────────────────────────────────────────────────────────────
+typedef enum {
+    COMIDA_NINGUNA,
+    COMIDA_TORTA,
+    COMIDA_PAPAS,
+    COMIDA_HAMBURGUESA,
+} eyes_comida_t;
+
+// Dibuja una comida con su centro en (cx, cy). "tamano" agranda o achica el
+// dibujo (1 = unos 30 pixeles de alto). "mordidas" (0 a 2) le dibuja marcas de
+// mordiscos. Solo dibuja: no llama a display_flush().
+void eyes_dibujar_comida(eyes_comida_t comida, float cx, float cy, float tamano, int mordidas);
+
+// Animacion de Pitri comiendo: la comida entra, Pitri la muerde 3 veces,
+// mastica y dice "¡Rico!"
+void eyes_comer(eyes_comida_t comida);
+
+// Pitri esta lleno: mueve la cabeza diciendo que no
+void eyes_decir_que_no(void);
+
 // ─── Cortar lo que esta haciendo ─────────────────────────────────────────────
 // "funcion" se consulta en cada cuadro de animacion. Si devuelve true, el juego
 // o actuacion que se este haciendo termina enseguida (por ejemplo, para abrir

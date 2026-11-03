@@ -14,6 +14,19 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-03 — ¡A comer! 🍔🍟🎂
+
+**Que hicimos:** El menu tiene una opcion nueva: **Comer**. Aparecen una torta, unas papas fritas y una hamburguesa (y **Atras** para volver). Al elegir una, Pitri se la come a mordiscos y dice "¡Rico!". Puede comer hasta **3 veces por hora**: si ya comio, mueve la cabeza diciendo que no. Y si no come, no le pasa nada: **Pitri nunca muere**.
+
+Tambien le sacamos el titulo al menu principal: ya se sabe que es el menu, y asi entran las 4 opciones juntas.
+
+**Que aprendimos:**
+- Un mordisco es un **circulo negro** que le borra un pedazo a la comida.
+- Si todas las medidas de un dibujo se multiplican por un numero, el mismo dibujo sirve grande y chiquito.
+- Para saber si comio "en la ultima hora", Pitri anota **cuando** comio cada vez y cuenta solo las comidas de los ultimos 60 minutos.
+
+---
+
 ## 2026-11-03 — La hora en el menu y chau tildes 🕐
 
 **Que hicimos:**

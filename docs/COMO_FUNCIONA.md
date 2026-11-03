@@ -179,6 +179,28 @@ mas grande**, como cuando giras la cabeza. Normalmente mira hacia donde estan su
 pero cuando muestra la temperatura hace algo especial: se achica, se corre a la
 **izquierda** y mira hacia la **derecha**, donde aparecen los datos.
 
+### Darle de comer
+
+En el menu, **Comer** muestra las comidas de a una, con su dibujo grande: torta, papas
+fritas y hamburguesa. Estan hechas con las formas de siempre: la hamburguesa es medio
+circulo (el pan), una linea ondulada (la lechuga) y dos rectangulos redondeados (la carne
+y el pan de abajo). Las semillas son puntitos negros.
+
+Cada dibujo se puede hacer **grande o chiquito**: todas sus medidas se multiplican por un
+numero (el tamano). En el menu se ve grande y cuando Pitri come, chiquito.
+
+Cuando Pitri come:
+
+1. La comida entra por la derecha y Pitri la mira con la boca en "O".
+2. Se la acerca a la boca y le da **3 mordiscos**. Cada mordisco es un **circulo negro**
+   que le "borra" un pedazo a la comida. Con el tercero, ¡se la termina!
+3. Mastica, pone cara feliz y dice "¡Rico!".
+
+**La pancita de Pitri:** Pitri anota cuando comio. Si ya comio **3 veces en la ultima
+hora**, esta lleno: mueve la cabeza diciendo que no. A medida que pasa el tiempo, las
+comidas viejas dejan de contar y puede volver a comer. Si no le dan de comer, no le pasa
+nada malo: **Pitri nunca muere**.
+
 ### Disfraces: los personajes de los modos
 
 En los modos especiales, Pitri se "disfraza". Hay dos clases de disfraces:
@@ -287,8 +309,9 @@ tiene una **barra blanca con letras negras** (como un resaltador). El **boton 2*
 barra a la opcion siguiente; al llegar a la ultima, vuelve a la primera. El **boton 1**
 elige la opcion de la barra.
 
-En la pantalla entran solo 3 opciones grandes. Si hay mas, aparecen flechitas ▲▼ arriba a
-la derecha, y la lista se corre a medida que bajas.
+El menu principal no tiene titulo (ya se sabe que es el menu), asi que entran sus 4
+opciones juntas. Los submenus, como **Modo**, tienen titulo arriba y entran 3 opciones: si
+hay mas, aparecen flechitas ▲▼ y la lista se corre a medida que bajas.
 
 ### Que el boton responda al instante
 
