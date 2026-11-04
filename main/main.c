@@ -75,7 +75,7 @@ static void mostrar_mensaje(const char *texto)
 }
 
 // ─── El menu ─────────────────────────────────────────────────────────────────
-//   Menu:  Modo / Comer / Hora / Salir
+//   Menu:  Modo / Comer / Hora / Sensor / Salir
 //   Comer: Torta / Papas fritas / Hamburguesa / Atras (con dibujos)
 //   Modo:  Normal / Halloween / Navidad / Animales / Volver
 
@@ -127,6 +127,39 @@ static void mostrar_hora(void)
         display_draw_text((LCD_H_RES - display_text_width(hora, 3)) / 2, 4, hora, 3, true);
         display_draw_text((LCD_H_RES - display_text_width(dias[t.tm_wday], 2)) / 2, 32, dias[t.tm_wday], 2, true);
         display_draw_text((LCD_H_RES - display_text_width(fecha, 1)) / 2, 53, fecha, 1, true);
+        display_flush();
+
+        vTaskDelay(pdMS_TO_TICKS(250));
+    }
+}
+
+// Muestra la temperatura grande y la humedad, con el mismo estilo que la hora,
+// durante MOSTRAR_HORA_MS. Si se aprieta cualquier boton, sale antes.
+static void mostrar_sensor(void)
+{
+    int16_t t, h;
+    if (!dht_ultima_lectura(&t, &h)) {
+        mostrar_texto("Todavia no\nhay datos", 2, 2500);
+        return;
+    }
+
+    ESP_LOGI(TAG, "Mostrando el sensor");
+    botones_se_apreto(1);
+    botones_se_apreto(2);
+
+    for (int ms = 0; ms < MOSTRAR_HORA_MS; ms += 250) {
+        if (botones_se_apreto(1) || botones_se_apreto(2)) break;
+        dht_ultima_lectura(&t, &h);
+
+        char temp[32], hum[32];
+        snprintf(temp, sizeof(temp), "%s%d.%d°C", t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10);
+        snprintf(hum, sizeof(hum), "Hum %d%%", (h + 5) / 10);
+        const char *abajo = "Temperatura y humedad";
+
+        display_clear();
+        display_draw_text((LCD_H_RES - display_text_width(temp, 3)) / 2, 4, temp, 3, true);
+        display_draw_text((LCD_H_RES - display_text_width(hum, 2)) / 2, 32, hum, 2, true);
+        display_draw_text((LCD_H_RES - display_text_width(abajo, 1)) / 2, 53, abajo, 1, true);
         display_flush();
 
         vTaskDelay(pdMS_TO_TICKS(250));
@@ -187,15 +220,20 @@ static void dibujar_opcion_comida(int opcion)
 
 static void abrir_menu(void)
 {
-    static const char *const opciones_menu[] = { "Modo", "Comer", "Hora", "Salir" };
+    static const char *const opciones_menu[] = { "Modo", "Comer", "Hora", "Sensor", "Salir" };
     static const char *const opciones_modo[] = { "Normal", "Halloween", "Navidad", "Animales", "Volver" };
-    const int opcion_modo = 0, opcion_comer = 1, opcion_hora = 2;
+    const int opcion_modo = 0, opcion_comer = 1, opcion_hora = 2, opcion_sensor = 3;
     const int volver = 4;
     const int atras = CANT_COMIDAS;
 
     ESP_LOGI(TAG, "Abriendo el menu");
     while (1) {
-        int elegida = menu_elegir("", opciones_menu, 4, 0, -1, MENU_ESPERA_MAX_MS);
+        int elegida = menu_elegir("", opciones_menu, 5, 0, -1, MENU_ESPERA_MAX_MS);
+
+        if (elegida == opcion_sensor) {
+            mostrar_sensor();
+            break;                                  // despues vuelve a la pantalla principal
+        }
 
         if (elegida == opcion_comer) {
             int c = menu_elegir_dibujos("Comer", CANT_COMIDAS + 1, dibujar_opcion_comida, 0, MENU_ESPERA_MAX_MS);
@@ -242,6 +280,8 @@ static void descansar(int ms)
     }
 }
 
+// ─── Pantallas automaticas ───────────────────────────────────────────────────
+
 // Pitri se corre a un costado y mira los datos del sensor, que aparecen con letra chica
 static void mostrar_temperatura(void)
 {
@@ -253,7 +293,77 @@ static void mostrar_temperatura(void)
              t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10, (h + 5) / 10);
 
     eyes_sacar_disfraz();
-    eyes_mostrar_datos(texto, MOSTRAR_TEMPERATURA_MS);
+    eyes_mostrar_datos(texto, 1, MOSTRAR_SENSOR_MS);
+}
+
+// Pitri se corre a un costado y mira la hora, que aparece con letra grande
+static void mostrar_hora_de_costado(const struct tm *t)
+{
+    char texto[32];
+    snprintf(texto, sizeof(texto), "%02d:%02d", t->tm_hour, t->tm_min);
+    ESP_LOGI(TAG, "Son las %s", texto);
+
+    eyes_sacar_disfraz();
+    eyes_mostrar_datos(texto, 2, MOSTRAR_HORA_COSTADO_MS);
+}
+
+// Muestra la hora en x:00, x:05, x:10... y el sensor en x:00, x:15, x:30, x:45.
+// Si todavia no sabe la hora, muestra el sensor cada SENSOR_CADA_MINUTOS
+// contando desde que se prendio.
+static void revisar_horarios(void)
+{
+    static int ultima_hora_mostrada = -1;      // "minuto del año" de la ultima vez
+    static int ultimo_sensor_mostrado = -1;
+    static int64_t ultimo_sensor_sin_hora_us = 0;
+
+    struct tm t;
+    if (reloj_hora(&t)) {
+        int este_minuto = t.tm_yday * 24 * 60 + t.tm_hour * 60 + t.tm_min;
+
+        if (t.tm_min % HORA_CADA_MINUTOS == 0 && este_minuto != ultima_hora_mostrada) {
+            ultima_hora_mostrada = este_minuto;
+            mostrar_hora_de_costado(&t);
+        }
+        if (t.tm_min % SENSOR_CADA_MINUTOS == 0 && este_minuto != ultimo_sensor_mostrado) {
+            ultimo_sensor_mostrado = este_minuto;
+            mostrar_temperatura();
+        }
+    } else {
+        int64_t ahora = esp_timer_get_time();
+        if (ahora - ultimo_sensor_sin_hora_us >= (int64_t)SENSOR_CADA_MINUTOS * 60 * 1000 * 1000) {
+            ultimo_sensor_sin_hora_us = ahora;
+            mostrar_temperatura();
+        }
+    }
+}
+
+// ─── WiFi ────────────────────────────────────────────────────────────────────
+
+static bool ya_festejo_wifi = false;
+
+// "Tengo wifi!" con la carita de costado (solo la primera vez que se conecta)
+static void festejar_wifi(void)
+{
+    ya_festejo_wifi = true;
+    ESP_LOGI(TAG, "Tengo wifi!");
+    if (MENSAJE_WIFI[0] == '\0') return;       // mensaje vacio: no mostrar nada
+    eyes_sacar_disfraz();
+    eyes_mostrar_datos(MENSAJE_WIFI, 1, MOSTRAR_WIFI_MS);
+}
+
+// Al arrancar: carita con ondas mientras se conecta (hasta WIFI_ESPERA_ARRANQUE_MS)
+static void esperar_wifi_al_arrancar(void)
+{
+    if (!wifi_configurado()) return;           // sin datos de red no hay nada que esperar
+
+    int64_t inicio = esp_timer_get_time();
+    while (!wifi_conectado() && !botones_pendiente(1) &&
+           esp_timer_get_time() - inicio < (int64_t)WIFI_ESPERA_ARRANQUE_MS * 1000) {
+        eyes_onditas();
+    }
+
+    if (wifi_conectado()) festejar_wifi();
+    else ESP_LOGI(TAG, "Todavia no hay wifi: sigo y lo festejo cuando llegue");
 }
 
 // Duerme hasta que el sensor vea a alguien (o hasta que aprieten el boton del menu)
@@ -284,7 +394,7 @@ void app_main(void)
     motion_init();
     dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
     wifi_iniciar();          // se conecta "de fondo", no hay que esperarlo
-    reloj_iniciar(ZONA_HORARIA);   // cuando haya WiFi, pone la hora (todavia no la mostramos)
+    reloj_iniciar(ZONA_HORARIA);   // cuando haya WiFi, pone la hora
     botones_iniciar();       // boton 1 = menu, boton 2 = moverse en el menu
 
     // Mensajes de bienvenida
@@ -293,10 +403,8 @@ void app_main(void)
 
     eyes_set_interrupcion(boton_menu_apretado);
     eyes_init();
+    esperar_wifi_al_arrancar();   // carita con ondas hasta que se conecta
     eyes_saludar();
-
-    int64_t ultima_vez_temperatura_us = esp_timer_get_time();
-    bool ya_festejo_wifi = false;
 
     while (1) {
         // Boton 1: abre el menu (el boton 2 solo sirve adentro del menu)
@@ -314,20 +422,11 @@ void app_main(void)
         // Si alguien llego mientras jugaba, lo recibe antes de seguir
         if (motion_alguien_llego()) recibir_visita();
 
-        // La primera vez que se conecta al WiFi, lo festeja
-        if (!ya_festejo_wifi && wifi_conectado()) {
-            ya_festejo_wifi = true;
-            mostrar_mensaje(MENSAJE_WIFI);
-            eyes_init();
-            eyes_saludar();
-        }
+        // Si el WiFi llego tarde (despues del arranque), lo festeja ahora
+        if (!ya_festejo_wifi && wifi_conectado()) festejar_wifi();
 
-        // Cada tanto muestra la temperatura
-        if (MOSTRAR_TEMPERATURA_CADA_MS > 0 &&
-            esp_timer_get_time() - ultima_vez_temperatura_us >= (int64_t)MOSTRAR_TEMPERATURA_CADA_MS * 1000) {
-            mostrar_temperatura();
-            ultima_vez_temperatura_us = esp_timer_get_time();
-        }
+        // En punto: la hora cada 5 minutos y el sensor cada 15
+        revisar_horarios();
 
         // Juega (modo normal) o hace un personaje (los otros modos)
         if (modo == MODO_NORMAL) eyes_jugar();

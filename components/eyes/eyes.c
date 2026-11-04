@@ -22,9 +22,11 @@ const cara_t CARA_NORMAL = {
 cara_t cara;
 
 // Texto que se muestra al costado con eyes_mostrar_datos()
-#define DATOS_X 78            // donde empieza el texto (deja la izquierda para la carita)
-#define DATOS_Y 15            // altura del primer renglon
+// (se acomoda segun el tamano de letra: ver de_costado())
 static char texto_datos[64];
+static int  datos_escala = 1;
+static int  datos_x = 78;     // donde empieza el texto (deja la izquierda para la carita)
+static int  datos_y = 15;     // altura del primer renglon
 
 // ─── Ayudantes ───────────────────────────────────────────────────────────────
 
@@ -391,8 +393,18 @@ static void dibujar(void)
 
     // Datos (texto chico) que entran deslizandose desde la derecha
     if (cara.datos > 0.01f) {
-        int x = (int)(LCD_H_RES - (LCD_H_RES - DATOS_X) * cara.datos);
-        display_draw_text(x, DATOS_Y, texto_datos, 1, true);
+        int x = (int)(LCD_H_RES - (LCD_H_RES - datos_x) * cara.datos);
+        display_draw_text(x, datos_y, texto_datos, datos_escala, true);
+    }
+
+    // Ondas de WiFi (mientras se conecta): un puntito y 3 arcos que se
+    // encienden de a uno, segun cara.fase
+    if (cara.ondas > 0.5f) {
+        const float ox = 103, oy = 44;
+        int arcos = ((int)(cara.fase * 4)) % 4;
+        display_fill_circle((int)ox, (int)oy, 2, true);
+        for (int k = 0; k < arcos; k++)
+            dibujar_arco(ox, oy, 8 + 6 * k, 1.25f * (float)M_PI, 1.75f * (float)M_PI, 2);
     }
 
     // Corazoncitos que suben flotando: uno a cada costado y uno en el medio
@@ -458,6 +470,7 @@ void animar(cara_t destino, int ms)
         cara.mira     = mezclar(inicio.mira,     destino.mira,     t);
         cara.datos    = mezclar(inicio.datos,    destino.datos,    t);
         cara.fase     = mezclar(inicio.fase,     destino.fase,     t);
+        cara.ondas    = mezclar(inicio.ondas,    destino.ondas,    t);
         cara.comida_x = mezclar(inicio.comida_x, destino.comida_x, t);
         cara.comida_y = mezclar(inicio.comida_y, destino.comida_y, t);
 
@@ -777,6 +790,34 @@ void eyes_init(void)
 
 // ─── Estoy lleno ─────────────────────────────────────────────────────────────
 
+// Prepara el texto que va al costado y devuelve la cara "de costado": chiquita,
+// a la izquierda y mirando a la derecha, hacia el texto.
+//   escala 1 (letra chica): hasta 4 renglones de ~8 letras
+//   escala 2 (letra grande): 1 o 2 renglones de 5 letras (por ejemplo "21:15")
+static cara_t de_costado(const char *texto, int escala)
+{
+    snprintf(texto_datos, sizeof(texto_datos), "%s", texto);
+    datos_escala = escala;
+
+    // El texto queda centrado de arriba a abajo
+    int renglones = 1;
+    for (const char *p = texto; *p; p++)
+        if (*p == '\n') renglones++;
+    int alto = (renglones * 9 - 2) * escala;
+    datos_y = (LCD_V_RES - alto) / 2;
+
+    // Con letra grande el texto necesita mas lugar: la carita se corre un poco mas
+    datos_x = (escala >= 2) ? 68 : 78;
+
+    cara_t d = CARA_NORMAL;
+    d.ancho = 20;
+    d.alto  = 26;
+    d.x     = (escala >= 2) ? -32 : -28;
+    d.mira  = 2;           // aunque esta a la izquierda, mira a la derecha
+    d.datos = 1;
+    return d;
+}
+
 void eyes_decir_que_no(void)
 {
     empezar_accion();
@@ -794,12 +835,8 @@ void eyes_decir_que_no(void)
     mover_a(0, 0, 110);
 
     // Se corre a un costado y lo dice con letras (como cuando muestra los datos)
-    snprintf(texto_datos, sizeof(texto_datos), "No,\ngracias!\nEstoy\nlleno");
-    d.ancho = 20;
-    d.alto  = 26;
-    d.x     = -28;
-    d.mira  = 2;
-    d.datos = 1;
+    d = de_costado("No,\ngracias!\nEstoy\nlleno", 1);
+    d.sospecha = 1;
     animar(d, 400);
     esperar(2000);
     animar(CARA_NORMAL, 400);
@@ -807,26 +844,36 @@ void eyes_decir_que_no(void)
 
 // ─── Mostrar datos ───────────────────────────────────────────────────────────
 
-void eyes_mostrar_datos(const char *texto, int ms)
+void eyes_mostrar_datos(const char *texto, int escala, int ms)
 {
     empezar_accion();
-    snprintf(texto_datos, sizeof(texto_datos), "%s", texto);
 
     // La carita se achica y se corre a la izquierda, mirando hacia la derecha,
     // mientras los datos entran deslizandose
-    cara_t d = CARA_NORMAL;
-    d.ancho = 20;
-    d.alto  = 26;
-    d.x     = -28;
-    d.mira  = 2;           // aunque esta a la izquierda, mira a la derecha
-    d.datos = 1;
-    animar(d, 500);
+    animar(de_costado(texto, escala), 500);
 
     esperar(ms / 2);
     eyes_parpadear();      // un parpadeo en el medio, para que se vea vivo
     esperar(ms / 2);
 
     animar(CARA_NORMAL, 400);   // los datos se van y la carita vuelve al centro
+}
+
+// ─── Buscando WiFi ───────────────────────────────────────────────────────────
+
+void eyes_onditas(void)
+{
+    empezar_accion();
+
+    // Carita de costado mirando las ondas, que se van encendiendo de a una
+    cara_t d = de_costado("", 1);
+    d.datos = 0;
+    d.ondas = 1;
+    d.fase  = cara.fase;
+    for (int i = 0; i < 4; i++) {
+        d.fase += 0.25f;
+        animar(d, 300);
+    }
 }
 
 // ─── Dormir ──────────────────────────────────────────────────────────────────

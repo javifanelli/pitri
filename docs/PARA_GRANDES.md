@@ -91,8 +91,11 @@ sensor DHT, rotacion de pantalla, pines reservados para audio. Ver
   `asombro`, `sospecha`, `sueno`, `mira`, `datos`).
 - Perspectiva: `p = (x / MAX_X + mira) · 0.12`, limitada a ±0,15. `mira` permite que la cara
   este en un lado y mire hacia el otro.
-- `eyes_mostrar_datos(texto, ms)`: achica la cara, la corre a la izquierda mirando a la
-  derecha y hace entrar `texto` (fuente 5×7, escala 1, desde x = 78) deslizandose.
+- `eyes_mostrar_datos(texto, escala, ms)`: achica la cara, la corre a la izquierda
+  mirando a la derecha y hace entrar `texto` deslizandose (escala 1 desde x = 78, escala 2
+  desde x = 68 con la cara mas corrida), centrado verticalmente. Lo arma `de_costado()`.
+- `eyes_onditas()`: un paso (~1,2 s) de la cara de costado con el simbolo de WiFi
+  (`cara.ondas`), cuyos arcos se encienden segun `cara.fase`.
 - Boca: siempre hay una. `dibujar_boca()` elige el tipo segun el peso de emocion mas alto
   (umbral 0,3; si ninguno llega, `BOCA_SENCILLA`, que se ubica como si los ojos estuvieran
   abiertos para no saltar al parpadear) y la
@@ -139,7 +142,7 @@ sensor DHT, rotacion de pantalla, pines reservados para audio. Ver
 - Reintentos con backoff exponencial (1 s → 60 s) y motivo de desconexion en castellano.
 - Credenciales solo en RAM (`WIFI_STORAGE_RAM`). Nunca se loguean ni el SSID ni la contraseña.
 - Si no existe `wifi_secretos.h`, compila igual y Pitri sigue sin WiFi (avisa por consola).
-- `wifi_conectado()` dice si tiene IP.
+- `wifi_conectado()` dice si tiene IP; `wifi_configurado()`, si hay datos de red.
 
 ### `botones` — [botones.h](../components/botones/include/botones.h)
 - Tarea propia que lee `PIN_BTN_1` y `PIN_BTN_2` cada 10 ms, con pull-up interno.
@@ -193,13 +196,17 @@ compilado contiene la contraseña.
 app_main
 ├── display_init, motion_init, dht_iniciar, wifi_iniciar, reloj_iniciar, botones_iniciar
 ├── mensajes de bienvenida (MENSAJE_ARRANQUE y MENSAJE_ARRANQUE_2)
-├── eyes_init + eyes_saludar
+├── eyes_init
+├── esperar_wifi_al_arrancar()   ← eyes_onditas() hasta conectar (max WIFI_ESPERA_ARRANQUE_MS)
+│                                  y "Tengo wifi!" de costado
+├── eyes_saludar
 └── while (1)
     ├── ¿boton 1?                                                 → abrir_menu()
     ├── ¿sin movimiento ≥ TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS?  → dormir()
     ├── ¿motion_alguien_llego()?                                  → recibir_visita()
-    ├── ¿primera conexion WiFi?                                   → "¡Tengo WiFi!" + saludo
-    ├── ¿paso MOSTRAR_TEMPERATURA_CADA_MS (5 min)?                → eyes_mostrar_datos()
+    ├── ¿WiFi llego tarde?                                        → festejar_wifi()
+    ├── revisar_horarios(): x:00/x:05... hora de costado; x:00/x:15... sensor de costado
+    │   (sin hora de internet: sensor cada SENSOR_CADA_MINUTOS desde el arranque)
     ├── modo normal: eyes_jugar()  /  otros modos: eyes_actuar(personaje al azar)
     └── descansar(azar)   ← revisa el sensor y el boton cada 50 ms
 ```
@@ -207,7 +214,7 @@ app_main
 El boton 1 corta cualquier animacion al instante (ver interrupcion en `eyes`). La llegada
 de alguien, en cambio, todavia espera a que termine el juego actual (hasta ~5 s).
 
-Menu principal: Modo / Comer / Hora / Salir. Comer: Torta / Papas fritas / Hamburguesa /
+Menu principal: Modo / Comer / Hora / Sensor / Salir. Comer: Torta / Papas fritas / Hamburguesa /
 Atras. El limite de comidas (`COMIDAS_POR_HORA`) es una ventana movil de 60 minutos con
 `esp_timer` (no necesita la hora de internet) y se reinicia al apagar. Modos: `modo_t` en `main.c`, con una tabla de 3
 personajes por modo. El modo no se guarda:

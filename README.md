@@ -22,13 +22,14 @@ Lo armamos entre Sofia y su papa, de a poquito, y cada vez le vamos enseñando c
 
 | Cuando… | Pitri… |
 |---|---|
-| Se prende | Dice **"¡Hola Sofi!"**, **"Soy Pitri"** y despues abre los ojos |
+| Se prende | Dice **"¡Hola Sofi!"**, **"Soy Pitri"** y, mientras se conecta al WiFi, mira unas **ondas** que se van encendiendo |
 | Esta tranquilo | Juega solo: mira para los costados, parpadea, guiña un ojo, se marea, se enoja, llora… |
 | Llega alguien | Se sorprende 😮 y se pone contento 😊 |
 | Pasa un rato sin ver a nadie | Se duerme 😴 y le salen "Z" |
-| Pasan 5 minutos | Se corre a un costado y mira la temperatura y la humedad, que aparecen con letra chica |
+| Cada 5 minutos en punto (x:00, x:05, x:10...) | Se corre a un costado y mira la **hora** |
+| Cada 15 minutos en punto (x:00, x:15, x:30, x:45) | Se corre a un costado y mira la **temperatura y la humedad** |
 | Apretas el boton 1 | Abre el **menu**, para elegir un **modo** (ver abajo) |
-| Se conecta al WiFi | Dice **"¡Tengo WiFi!"**, se pone contento y **se pone en hora** |
+| Se conecta al WiFi | Dice **"Tengo wifi!"** con la carita de costado y **se pone en hora** |
 
 ### Los juegos de Pitri
 
@@ -59,13 +60,14 @@ Cuando esta tranquilo, lleva una sonrisita chiquita.
 ## 🎭 Los modos
 
 Con el **boton 1** se abre el menu. El **boton 2** baja a la opcion siguiente y el
-**boton 1** elige. El menu tiene cuatro opciones: **Modo**, **Comer**, **Hora** y **Salir**.
+**boton 1** elige. El menu tiene cinco opciones: **Modo**, **Comer**, **Hora**, **Sensor** y **Salir**.
 
 - **Comer**: aparecen los dibujos de una **torta**, unas **papas fritas** y una
   **hamburguesa** (con el boton 2 se pasa de una a otra, y al final esta **Atras** para
   volver al menu). Al elegir una, Pitri se la come a mordiscos y dice "¡Rico!". Puede
   comer hasta **3 veces por hora**: si ya comio, mueve la cabeza diciendo que no porque
   esta lleno. Si no come, no le pasa nada: **Pitri nunca muere**.
+- **Sensor** muestra la temperatura grande y la humedad durante 5 segundos.
 - **Hora** muestra la hora grande, el dia y la fecha durante 5 segundos, y despues Pitri
   vuelve a lo que estaba haciendo.
 - En **Modo** se elige que hace Pitri:
@@ -118,7 +120,7 @@ sin saber programar. Algunos ejemplos:
 #define MENSAJE_ARRANQUE    "¡Hola\nSofi!"               // lo que dice al prenderse
 #define MENSAJE_ARRANQUE_2  "Soy\nPitri"                 // y despues
 #define TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS  (60 * 1000) // cuando se duerme
-#define MOSTRAR_TEMPERATURA_CADA_MS  (5 * 60 * 1000)      // cada cuanto muestra la temperatura
+#define SENSOR_CADA_MINUTOS  15                           // cada cuanto muestra la temperatura
 ```
 
 Y en [components/eyes/eyes_interno.h](components/eyes/eyes_interno.h), arriba de todo, esta la

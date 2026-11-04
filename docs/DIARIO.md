@@ -14,6 +14,18 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-03 — En punto ⏰
+
+**Que hicimos:**
+- Al prenderse, mientras se conecta al WiFi, Pitri mira unas **ondas** que se van encendiendo. Cuando se conecta, dice "Tengo wifi!" con la carita de costado.
+- Ahora muestra la **hora en punto**: a las x:00, x:05, x:10... Y a las x:00, x:15, x:30 y x:45 muestra tambien la temperatura y la humedad.
+- En el menu hay una opcion nueva, **Sensor**, que muestra la temperatura grande.
+- Se duerme en cualquier modo y se despierta con el sensor.
+
+**Que aprendimos:** Para saber si es "en punto", alcanza con ver si los minutos se pueden dividir justo por 5: 10, 15 y 20 si; 12 no. Y para no mostrar la hora dos veces en el mismo minuto, Pitri anota cual fue el ultimo minuto en que la mostro.
+
+---
+
 ## 2026-11-03 — ¡A comer! 🍔🍟🎂
 
 **Que hicimos:** El menu tiene una opcion nueva: **Comer**. Aparecen una torta, unas papas fritas y una hamburguesa (y **Atras** para volver). Al elegir una, Pitri se la come a mordiscos y dice "¡Rico!". Puede comer hasta **3 veces por hora**: si ya comio, mueve la cabeza diciendo que no. Y si no come, no le pasa nada: **Pitri nunca muere**.

@@ -44,6 +44,7 @@ typedef struct {
     float datos;              // 0 a 1: cuanto entraron los datos (texto) desde la derecha
     float fase;               // reloj de los disfraces: cada +1 es una vuelta de su animacion
     float comida_x, comida_y; // donde esta la comida que le estan dando (centro)
+    float ondas;              // 0 a 1: ondas de WiFi al costado (mientras se conecta)
 } cara_t;
 
 extern const cara_t CARA_NORMAL;

@@ -11,21 +11,31 @@
 #define MENSAJE_ARRANQUE_TAMANO 3          // 1 = chiquito, 3 = grandote
 #define MENSAJE_ARRANQUE_MS     3000       // cuanto tiempo se ve
 
-// Mensaje que muestra la primera vez que se conecta al WiFi ("" = no mostrarlo)
-#define MENSAJE_WIFI            "¡Tengo\nWiFi!"
+// ─── WiFi ────────────────────────────────────────────────────────────────────
+// Al arrancar, mientras se conecta, muestra la carita con ondas de WiFi
+#define WIFI_ESPERA_ARRANQUE_MS (20 * 1000)  // si no conecta en este tiempo, sigue igual
+// Mensaje (letra chica, al costado de la carita) cuando se conecta ("" = no mostrarlo)
+#define MENSAJE_WIFI            "Tengo\nwifi!"
+#define MOSTRAR_WIFI_MS         3000
 
 // Si pasa este tiempo sin que el sensor vea a nadie, Pitri se va a dormir
 #define TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS  (60 * 1000)   // 1 minuto
 
 // ─── Temperatura y humedad (DHT11 / DHT22) ───────────────────────────
 #define TIEMPO_ENTRE_LECTURAS_MS       (10 * 1000)  // cada cuanto lee el sensor (minimo 2 s)
-#define MOSTRAR_TEMPERATURA_CADA_MS    (5 * 60 * 1000)  // cada cuanto la muestra: 5 minutos (0 = nunca)
-#define MOSTRAR_TEMPERATURA_MS         6000             // cuanto tiempo se ve
 
 // ─── Hora (se saca de internet cuando hay WiFi) ─────────────────────────────
 // Diferencia con la hora mundial (UTC), en formato TZ: "ART3" = 3 horas menos
 #define ZONA_HORARIA  "ART3"
-#define MOSTRAR_HORA_MS  5000      // cuanto se ve la hora al elegirla en el menu
+
+// ─── Pantallas automaticas (en punto) ───────────────────────────────────────
+#define HORA_CADA_MINUTOS        5      // la hora en x:00, x:05, x:10...
+#define SENSOR_CADA_MINUTOS      15     // temperatura y humedad en x:00, x:15, x:30, x:45
+#define MOSTRAR_HORA_COSTADO_MS  4000   // cuanto se ve la hora (carita de costado)
+#define MOSTRAR_SENSOR_MS        6000   // cuanto se ven los datos del sensor
+
+// Cuanto se ve la hora o el sensor al elegirlos en el menu
+#define MOSTRAR_HORA_MS  5000
 
 // ─── Comida ───────────────────────────────────────────────────────────────
 #define COMIDAS_POR_HORA  3        // cuantas veces puede comer en una hora

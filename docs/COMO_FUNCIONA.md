@@ -13,13 +13,14 @@ El programa de Pitri es como una lista de instrucciones que se repite **para sie
 Al prenderse:
    1. Preparar la pantalla y los sensores
    2. Mostrar "¡Hola Sofi!" y "Soy Pitri"
-   3. Abrir los ojos y saludar
+   3. Mirar las ondas de WiFi hasta conectarse, y decir "Tengo wifi!"
+   4. Abrir los ojos y saludar
 
 Y despues, una y otra vez:
    ¿Apretaron el boton 1?           →  abro el menu
    ¿Hace mucho que no veo a nadie?  →  me duermo hasta que llegue alguien
    ¿Llego alguien?                  →  ¡lo saludo!
-   ¿Pasaron 5 minutos?              →  miro la temperatura
+   ¿Es en punto (x:00, x:05...)?    →  miro la hora (y cada 15, la temperatura)
    Elijo un juego al azar y lo hago (o, en un modo especial, hago de un personaje)
    Descanso un ratito
 ```
@@ -337,6 +338,10 @@ Para entrar a una red WiFi hacen falta dos cosas: el **nombre de la red** y la
 > compu y nunca se sube**. En internet solo esta una plantilla con datos de mentira.
 > Por la misma razon, Pitri nunca escribe la contraseña ni el nombre de la red en la consola.
 
+Al prenderse, mientras se conecta, Pitri se corre a un costado y mira un **simbolo de
+WiFi**: un puntito y tres ondas que se van encendiendo de a una, como cuando el celular
+busca señal. Cuando se conecta, las ondas se cambian por "Tengo wifi!".
+
 Si el WiFi se corta, Pitri lo vuelve a intentar solo: primero al segundo, despues a los 2,
 a los 4, a los 8… hasta probar una vez por minuto, para no cansarse (ni cansar al router).
 
@@ -361,8 +366,14 @@ Los servidores contestan la **hora mundial** (UTC). Para saber la hora de casa h
 decirle a Pitri cuantas horas de diferencia hay: eso es la **zona horaria**
 (`ZONA_HORARIA` en [pitri_config.h](../main/pitri_config.h)).
 
-Para ver la hora, abri el menu con el boton 1 y elegi **Hora**: aparece grande, con el
+Pitri muestra la hora solo, **en punto**: cada 5 minutos (x:00, x:05, x:10...) se corre a
+un costado y la mira. Y cada 15 minutos (x:00, x:15, x:30, x:45) mira tambien la
+temperatura y la humedad. Para saber si es "en punto", se fija si los minutos se pueden
+dividir justo por 5 (o por 15).
+
+Tambien se puede ver cuando uno quiere: en el menu, **Hora** la muestra grande, con el
 dia y la fecha, y los dos puntos titilan una vez por segundo, como en un reloj de verdad.
+Y **Sensor** muestra la temperatura grande y la humedad, con el mismo estilo.
 
 > 🧑‍🔧 **Para grandes:** [reloj.c](../components/reloj/reloj.c) espera en una tarea a que
 > `wifi_conectado()` sea true, inicia `esp_netif_sntp` contra `pool.ntp.org` y marca
@@ -376,4 +387,5 @@ dia y la fecha, y los dos puntos titilan una vez por segundo, como en un reloj d
 El ayudante del sensor de movimiento anota **la hora de la ultima vez que vio a alguien**.
 El programa principal pregunta todo el tiempo: *"¿cuanto hace que no ves a nadie?"*.
 Si paso mas de un minuto, Pitri cierra los ojos y se queda "respirando" (los ojos cerrados
-suben y bajan y sale una Z) hasta que el sensor vuelva a ver a alguien.
+suben y bajan y sale una Z) hasta que el sensor vuelva a ver a alguien. Esto pasa en
+**cualquier modo**: si estaba disfrazado, primero se saca el disfraz.

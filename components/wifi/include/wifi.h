@@ -14,4 +14,7 @@ void wifi_iniciar(void);
 // true mientras esta conectado y tiene direccion en la red
 bool wifi_conectado(void);
 
+// true si hay datos de una red (wifi_secretos.h), o sea, si va a intentar conectarse
+bool wifi_configurado(void);
+
 #endif // PITRI_WIFI_H

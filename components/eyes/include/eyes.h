@@ -25,9 +25,14 @@ void eyes_dormido(void);
 void eyes_despertar(void);
 
 // La carita se corre a la izquierda y mira hacia la derecha, donde aparece
-// "texto" con letra chica (acepta '\n', hasta 4 renglones de ~8 letras).
-// Se queda "ms" milisegundos y despues vuelve a la normalidad.
-void eyes_mostrar_datos(const char *texto, int ms);
+// "texto" (acepta '\n'). Se queda "ms" milisegundos y despues vuelve a la normalidad.
+//   escala 1 = letra chica: hasta 4 renglones de ~8 letras
+//   escala 2 = letra grande: 1 o 2 renglones de 5 letras (por ejemplo "21:15")
+void eyes_mostrar_datos(const char *texto, int escala, int ms);
+
+// Un "paso" (~1,2 s) de la carita de costado mirando unas ondas de WiFi que se
+// van encendiendo. Llamarla una y otra vez mientras se conecta.
+void eyes_onditas(void);
 
 // ─── Disfraces (personajes de los modos) ─────────────────────────────────────
 typedef enum {

@@ -124,3 +124,8 @@ bool wifi_conectado(void)
 {
     return conectado;
 }
+
+bool wifi_configurado(void)
+{
+    return strlen(WIFI_NOMBRE_RED) > 0;
+}
