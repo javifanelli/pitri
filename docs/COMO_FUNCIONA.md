@@ -221,10 +221,13 @@ Pitri lleva dos cuentas separadas: puede comer 3 veces y tomar 3 veces por hora.
 En los modos especiales, Pitri se "disfraza". Hay dos clases de disfraces:
 
 - **Encima de los ojos de Pitri:** el vampiro (pelo con pico, cuello de capa y colmillos),
-  Papa Noel (gorro, barba y bigote), la gallina (cresta, pico y moquito) y el cerdo
-  (orejas y hocico). Pitri sigue parpadeando y mirando con sus ojos de siempre.
-- **Un dibujo entero:** el fantasma, la calabaza, el arbolito, la galleta y la tortuga.
-  Tienen sus propios ojos (huecos, triangulares, puntitos...) que igual parpadean.
+  Papa Noel (gorro, barba y bigote), la gallina (cresta, pico y moquito), el cerdo
+  (orejas y hocico) y la vaca (cuernitos, orejas y un hocico grande). Pitri sigue
+  parpadeando y mirando con sus ojos de siempre.
+- **Un dibujo entero:** el fantasma, la calabaza, el arbolito y la galleta. Tienen sus
+  propios ojos (huecos, triangulares, puntitos...) que igual parpadean.
+
+Los animales usan todos los ojos de Pitri, asi se nota que es el, disfrazado.
 
 Todos estan hechos con las mismas formas de siempre: circulos, rectangulos redondeados,
 triangulos y lineas. Por ejemplo, la **estrella** del arbolito son 5 triangulos (las

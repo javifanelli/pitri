@@ -38,7 +38,7 @@ static const char *const nombres_modos[CANT_MODOS] = {
 static const eyes_disfraz_t personajes[CANT_MODOS][3] = {
     [MODO_HALLOWEEN] = { DISFRAZ_VAMPIRO,   DISFRAZ_FANTASMA, DISFRAZ_CALABAZA },
     [MODO_NAVIDAD]   = { DISFRAZ_PAPA_NOEL, DISFRAZ_ARBOLITO, DISFRAZ_GALLETA  },
-    [MODO_ANIMALES]  = { DISFRAZ_GALLINA,   DISFRAZ_CERDO,    DISFRAZ_TORTUGA  },
+    [MODO_ANIMALES]  = { DISFRAZ_GALLINA,   DISFRAZ_CERDO,    DISFRAZ_VACA     },
 };
 
 static modo_t modo = MODO_NORMAL;

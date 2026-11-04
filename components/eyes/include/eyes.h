@@ -48,7 +48,7 @@ typedef enum {
     // Animales
     DISFRAZ_GALLINA,
     DISFRAZ_CERDO,
-    DISFRAZ_TORTUGA,
+    DISFRAZ_VACA,
 } eyes_disfraz_t;
 
 // Se pone el disfraz (si no lo tenia puesto) y hace la actuacion de ese

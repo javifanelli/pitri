@@ -5,11 +5,11 @@
 //  Hay dos clases de disfraces:
 //
 //   - Los que se ponen ENCIMA de los ojos de Pitri (vampiro, Papa Noel,
-//     gallina, cerdo): Pitri sigue teniendo sus ojos, y el disfraz agrega
+//     gallina, cerdo, vaca): Pitri sigue teniendo sus ojos, y el disfraz agrega
 //     pelo, gorro, pico, orejas... y cambia la boca.
 //
-//   - Los que son un DIBUJO ENTERO (fantasma, calabaza, arbolito, galleta,
-//     tortuga): el disfraz dibuja todo, con sus propios ojos.
+//   - Los que son un DIBUJO ENTERO (fantasma, calabaza, arbolito, galleta):
+//     el disfraz dibuja todo, con sus propios ojos.
 //
 //  Cada personaje tiene:
 //   - una funcion dibujar_xxx(): como se ve en un cuadro
@@ -495,60 +495,55 @@ static void actuar_cerdo(void)
     }
 }
 
-// 🐢 Tortuga (de costado): caparazon con dibujitos, patas, cola y cabeza que se esconde
-static void dibujar_tortuga(float mx, float cy)
+// 🐮 Vaca: cuernitos, orejas a los costados y un hocico grande con agujeritos
+static void dibujar_vaca(float mx, float cy)
 {
-    float base = cy + 14;                       // linea de abajo del caparazon
-    float paso = 2 * onda();                    // las patas caminan
-    float hx   = mx + 34 - 16 * cara.asombro;   // cabeza: asombro 1 = escondida
+    float aleteo = 2 * onda();
 
-    // Cuello y cabeza (se dibujan antes, asi el caparazon los tapa al esconderse)
-    if (hx > mx + 20) rect_redondo(mx + 18, base - 13, hx - mx - 18, 8, 3, true);
-    circulo(hx, base - 10, 8, true);
-    if (cara.abre_der > 0.4f) circulo(hx + 2, base - 13, 1, false);
-    else                      linea(hx, base - 13, hx + 4, base - 13, 1, false);
-    arco(hx + 1, base - 9, 4, 0.1f * PI, 0.6f * PI, 1, false);
+    // Cuernitos arriba, apuntando para afuera
+    triangulo(mx - 20, cy - 15, mx - 12, cy - 15, mx - 30, cy - 27, true);
+    triangulo(mx + 20, cy - 15, mx + 12, cy - 15, mx + 30, cy - 27, true);
 
-    // Caparazon: medio circulo, con un borde y dibujitos
-    circulo(mx - 4, base, 26, true);
-    rect(mx - 31, base + 1, 56, 27, false);     // borra la mitad de abajo
-    rect_redondo(mx - 33, base - 3, 60, 6, 3, true);
-    arco(mx - 4, base, 15, PI, 2 * PI, 1, false);
-    for (int k = 1; k <= 3; k++) {
-        float a = PI + k * PI / 4;
-        linea(mx - 4 + 15 * cosf(a), base + 15 * sinf(a),
-              mx - 4 + 25 * cosf(a), base + 25 * sinf(a), 1, false);
-    }
+    // Orejas a los costados (se mueven un poquito), con una rayita adentro
+    rect_redondo(mx - 58, cy - 12 + aleteo, 20, 8, 4, true);
+    rect_redondo(mx + 38, cy - 12 - aleteo, 20, 8, 4, true);
+    rect(mx - 54, cy - 9 + aleteo, 11, 2, false);
+    rect(mx + 43, cy - 9 - aleteo, 11, 2, false);
 
-    // Patas y cola
-    rect_redondo(mx - 24, base + 1, 9, 12 + paso, 3, true);
-    rect_redondo(mx + 8,  base + 1, 9, 12 - paso, 3, true);
-    triangulo(mx - 30, base - 1, mx - 39, base + 3, mx - 30, base + 3, true);
+    // Hocico grande con dos agujeritos y la boca (que se abre para el "¡Muu!")
+    rect_redondo(mx - 20, cy + 14, 40, 18, 9, true);
+    rect_redondo(mx - 12, cy + 18, 6, 5, 2, false);
+    rect_redondo(mx + 6,  cy + 18, 6, 5, 2, false);
+    if (cara.asombro > 0.5f) circulo(mx, cy + 27, 3, false);
+    else                     arco(mx, cy + 22, 6, 0.25f * PI, 0.75f * PI, 1, false);
 }
 
-static void actuar_tortuga(void)
+static void actuar_vaca(void)
 {
     cara_t d = cara;
+    float y_normal = d.y;
 
-    cara.x = d.x = -100;                // entra caminando despacito desde la izquierda
-    for (int i = 0; i < 24; i++) {
-        d.fase += 0.2f;
-        d.x += 100.0f / 24;
-        animar(d, 150);
+    for (int i = 0; i < 8; i++) {       // rumia: mueve el hocico de un lado al otro
+        d.fase += 0.25f;
+        d.x = (i % 2) ? 2 : -2;
+        animar(d, 180);
     }
     d.x = 0;
-    animar(d, 100);
-    esperar(400);
-    cerrar_y_abrir(true, true, 100);    // parpadea
+    animar(d, 150);
 
-    d = cara;
-    d.asombro = 1;                      // ¡se esconde en el caparazon!
-    animar(d, 300);
-    esperar(1200);
-    d.asombro = 0;                      // y vuelve a asomarse
-    animar(d, 500);
+    cerrar_y_abrir(true, true, 250);    // parpadea despacito, muy tranquila
     esperar(300);
-    cerrar_y_abrir(true, true, 80);
+
+    decir("¡Muu!", (int)(LCD_H_RES / 2) - 14, 1, 1);
+    d = cara;
+    d.asombro = 1;                      // abre la boca
+    d.y = y_normal - 2;
+    animar(d, 200);
+    esperar(1000);
+    callar();
+    d.asombro = 0;
+    d.y = y_normal;
+    animar(d, 250);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -573,7 +568,7 @@ static const personaje_t personajes[] = {
     [DISFRAZ_GALLETA]   = { "galleta",    true,  OJO_ANCHO, OJO_ALTO, 0, 0,    1,    dibujar_galleta,   actuar_galleta   },
     [DISFRAZ_GALLINA]   = { "gallina",    false, 22,        22,      -3, 0,    1,    dibujar_gallina,   actuar_gallina   },
     [DISFRAZ_CERDO]     = { "cerdo",      false, 22,        24,      -6, 0,    1,    dibujar_cerdo,     actuar_cerdo     },
-    [DISFRAZ_TORTUGA]   = { "tortuga",    true,  OJO_ANCHO, OJO_ALTO, 0, 0,    1,    dibujar_tortuga,   actuar_tortuga   },
+    [DISFRAZ_VACA]      = { "vaca",       false, 22,        24,      -6, 0,    1,    dibujar_vaca,      actuar_vaca      },
 };
 #define CANT_PERSONAJES ((int)(sizeof(personajes) / sizeof(personajes[0])))
 

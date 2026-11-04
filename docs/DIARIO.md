@@ -14,6 +14,14 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-03 — La tortuga se va, llega la vaca 🐮
+
+**Que hicimos:** En el modo Animales cambiamos la tortuga por una **vaca**: tiene los ojos de Pitri, cuernitos, orejas a los costados y un hocico grande. Rumia moviendo el hocico, parpadea despacito y dice "¡Muu!".
+
+**Que aprendimos:** La tortuga era un dibujo de costado que no se parecia en nada a Pitri. Los personajes que mejor quedan son los que usan **sus ojos** y le agregan partes: asi se nota que es Pitri disfrazado.
+
+---
+
 ## 2026-11-03 — Agua, cafe y mate 🧉
 
 **Que hicimos:** Las bebidas ahora tienen nombre: la botella es **agua** y la taza es **cafe**. Y agregamos el **mate**, con su calabacita, la yerba y la bombilla. Cuando Pitri lo termina, hace "Slurp", como cuando el mate se acaba.
