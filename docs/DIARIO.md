@@ -14,6 +14,17 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-03 — ¡Cinco personajes por modo! 🦇🧙🦌⛄🧝🐱🐶
+
+**Que hicimos:** Pensamos personajes nuevos que sean tiernos y que **usen los ojos de Pitri**, y ahora cada modo tiene 5:
+- 🎃 **Halloween:** vampiro, fantasma, calabaza (ahora con los ojos de Pitri en vez de triangulos), **murcielago** y **brujita**.
+- 🎄 **Navidad:** Papa Noel, arbolito, **reno** (con la nariz que titila), **muñeco de nieve** y **duende**. La galleta se fue.
+- 🐾 **Animales:** gallina, cerdo, vaca, **gato** y **perro**.
+
+**Que aprendimos:** Antes de dibujar, conviene anotar donde quedan los ojos y repartir el resto alrededor: los cuernos y gorros arriba, las orejas y alas a los costados, y narices, picos y bocas abajo. Asi nada se pisa.
+
+---
+
 ## 2026-11-03 — La tortuga se va, llega la vaca 🐮
 
 **Que hicimos:** En el modo Animales cambiamos la tortuga por una **vaca**: tiene los ojos de Pitri, cuernitos, orejas a los costados y un hocico grande. Rumia moviendo el hocico, parpadea despacito y dice "¡Muu!".

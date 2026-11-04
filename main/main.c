@@ -34,11 +34,12 @@ static const char *const nombres_modos[CANT_MODOS] = {
     "Normal", "Halloween", "Navidad", "Animales",
 };
 
-// Los 3 personajes de cada modo
-static const eyes_disfraz_t personajes[CANT_MODOS][3] = {
-    [MODO_HALLOWEEN] = { DISFRAZ_VAMPIRO,   DISFRAZ_FANTASMA, DISFRAZ_CALABAZA },
-    [MODO_NAVIDAD]   = { DISFRAZ_PAPA_NOEL, DISFRAZ_ARBOLITO, DISFRAZ_GALLETA  },
-    [MODO_ANIMALES]  = { DISFRAZ_GALLINA,   DISFRAZ_CERDO,    DISFRAZ_VACA     },
+// Los personajes de cada modo
+#define PERSONAJES_POR_MODO 5
+static const eyes_disfraz_t personajes[CANT_MODOS][PERSONAJES_POR_MODO] = {
+    [MODO_HALLOWEEN] = { DISFRAZ_VAMPIRO,   DISFRAZ_FANTASMA, DISFRAZ_CALABAZA,     DISFRAZ_MURCIELAGO, DISFRAZ_BRUJITA },
+    [MODO_NAVIDAD]   = { DISFRAZ_PAPA_NOEL, DISFRAZ_ARBOLITO, DISFRAZ_RENO,         DISFRAZ_MUNECO_NIEVE, DISFRAZ_DUENDE },
+    [MODO_ANIMALES]  = { DISFRAZ_GALLINA,   DISFRAZ_CERDO,    DISFRAZ_VACA,         DISFRAZ_GATO,       DISFRAZ_PERRO   },
 };
 
 static modo_t modo = MODO_NORMAL;
@@ -51,7 +52,7 @@ static eyes_disfraz_t elegir_personaje(void)
 
     eyes_disfraz_t p;
     do {
-        p = personajes[modo][esp_random() % 3];
+        p = personajes[modo][esp_random() % PERSONAJES_POR_MODO];
     } while (p == ultimo_personaje);
     ultimo_personaje = p;
     return p;

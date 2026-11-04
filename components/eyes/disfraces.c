@@ -4,12 +4,12 @@
 //
 //  Hay dos clases de disfraces:
 //
-//   - Los que se ponen ENCIMA de los ojos de Pitri (vampiro, Papa Noel,
-//     gallina, cerdo, vaca): Pitri sigue teniendo sus ojos, y el disfraz agrega
-//     pelo, gorro, pico, orejas... y cambia la boca.
+//   - Los que se ponen ENCIMA de los ojos de Pitri (la mayoria): Pitri sigue
+//     teniendo sus ojos, y el disfraz agrega pelo, gorro, pico, orejas... y
+//     cambia la boca. Son los que mejor quedan: se nota que es Pitri disfrazado.
 //
-//   - Los que son un DIBUJO ENTERO (fantasma, calabaza, arbolito, galleta):
-//     el disfraz dibuja todo, con sus propios ojos.
+//   - Los que son un DIBUJO ENTERO (fantasma, calabaza, arbolito): el disfraz
+//     dibuja todo. La calabaza igual tiene huecos con la forma de los ojos de Pitri.
 //
 //  Cada personaje tiene:
 //   - una funcion dibujar_xxx(): como se ve en un cuadro
@@ -83,6 +83,23 @@ static void estrella(float cx, float cy, float r_afuera, float r_adentro)
         triangulo(cx, cy,
                   cx + r_adentro * cosf(a_izq), cy + r_adentro * sinf(a_izq),
                   cx + r_adentro * cosf(a_der), cy + r_adentro * sinf(a_der), true);
+    }
+}
+
+// Destello: una crucecita, como una estrellita que brilla
+static void destello(float x, float y, float r)
+{
+    rect(x - r, y, 2 * r + 1, 1, true);
+    rect(x, y - r, 1, 2 * r + 1, true);
+}
+
+// Copitos de nieve que caen por toda la pantalla (se mueven con cara.fase)
+static void nieve(void)
+{
+    for (int i = 0; i < 14; i++) {
+        float x = fmodf(i * 37 + 11, 128);
+        float y = fmodf(i * 23 + cara.fase * 40, 70) - 3;
+        rect(x, y, 2, 2, true);
     }
 }
 
@@ -206,7 +223,7 @@ static void actuar_fantasma(void)
     animar(d, 500);
 }
 
-// 🎃 Calabaza: ojos y nariz triangulares, boca con dientes y un cabito
+// 🎃 Calabaza: con huecos con la forma de los ojos de Pitri, nariz, boca con dientes y un cabito
 static void dibujar_calabaza(float mx, float cy)
 {
     rect_redondo(mx - 46, cy - 24, 92, 52, 24, true);              // la calabaza
@@ -215,11 +232,11 @@ static void dibujar_calabaza(float mx, float cy)
     rect(mx - 3, cy - 31, 7, 9, true);                             // cabito
     linea(mx + 4, cy - 29, mx + 12, cy - 33, 2, true);             // hojita
 
-    // Ojos triangulares (parpadean, como la luz de una vela)
-    float h_izq = fmaxf(2, 14 * cara.abre_izq);
-    float h_der = fmaxf(2, 14 * cara.abre_der);
-    triangulo(mx - 30, cy - 2, mx - 12, cy - 2, mx - 21, cy - 2 - h_izq, false);
-    triangulo(mx + 12, cy - 2, mx + 30, cy - 2, mx + 21, cy - 2 - h_der, false);
+    // Ojos: huecos con la forma de los ojos de Pitri (parpadean, como la luz de una vela)
+    float h_izq = fmaxf(2, 20 * cara.abre_izq);
+    float h_der = fmaxf(2, 20 * cara.abre_der);
+    rect_redondo(mx - 28, cy - 5 - h_izq / 2, 18, h_izq, 6, false);
+    rect_redondo(mx + 10, cy - 5 - h_der / 2, 18, h_der, 6, false);
 
     triangulo(mx - 4, cy + 7, mx + 4, cy + 7, mx, cy + 1, false);   // nariz
 
@@ -249,6 +266,103 @@ static void actuar_calabaza(void)
     d.abre_izq = d.abre_der = 1;
     animar(d, 100);
     esperar(400);
+}
+
+// 🦇 Murcielago: alas con borde ondulado que aletean, orejitas y colmillitos
+static void dibujar_ala(float mx, float cy, int lado, float aleteo)
+{
+    float ax = mx + lado * 34, ay = cy - 6;                      // hombro
+    float bx = mx + lado * 62, by = cy - 18 + 6 * aleteo;        // punta del ala
+    float px = mx + lado * 60, py = cy + 8 + 4 * aleteo;
+    float dx = mx + lado * 34, dy = cy + 12;
+    triangulo(ax, ay, bx, by, dx, dy, true);
+    triangulo(bx, by, px, py, dx, dy, true);
+    circulo(mx + lado * 52, cy + 12 + 2 * aleteo, 5, false);    // borde ondulado:
+    circulo(mx + lado * 42, cy + 14 + aleteo, 5, false);        // dos "mordidas"
+}
+
+static void dibujar_murcielago(float mx, float cy)
+{
+    float aleteo = onda();
+    dibujar_ala(mx, cy, -1, aleteo);
+    dibujar_ala(mx, cy, +1, aleteo);
+
+    triangulo(mx - 22, cy - 12, mx - 12, cy - 12, mx - 18, cy - 22, true);   // orejitas
+    triangulo(mx + 22, cy - 12, mx + 12, cy - 12, mx + 18, cy - 22, true);
+
+    arco(mx, cy + 12, 6, 0.25f * PI, 0.75f * PI, 1, true);                   // sonrisa
+    triangulo(mx - 4, cy + 16, mx - 2, cy + 16, mx - 3, cy + 20, true);      // colmillitos
+    triangulo(mx + 2, cy + 16, mx + 4, cy + 16, mx + 3, cy + 20, true);
+}
+
+static void actuar_murcielago(void)
+{
+    cara_t d = cara;
+    float y_normal = d.y;
+
+    for (int i = 0; i < 16; i++) {      // vuela: aletea, sube y baja, y va de un lado al otro
+        d.fase += 0.25f;
+        d.y = y_normal + 3 * sinf(i * 0.8f);
+        d.x = 10 * sinf(i * 0.3f);
+        animar(d, 100);
+    }
+    d.x = 0;
+    d.y = y_normal;
+    animar(d, 200);
+
+    decir("¡Iiih!", (int)(LCD_H_RES / 2) - 17, 1, 1);
+    for (int i = 0; i < 6; i++) {       // chilla aleteando rapido
+        d.fase += 0.5f;
+        animar(d, 80);
+    }
+    esperar(500);
+    callar();
+}
+
+// 🧙 Brujita: sombrero en punta con hebilla y estrellitas que titilan alrededor
+static void dibujar_brujita(float mx, float cy)
+{
+    // Sombrero: el cono (con la punta doblada) y el ala ancha
+    triangulo(mx - 24, cy - 17, mx + 24, cy - 17, mx + 10, cy - 36, true);
+    linea(mx + 10, cy - 35, mx + 20, cy - 31, 2, true);
+    rect(mx - 22, cy - 22, 44, 2, false);                       // cinta
+    rect(mx - 4, cy - 24, 8, 6, true);                          // hebilla
+    rect(mx - 2, cy - 23, 4, 4, false);
+    rect_redondo(mx - 44, cy - 17, 88, 4, 2, true);             // ala
+
+    // Estrellitas: la mitad brilla y la otra mitad no, y van turnandose
+    int turno = ((int)(cara.fase * 4)) % 2;
+    if (turno == 0) { destello(mx - 52, cy - 2, 3);  destello(mx + 46, cy - 26, 2); }
+    else            { destello(mx + 52, cy + 6, 3);  destello(mx - 46, cy + 16, 2); }
+
+    arco(mx, cy + 10, 5, 0.25f * PI, 0.75f * PI, 1, true);      // sonrisa
+}
+
+static void actuar_brujita(void)
+{
+    cara_t d = cara;
+
+    for (int i = 0; i < 8; i++) {       // mira las estrellitas que titilan
+        d.fase += 0.25f;
+        d.x = (i < 4) ? -8 : 8;
+        animar(d, 200);
+    }
+    d.x = 0;
+    animar(d, 200);
+
+    float y_normal = d.y;
+    decir("¡Abracadabra!", (int)(LCD_H_RES / 2) - 38, 56, 1);   // ¡hace magia!
+    d.feliz = 1;
+    for (int i = 0; i < 8; i++) {
+        d.fase += 0.25f;
+        d.y = y_normal + ((i % 2) ? -2 : 2);
+        animar(d, 120);
+    }
+    esperar(600);
+    callar();
+    d.feliz = 0;
+    d.y = y_normal;
+    animar(d, 200);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -307,12 +421,7 @@ static void dibujar_arbolito(float mx, float cy)
 {
     float arriba = cy - 32;
 
-    // Nieve que cae (atras del arbol)
-    for (int i = 0; i < 14; i++) {
-        float x = fmodf(i * 37 + 11, 128);
-        float y = fmodf(i * 23 + cara.fase * 40, 70) - 3;
-        rect(x, y, 2, 2, true);
-    }
+    nieve();    // atras del arbol
 
     // Tres pisos de hojas y el tronco
     triangulo(mx, arriba + 9,  mx - 16, arriba + 24, mx + 16, arriba + 24, true);
@@ -352,66 +461,136 @@ static void actuar_arbolito(void)
     animar(d, 500);
 }
 
-// 🍪 Galleta de jengibre: cabeza, cuerpo, brazos y piernas, con botones y glaseado
-static void dibujar_galleta(float mx, float cy)
+// 🦌 Reno: cuernos ramificados, orejitas y una nariz que se prende y se apaga
+static void dibujar_cuerno(float mx, float cy, int lado)
 {
-    float arriba = cy - 32;
-    float paso = 3 * onda();            // brazos y piernas se mueven al reves
-
-    rect_redondo(mx - 12, arriba + 42 + paso, 10, 24, 4, true);   // piernas
-    rect_redondo(mx + 2,  arriba + 42 - paso, 10, 24, 4, true);
-    rect_redondo(mx - 29, arriba + 22 - paso, 18, 9, 4, true);    // brazos
-    rect_redondo(mx + 11, arriba + 22 + paso, 18, 9, 4, true);
-    rect_redondo(mx - 13, arriba + 19, 26, 28, 8, true);          // cuerpo
-    circulo(mx, arriba + 11, 10, true);                           // cabeza
-
-    // Glaseado en las puntas de los brazos y las piernas
-    linea(mx - 24, arriba + 23 - paso, mx - 24, arriba + 29 - paso, 1, false);
-    linea(mx + 23, arriba + 23 + paso, mx + 23, arriba + 29 + paso, 1, false);
-    linea(mx - 11, arriba + 57 + paso, mx - 4,  arriba + 57 + paso, 1, false);
-    linea(mx + 3,  arriba + 57 - paso, mx + 10, arriba + 57 - paso, 1, false);
-
-    for (int k = 0; k < 3; k++)                                   // botones
-        circulo(mx, arriba + 26 + 7 * k, 2, false);
-
-    // Cara: ojitos (o rayitas si parpadea) y sonrisa
-    if (cara.abre_izq > 0.4f) circulo(mx - 4, arriba + 9, 2, false);
-    else                      linea(mx - 6, arriba + 9, mx - 2, arriba + 9, 1, false);
-    if (cara.abre_der > 0.4f) circulo(mx + 4, arriba + 9, 2, false);
-    else                      linea(mx + 2, arriba + 9, mx + 6, arriba + 9, 1, false);
-    arco(mx, arriba + 11, 5, 0.2f * PI, 0.8f * PI, 1, false);
+    linea(mx + lado * 14, cy - 12, mx + lado * 24, cy - 30, 2, true);   // rama principal
+    linea(mx + lado * 19, cy - 21, mx + lado * 30, cy - 24, 2, true);   // ramitas
+    linea(mx + lado * 22, cy - 26, mx + lado * 18, cy - 33, 2, true);
 }
 
-static void actuar_galleta(void)
+static void dibujar_reno(float mx, float cy)
+{
+    dibujar_cuerno(mx, cy, -1);
+    dibujar_cuerno(mx, cy, +1);
+
+    float aleteo = 2 * onda();                                          // orejitas
+    rect_redondo(mx - 48, cy - 12 + aleteo, 14, 6, 3, true);
+    rect_redondo(mx + 34, cy - 12 - aleteo, 14, 6, 3, true);
+
+    // Nariz redonda: prendida (llena) o apagada (solo el borde)
+    circulo(mx, cy + 15, 5, true);
+    if (((int)(cara.fase * 4)) % 2) circulo(mx, cy + 15, 3, false);
+
+    arco(mx, cy + 18, 6, 0.25f * PI, 0.75f * PI, 1, true);              // sonrisa
+}
+
+static void actuar_reno(void)
 {
     cara_t d = cara;
+    float y_normal = d.y;
 
-    for (int i = 0; i < 8; i++) {       // baila
+    for (int i = 0; i < 8; i++) {       // la nariz titila y mueve las orejitas
         d.fase += 0.25f;
-        d.y = (i % 2) ? -3 : 0;
         animar(d, 200);
     }
-    d.y = 0;
+    for (int i = 0; i < 3; i++) {       // salta, como tirando del trineo
+        d.fase += 0.25f;
+        d.y = y_normal - 5; animar(d, 150);
+        d.fase += 0.25f;
+        d.y = y_normal;     animar(d, 150);
+    }
+    for (int i = 0; i < 4; i++) {
+        d.fase += 0.25f;
+        animar(d, 200);
+    }
+}
 
-    d.x = -34;                          // se corre y desafia
-    animar(d, 400);
-    decir("¡Atrapame!", 64, 28, 1);
-    esperar(1300);
+// ⛄ Muneco de nieve: galera, nariz de zanahoria, boca de carbon, bufanda y nieve
+static void dibujar_muneco_nieve(float mx, float cy)
+{
+    nieve();
+
+    rect(mx - 17, cy - 33, 34, 18, true);                       // galera
+    rect(mx - 17, cy - 19, 34, 2, false);                       // cinta
+    rect(mx - 26, cy - 15, 52, 3, true);                        // ala
+
+    triangulo(mx - 3, cy + 12, mx - 3, cy + 17, mx + 16, cy + 15, true);   // zanahoria
+
+    for (int k = 0; k < 5; k++) {                               // boca de carbon
+        float a = (0.25f + k * 0.125f) * PI;
+        rect(mx + 8 * cosf(a) - 1, cy + 14 + 8 * sinf(a) - 1, 2, 2, true);
+    }
+
+    rect(mx - 30, cy + 24, 60, 5, true);                        // bufanda
+    rect(mx + 14, cy + 24, 7, 10, true);
+}
+
+static void actuar_muneco_nieve(void)
+{
+    cara_t d = cara;
+    float x_normal = d.x;
+
+    for (int i = 0; i < 30; i++) {      // nieva
+        d.fase += 0.1f;
+        animar(d, 90);
+    }
+
+    decir("¡Brrr!", 92, 2, 1);          // ¡que frio! tiembla
+    for (int i = 0; i < 12; i++) {
+        d.fase += 0.1f;
+        d.x = x_normal + ((i % 2) ? 1.5f : -1.5f);
+        animar(d, 60);
+    }
+    d.x = x_normal;
+    animar(d, 60);
     callar();
-
-    for (int i = 0; i < 12; i++) {      // ¡sale corriendo para la derecha!
-        d.fase += 0.25f;
-        d.x += 11;
-        animar(d, 70);
-    }
-    cara.x = d.x = -100;                // y vuelve a aparecer por la izquierda
     for (int i = 0; i < 10; i++) {
-        d.fase += 0.25f;
-        d.x += 10;
-        animar(d, 70);
+        d.fase += 0.1f;
+        animar(d, 90);
     }
-    d.x = 0;
-    animar(d, 100);
+}
+
+// 🧝 Duende: gorro en punta con cascabel y orejas puntiagudas
+static void dibujar_duende(float mx, float cy)
+{
+    float tilin = 2 * onda();           // el cascabel se mueve
+
+    triangulo(mx - 26, cy - 16, mx + 26, cy - 16, mx + 6, cy - 38, true);   // gorro
+    linea(mx + 6, cy - 36, mx + 30, cy - 28 + tilin, 4, true);              // punta caida
+    circulo(mx + 33, cy - 26 + tilin, 3, true);                             // cascabel
+    rect(mx + 33, cy - 26 + tilin, 1, 1, false);
+    rect_redondo(mx - 28, cy - 18, 56, 5, 2, true);                         // borde
+
+    triangulo(mx - 34, cy - 6, mx - 34, cy + 6, mx - 52, cy - 14, true);    // orejas
+    triangulo(mx + 34, cy - 6, mx + 34, cy + 6, mx + 52, cy - 14, true);
+
+    arco(mx, cy + 11, 7, 0.2f * PI, 0.8f * PI, 2, true);                    // sonrisa grande
+}
+
+static void actuar_duende(void)
+{
+    cara_t d = cara;
+    float y_normal = d.y;
+
+    for (int i = 0; i < 6; i++) {       // mira para todos lados, curioso
+        d.fase += 0.25f;
+        d.x = (i % 3 == 0) ? -10 : (i % 3 == 1) ? 10 : 0;
+        animar(d, 250);
+    }
+
+    decir("¡Ji ji!", 2, 2, 1);          // se rie
+    d.feliz = 1;
+    for (int i = 0; i < 4; i++) {
+        d.fase += 0.25f;
+        d.y = y_normal - 3; animar(d, 120);
+        d.fase += 0.25f;
+        d.y = y_normal;     animar(d, 120);
+    }
+    esperar(400);
+    callar();
+    d.feliz = 0;
+    animar(d, 200);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -546,6 +725,115 @@ static void actuar_vaca(void)
     animar(d, 250);
 }
 
+// 🐱 Gato: orejas en punta (una se mueve), naricita, bigotes y boquita en "w"
+static void dibujar_gato(float mx, float cy)
+{
+    float tic = 2 * onda();             // la oreja derecha se mueve
+
+    triangulo(mx - 34, cy - 14, mx - 14, cy - 14, mx - 28, cy - 30, true);              // orejas
+    triangulo(mx - 30, cy - 15, mx - 18, cy - 15, mx - 27, cy - 25, false);
+    triangulo(mx + 34, cy - 14, mx + 14, cy - 14, mx + 28 + tic, cy - 30 + tic, true);
+    triangulo(mx + 30, cy - 15, mx + 18, cy - 15, mx + 27 + tic, cy - 25 + tic, false);
+
+    triangulo(mx - 3, cy + 14, mx + 3, cy + 14, mx, cy + 18, true);     // naricita
+
+    if (cara.asombro > 0.5f) {                                          // boca: "o" o "w"
+        circulo(mx, cy + 21, 2, true);
+    } else {
+        arco(mx - 3, cy + 18, 3, 0.1f * PI, 0.9f * PI, 1, true);
+        arco(mx + 3, cy + 18, 3, 0.1f * PI, 0.9f * PI, 1, true);
+    }
+
+    for (int lado = -1; lado <= 1; lado += 2) {                         // bigotes
+        linea(mx + lado * 12, cy + 16, mx + lado * 30, cy + 14, 1, true);
+        linea(mx + lado * 12, cy + 19, mx + lado * 31, cy + 19, 1, true);
+        linea(mx + lado * 12, cy + 22, mx + lado * 30, cy + 24, 1, true);
+    }
+}
+
+static void actuar_gato(void)
+{
+    cara_t d = cara;
+    float x_normal = d.x;
+
+    for (int i = 0; i < 6; i++) {       // mueve la oreja
+        d.fase += 0.25f;
+        animar(d, 150);
+    }
+
+    decir("rrr", 96, 2, 1);             // ronronea temblando un poquito
+    d.feliz = 0.6f;
+    for (int i = 0; i < 14; i++) {
+        d.x = x_normal + ((i % 2) ? 1 : -1);
+        animar(d, 60);
+    }
+    d.x = x_normal;
+    callar();
+    animar(d, 100);
+
+    decir("¡Miau!", (int)(LCD_H_RES / 2) - 17, 1, 1);
+    d.feliz = 0;
+    d.asombro = 1;
+    animar(d, 200);
+    esperar(900);
+    callar();
+    d.asombro = 0;
+    animar(d, 200);
+}
+
+// 🐶 Perro: orejas largas caidas, nariz con brillito y la lengua afuera
+static void dibujar_perro(float mx, float cy)
+{
+    float sacudida = 2 * onda();
+
+    rect_redondo(mx - 46, cy - 14 + sacudida, 12, 30, 6, true);         // orejas
+    rect_redondo(mx + 34, cy - 14 - sacudida, 12, 30, 6, true);
+
+    rect_redondo(mx - 6, cy + 15, 12, 8, 4, true);                      // nariz
+    circulo(mx - 2, cy + 17, 1, false);                                 // brillito
+
+    linea(mx, cy + 23, mx, cy + 25, 1, true);                           // boca
+    arco(mx - 3, cy + 23, 3, 0.1f * PI, 0.9f * PI, 1, true);
+    arco(mx + 3, cy + 23, 3, 0.1f * PI, 0.9f * PI, 1, true);
+
+    if (cara.asombro > 0.3f) {                                          // lengua afuera
+        float largo = 7 + 2 * fabsf(onda());
+        rect_redondo(mx - 4, cy + 26, 8, largo, 3, true);
+        rect(mx, cy + 27, 1, largo - 3, false);
+    }
+}
+
+static void actuar_perro(void)
+{
+    cara_t d = cara;
+    float y_normal = d.y;
+
+    d.asombro = 0.6f;                   // jadea con la lengua afuera
+    for (int i = 0; i < 8; i++) {
+        d.fase += 0.25f;
+        animar(d, 150);
+    }
+
+    for (int i = 0; i < 4; i++) {       // sacude la cabeza
+        d.fase += 0.25f;
+        d.x = (i % 2) ? 4 : -4;
+        animar(d, 100);
+    }
+    d.x = 0;
+    d.asombro = 0;
+    animar(d, 150);
+
+    for (int i = 0; i < 2; i++) {       // ¡guau!
+        decir("¡Guau!", (int)(LCD_H_RES / 2) - 17, 1, 1);
+        d.y = y_normal - 3; animar(d, 120);
+        d.y = y_normal;     animar(d, 150);
+        esperar(250);
+        callar();
+        animar(d, 30);
+        esperar(200);
+    }
+}
+
 // ═════════════════════════════════════════════════════════════════════════════
 //  La lista de personajes
 // ═════════════════════════════════════════════════════════════════════════════
@@ -560,15 +848,22 @@ typedef struct {
 } personaje_t;
 
 static const personaje_t personajes[] = {
-    [DISFRAZ_VAMPIRO]   = { "vampiro",    false, OJO_ANCHO, OJO_ALTO, 0, 0.6f, 0.8f, dibujar_vampiro,   actuar_vampiro   },
-    [DISFRAZ_FANTASMA]  = { "fantasma",   true,  OJO_ANCHO, OJO_ALTO, 0, 0,    1,    dibujar_fantasma,  actuar_fantasma  },
-    [DISFRAZ_CALABAZA]  = { "calabaza",   true,  OJO_ANCHO, OJO_ALTO, 0, 0,    1,    dibujar_calabaza,  actuar_calabaza  },
-    [DISFRAZ_PAPA_NOEL] = { "Papa Noel",  false, 24,        24,       0, 0,    1,    dibujar_papa_noel, actuar_papa_noel },
-    [DISFRAZ_ARBOLITO]  = { "arbolito",   true,  OJO_ANCHO, OJO_ALTO, 0, 0,    1,    dibujar_arbolito,  actuar_arbolito  },
-    [DISFRAZ_GALLETA]   = { "galleta",    true,  OJO_ANCHO, OJO_ALTO, 0, 0,    1,    dibujar_galleta,   actuar_galleta   },
-    [DISFRAZ_GALLINA]   = { "gallina",    false, 22,        22,      -3, 0,    1,    dibujar_gallina,   actuar_gallina   },
-    [DISFRAZ_CERDO]     = { "cerdo",      false, 22,        24,      -6, 0,    1,    dibujar_cerdo,     actuar_cerdo     },
-    [DISFRAZ_VACA]      = { "vaca",       false, 22,        24,      -6, 0,    1,    dibujar_vaca,      actuar_vaca      },
+    //                        nombre           tapa   ancho      alto      y   enojo abre
+    [DISFRAZ_VAMPIRO]      = { "vampiro",      false, OJO_ANCHO, OJO_ALTO, 0,  0.6f, 0.8f, dibujar_vampiro,      actuar_vampiro      },
+    [DISFRAZ_FANTASMA]     = { "fantasma",     true,  OJO_ANCHO, OJO_ALTO, 0,  0,    1,    dibujar_fantasma,     actuar_fantasma     },
+    [DISFRAZ_CALABAZA]     = { "calabaza",     true,  OJO_ANCHO, OJO_ALTO, 0,  0,    1,    dibujar_calabaza,     actuar_calabaza     },
+    [DISFRAZ_MURCIELAGO]   = { "murcielago",   false, 22,        22,       0,  0,    1,    dibujar_murcielago,   actuar_murcielago   },
+    [DISFRAZ_BRUJITA]      = { "brujita",      false, 24,        26,       4,  0,    1,    dibujar_brujita,      actuar_brujita      },
+    [DISFRAZ_PAPA_NOEL]    = { "Papa Noel",    false, 24,        24,       0,  0,    1,    dibujar_papa_noel,    actuar_papa_noel    },
+    [DISFRAZ_ARBOLITO]     = { "arbolito",     true,  OJO_ANCHO, OJO_ALTO, 0,  0,    1,    dibujar_arbolito,     actuar_arbolito     },
+    [DISFRAZ_RENO]         = { "reno",         false, 22,        22,       2,  0,    1,    dibujar_reno,         actuar_reno         },
+    [DISFRAZ_MUNECO_NIEVE] = { "muneco",       false, 22,        22,       2,  0,    1,    dibujar_muneco_nieve, actuar_muneco_nieve },
+    [DISFRAZ_DUENDE]       = { "duende",       false, 22,        24,       4,  0,    1,    dibujar_duende,       actuar_duende       },
+    [DISFRAZ_GALLINA]      = { "gallina",      false, 22,        22,      -3,  0,    1,    dibujar_gallina,      actuar_gallina      },
+    [DISFRAZ_CERDO]        = { "cerdo",        false, 22,        24,      -6,  0,    1,    dibujar_cerdo,        actuar_cerdo        },
+    [DISFRAZ_VACA]         = { "vaca",         false, 22,        24,      -6,  0,    1,    dibujar_vaca,         actuar_vaca         },
+    [DISFRAZ_GATO]         = { "gato",         false, 22,        24,      -2,  0,    1,    dibujar_gato,         actuar_gato         },
+    [DISFRAZ_PERRO]        = { "perro",        false, 22,        24,      -4,  0,    1,    dibujar_perro,        actuar_perro        },
 };
 #define CANT_PERSONAJES ((int)(sizeof(personajes) / sizeof(personajes[0])))
 

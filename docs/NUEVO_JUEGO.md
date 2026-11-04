@@ -148,16 +148,19 @@ que salga seguido y lo puedas ver enseguida. Cuando ya lo viste, bajalo a 1.
 
 Los personajes estan en [components/eyes/disfraces.c](../components/eyes/disfraces.c).
 Cada uno tiene dos funciones: `dibujar_xxx()` (como se ve) y `actuar_xxx()` (que hace).
-Para agregar uno nuevo, por ejemplo un **gato** 🐱 para el modo Animales:
+Para agregar uno nuevo, por ejemplo un **conejo** 🐰 para el modo Animales:
 
-1. En [eyes.h](../components/eyes/include/eyes.h), agrega `DISFRAZ_GATO` a la lista de
+1. En [eyes.h](../components/eyes/include/eyes.h), agrega `DISFRAZ_CONEJO` a la lista de
    disfraces.
-2. En `disfraces.c`, copia un personaje parecido (el cerdo, que usa los ojos de Pitri) y
-   cambialo: orejas puntiagudas (triangulos), nariz (un triangulito) y bigotes (lineas).
-   Que diga `decir("¡Miau!", ...)`.
+2. En `disfraces.c`, copia un personaje parecido (el gato, que usa los ojos de Pitri) y
+   cambialo: dos orejas largas arriba (rectangulos redondeados), una naricita y dos
+   dientes. Que diga `decir("¡Hop!", ...)`.
 3. Agregalo a la lista `personajes[]` al final de `disfraces.c`.
 4. En [main.c](../main/main.c), agregalo a la tabla `personajes` del modo que quieras
-   (cambiando el 3 por un 4).
+   (cambiando `PERSONAJES_POR_MODO` de 5 a 6, o reemplazando a otro).
+
+💡 Consejo: que el personaje use **los ojos de Pitri** y le agregue cosas alrededor.
+Asi se sigue notando que es Pitri disfrazado.
 
 Para el dibujo, `mx` es el centro de la cara (se mueve con `cara.x`) y `cy` la altura de
 los ojos. `cara.fase` es un "reloj" para cosas que se mueven solas (como las orejas del

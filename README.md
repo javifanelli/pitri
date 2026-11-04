@@ -79,9 +79,9 @@ Con el **boton 1** se abre el menu. El **boton 2** baja a la opcion siguiente y 
 | Modo | Pitri hace de… |
 |---|---|
 | 🙂 **Normal** | Pitri, con todos sus juegos |
-| 🎃 **Halloween** | 🧛 vampiro, 👻 fantasma (¡Buu!) y 🎃 calabaza |
-| 🎄 **Navidad** | 🎅 Papa Noel (¡Jo jo jo!), 🎄 arbolito con luces y nieve, y 🍪 galleta de jengibre (¡Atrapame!) |
-| 🐾 **Animales** | 🐔 gallina (¡Coc!), 🐷 cerdo (¡Oink!) y 🐮 vaca (¡Muu!) |
+| 🎃 **Halloween** | 🧛 vampiro, 👻 fantasma (¡Buu!), 🎃 calabaza, 🦇 murcielago (¡Iiih!) y 🧙 brujita (¡Abracadabra!) |
+| 🎄 **Navidad** | 🎅 Papa Noel (¡Jo jo jo!), 🎄 arbolito con luces y nieve, 🦌 reno con la nariz que titila, ⛄ muñeco de nieve (¡Brrr!) y 🧝 duende (¡Ji ji!) |
+| 🐾 **Animales** | 🐔 gallina (¡Coc!), 🐷 cerdo (¡Oink!), 🐮 vaca (¡Muu!), 🐱 gato (¡Miau!) y 🐶 perro (¡Guau!) |
 
 En los modos especiales, Pitri va cambiando de personaje, y cuando llega alguien lo
 recibe con una actuacion. Si nadie toca el menu durante 20 segundos, se cierra solo.

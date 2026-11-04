@@ -41,14 +41,20 @@ typedef enum {
     DISFRAZ_VAMPIRO,
     DISFRAZ_FANTASMA,
     DISFRAZ_CALABAZA,
+    DISFRAZ_MURCIELAGO,
+    DISFRAZ_BRUJITA,
     // Navidad
     DISFRAZ_PAPA_NOEL,
     DISFRAZ_ARBOLITO,
-    DISFRAZ_GALLETA,
+    DISFRAZ_RENO,
+    DISFRAZ_MUNECO_NIEVE,
+    DISFRAZ_DUENDE,
     // Animales
     DISFRAZ_GALLINA,
     DISFRAZ_CERDO,
     DISFRAZ_VACA,
+    DISFRAZ_GATO,
+    DISFRAZ_PERRO,
 } eyes_disfraz_t;
 
 // Se pone el disfraz (si no lo tenia puesto) y hace la actuacion de ese

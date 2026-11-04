@@ -220,14 +220,21 @@ Pitri lleva dos cuentas separadas: puede comer 3 veces y tomar 3 veces por hora.
 
 En los modos especiales, Pitri se "disfraza". Hay dos clases de disfraces:
 
-- **Encima de los ojos de Pitri:** el vampiro (pelo con pico, cuello de capa y colmillos),
-  Papa Noel (gorro, barba y bigote), la gallina (cresta, pico y moquito), el cerdo
-  (orejas y hocico) y la vaca (cuernitos, orejas y un hocico grande). Pitri sigue
-  parpadeando y mirando con sus ojos de siempre.
-- **Un dibujo entero:** el fantasma, la calabaza, el arbolito y la galleta. Tienen sus
-  propios ojos (huecos, triangulares, puntitos...) que igual parpadean.
+- **Encima de los ojos de Pitri** (la mayoria): Pitri sigue parpadeando y mirando con
+  sus ojos de siempre, y el disfraz le agrega partes:
+  - vampiro: pelo con pico, cuello de capa y colmillos
+  - murcielago: alas con borde ondulado que aletean, orejitas y colmillitos
+  - brujita: sombrero en punta con hebilla y estrellitas que titilan
+  - Papa Noel: gorro, barba y bigote
+  - reno: cuernos ramificados, orejitas y una nariz que se prende y se apaga
+  - muñeco de nieve: galera, nariz de zanahoria, boca de carbon y bufanda
+  - duende: gorro con cascabel y orejas puntiagudas
+  - gallina, cerdo, vaca, gato y perro: crestas, picos, orejas, hocicos, bigotes...
+- **Un dibujo entero:** el fantasma, la calabaza y el arbolito. Igual, la calabaza tiene
+  huecos con la forma de los ojos de Pitri, que parpadean.
 
-Los animales usan todos los ojos de Pitri, asi se nota que es el, disfrazado.
+Los personajes que mejor quedan son los que usan los ojos de Pitri: asi se nota que es
+el, disfrazado.
 
 Todos estan hechos con las mismas formas de siempre: circulos, rectangulos redondeados,
 triangulos y lineas. Por ejemplo, la **estrella** del arbolito son 5 triangulos (las

@@ -220,8 +220,8 @@ de alguien, en cambio, todavia espera a que termine el juego actual (hasta ~5 s)
 Menu principal: Modo / Comer / Tomar / Hora / Sensor / Salir. Comer: Torta / Papas fritas /
 Hamburguesa / Atras. Tomar: Agua / Cafe / Mate / Atras. Los limites (`COMIDAS_POR_HORA`,
 `BEBIDAS_POR_HORA`) son ventanas moviles de 60 minutos con `esp_timer` (no necesitan la hora
-de internet), separadas, y se reinician al apagar. Modos: `modo_t` en `main.c`, con una tabla de 3
-personajes por modo. El modo no se guarda:
+de internet), separadas, y se reinician al apagar. Modos: `modo_t` en `main.c`, con una tabla de
+`PERSONAJES_POR_MODO` (5) personajes por modo. El modo no se guarda:
 al reiniciar, Pitri arranca en Normal.
 
 ---
