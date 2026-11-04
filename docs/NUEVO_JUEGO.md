@@ -178,6 +178,11 @@ agregar una, por ejemplo una **pizza**:
 4. En [main.c](../main/main.c), agregala a `comidas[]` y `nombres_comidas[]`, y cambia
    `CANT_COMIDAS` de 3 a 4.
 
+Para una **bebida** (por ejemplo un vaso de jugo) es parecido: copia `dibujar_taza()`, usa
+el numero de sorbos para la altura del liquido, agregala a `eyes_dibujar_comida()` y a
+`es_bebida()`, y en `main.c` a `bebidas[]`, `nombres_bebidas[]` y `CANT_BEBIDAS`. Si el
+liquido no se ve (como en el mate, `dibujar_mate()`), los sorbos no cambian el dibujo.
+
 ### ¿No anda?
 
 - **Si al compilar sale un error:** fijate que cada linea termine con `;` y que cada `{`

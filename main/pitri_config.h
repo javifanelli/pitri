@@ -37,8 +37,9 @@
 // Cuanto se ve la hora o el sensor al elegirlos en el menu
 #define MOSTRAR_HORA_MS  5000
 
-// ─── Comida ───────────────────────────────────────────────────────────────
+// ─── Comida y bebida ───────────────────────────────────────────────────────────────
 #define COMIDAS_POR_HORA  3        // cuantas veces puede comer en una hora
+#define BEBIDAS_POR_HORA  3        // cuantas veces puede tomar en una hora
 
 // ─── Menu (boton 1 lo abre, boton 2 baja, boton 1 elige) ────────────────────
 #define MENU_ESPERA_MAX_MS  (20 * 1000)   // si nadie toca nada, se cierra solo

@@ -75,8 +75,9 @@ static void mostrar_mensaje(const char *texto)
 }
 
 // ─── El menu ─────────────────────────────────────────────────────────────────
-//   Menu:  Modo / Comer / Hora / Sensor / Salir
+//   Menu:  Modo / Comer / Tomar / Hora / Sensor / Salir
 //   Comer: Torta / Papas fritas / Hamburguesa / Atras (con dibujos)
+//   Tomar: Agua / Cafe / Mate / Atras (con dibujos)
 //   Modo:  Normal / Halloween / Navidad / Animales / Volver
 
 // Para que los ojos corten lo que estan haciendo apenas se aprieta el boton 1
@@ -166,84 +167,114 @@ static void mostrar_sensor(void)
     }
 }
 
-// ─── Comer ───────────────────────────────────────────────────────────────────
-// Pitri puede comer hasta COMIDAS_POR_HORA veces en una hora. Si ya comio todo
-// eso, dice que no. No le pasa nada malo si no come: Pitri nunca muere.
+// ─── Comer y tomar ───────────────────────────────────────────────────────────
+// Pitri puede comer hasta COMIDAS_POR_HORA veces y tomar hasta BEBIDAS_POR_HORA
+// veces en una hora. Si ya llego a eso, esta lleno y dice que no. No le pasa
+// nada malo si no come ni toma: Pitri nunca muere.
 
 static const eyes_comida_t comidas[] = { COMIDA_TORTA, COMIDA_PAPAS, COMIDA_HAMBURGUESA };
 static const char *const nombres_comidas[] = { "Torta", "Papas fritas", "Hamburguesa" };
 #define CANT_COMIDAS 3
 
-// Cuando comio las ultimas veces (en microsegundos desde que se prendio)
-static int64_t cuando_comio[COMIDAS_POR_HORA];
+static const eyes_comida_t bebidas[] = { COMIDA_BOTELLA, COMIDA_TAZA, COMIDA_MATE };
+static const char *const nombres_bebidas[] = { "Agua", "Cafe", "Mate" };
+#define CANT_BEBIDAS 3
 
-static int comidas_en_la_ultima_hora(void)
+// Cuando comio y cuando tomo las ultimas veces (microsegundos desde que se prendio)
+static int64_t cuando_comio[COMIDAS_POR_HORA];
+static int64_t cuando_tomo[BEBIDAS_POR_HORA];
+
+// Cuantas de las veces anotadas fueron en los ultimos 60 minutos
+static int veces_en_la_ultima_hora(const int64_t *veces, int cantidad)
 {
     const int64_t una_hora_us = 60LL * 60 * 1000 * 1000;
     int64_t ahora = esp_timer_get_time();
     int cuantas = 0;
-    for (int i = 0; i < COMIDAS_POR_HORA; i++)
-        if (cuando_comio[i] != 0 && ahora - cuando_comio[i] < una_hora_us) cuantas++;
+    for (int i = 0; i < cantidad; i++)
+        if (veces[i] != 0 && ahora - veces[i] < una_hora_us) cuantas++;
     return cuantas;
+}
+
+// Anota "ahora" en el lugar de la vez mas vieja
+static void anotar(int64_t *veces, int cantidad)
+{
+    int mas_vieja = 0;
+    for (int i = 1; i < cantidad; i++)
+        if (veces[i] < veces[mas_vieja]) mas_vieja = i;
+    veces[mas_vieja] = esp_timer_get_time();
 }
 
 static void dar_de_comer(int cual)
 {
-    if (comidas_en_la_ultima_hora() >= COMIDAS_POR_HORA) {
+    if (veces_en_la_ultima_hora(cuando_comio, COMIDAS_POR_HORA) >= COMIDAS_POR_HORA) {
         ESP_LOGI(TAG, "Pitri esta lleno (ya comio %d veces en la ultima hora)", COMIDAS_POR_HORA);
         eyes_decir_que_no();
         return;
     }
-
-    // Anotamos la comida en el lugar de la mas vieja
-    int mas_vieja = 0;
-    for (int i = 1; i < COMIDAS_POR_HORA; i++)
-        if (cuando_comio[i] < cuando_comio[mas_vieja]) mas_vieja = i;
-    cuando_comio[mas_vieja] = esp_timer_get_time();
-
-    ESP_LOGI(TAG, "Pitri come %s (%d de %d en la ultima hora)",
-             nombres_comidas[cual], comidas_en_la_ultima_hora(), COMIDAS_POR_HORA);
+    anotar(cuando_comio, COMIDAS_POR_HORA);
+    ESP_LOGI(TAG, "Pitri come %s (%d de %d en la ultima hora)", nombres_comidas[cual],
+             veces_en_la_ultima_hora(cuando_comio, COMIDAS_POR_HORA), COMIDAS_POR_HORA);
     eyes_comer(comidas[cual]);
 }
 
-// Dibuja cada opcion del menu "Comer": la comida grande con su nombre, o "Atras"
-static void dibujar_opcion_comida(int opcion)
+static void dar_de_tomar(int cual)
 {
-    if (opcion < CANT_COMIDAS) {
-        eyes_dibujar_comida(comidas[opcion], LCD_H_RES / 2.0f, 32, 1.1f, 0);
-        const char *nombre = nombres_comidas[opcion];
-        display_draw_text((LCD_H_RES - display_text_width(nombre, 1)) / 2, 55, nombre, 1, true);
+    if (veces_en_la_ultima_hora(cuando_tomo, BEBIDAS_POR_HORA) >= BEBIDAS_POR_HORA) {
+        ESP_LOGI(TAG, "Pitri esta lleno (ya tomo %d veces en la ultima hora)", BEBIDAS_POR_HORA);
+        eyes_decir_que_no();
+        return;
+    }
+    anotar(cuando_tomo, BEBIDAS_POR_HORA);
+    ESP_LOGI(TAG, "Pitri toma %s (%d de %d en la ultima hora)", nombres_bebidas[cual],
+             veces_en_la_ultima_hora(cuando_tomo, BEBIDAS_POR_HORA), BEBIDAS_POR_HORA);
+    eyes_tomar(bebidas[cual]);
+}
+
+// Dibuja una opcion de los menus "Comer" y "Tomar": el dibujo grande con su
+// nombre abajo, o la palabra "Atras" si ya se pasaron todas
+static void dibujar_opcion(const eyes_comida_t *lista, const char *const *nombres, int cantidad, int opcion)
+{
+    if (opcion < cantidad) {
+        eyes_dibujar_comida(lista[opcion], LCD_H_RES / 2.0f, 32, 1.1f, 0);
+        display_draw_text((LCD_H_RES - display_text_width(nombres[opcion], 1)) / 2, 55, nombres[opcion], 1, true);
     } else {
         display_draw_text((LCD_H_RES - display_text_width("Atras", 3)) / 2, 27, "Atras", 3, true);
     }
 }
 
+static void dibujar_opcion_comida(int opcion) { dibujar_opcion(comidas, nombres_comidas, CANT_COMIDAS, opcion); }
+static void dibujar_opcion_bebida(int opcion) { dibujar_opcion(bebidas, nombres_bebidas, CANT_BEBIDAS, opcion); }
+
 static void abrir_menu(void)
 {
-    static const char *const opciones_menu[] = { "Modo", "Comer", "Hora", "Sensor", "Salir" };
+    static const char *const opciones_menu[] = { "Modo", "Comer", "Tomar", "Hora", "Sensor", "Salir" };
     static const char *const opciones_modo[] = { "Normal", "Halloween", "Navidad", "Animales", "Volver" };
-    const int opcion_modo = 0, opcion_comer = 1, opcion_hora = 2, opcion_sensor = 3;
+    const int opcion_modo = 0, opcion_comer = 1, opcion_tomar = 2, opcion_hora = 3, opcion_sensor = 4;
     const int volver = 4;
-    const int atras = CANT_COMIDAS;
 
     ESP_LOGI(TAG, "Abriendo el menu");
     while (1) {
-        int elegida = menu_elegir("", opciones_menu, 5, 0, -1, MENU_ESPERA_MAX_MS);
-
-        if (elegida == opcion_sensor) {
-            mostrar_sensor();
-            break;                                  // despues vuelve a la pantalla principal
-        }
+        int elegida = menu_elegir("", opciones_menu, 6, 0, -1, MENU_ESPERA_MAX_MS);
 
         if (elegida == opcion_comer) {
             int c = menu_elegir_dibujos("Comer", CANT_COMIDAS + 1, dibujar_opcion_comida, 0, MENU_ESPERA_MAX_MS);
-            if (c == atras) continue;               // vuelve al menu anterior
+            if (c == CANT_COMIDAS) continue;        // "Atras": vuelve al menu anterior
             if (c >= 0) dar_de_comer(c);
             break;                                  // despues vuelve a la pantalla principal
         }
+        if (elegida == opcion_tomar) {
+            int b = menu_elegir_dibujos("Tomar", CANT_BEBIDAS + 1, dibujar_opcion_bebida, 0, MENU_ESPERA_MAX_MS);
+            if (b == CANT_BEBIDAS) continue;        // "Atras": vuelve al menu anterior
+            if (b >= 0) dar_de_tomar(b);
+            break;
+        }
         if (elegida == opcion_hora) {
             mostrar_hora();
-            break;                                  // despues vuelve a la pantalla principal
+            break;
+        }
+        if (elegida == opcion_sensor) {
+            mostrar_sensor();
+            break;
         }
         if (elegida != opcion_modo) break;          // "Salir" o se cerro solo
 

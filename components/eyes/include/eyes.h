@@ -58,18 +58,27 @@ void eyes_actuar(eyes_disfraz_t personaje);
 // Se saca el disfraz y vuelve a ser Pitri
 void eyes_sacar_disfraz(void);
 
-// ─── Comida ──────────────────────────────────────────────────────────────────
+// ─── Comida y bebida ─────────────────────────────────────────────────────────
 typedef enum {
     COMIDA_NINGUNA,
+    // Para comer
     COMIDA_TORTA,
     COMIDA_PAPAS,
     COMIDA_HAMBURGUESA,
+    // Para tomar
+    COMIDA_BOTELLA,     // agua
+    COMIDA_TAZA,        // cafe
+    COMIDA_MATE,
 } eyes_comida_t;
 
-// Dibuja una comida con su centro en (cx, cy). "tamano" agranda o achica el
-// dibujo (1 = unos 30 pixeles de alto). "mordidas" (0 a 2) le dibuja marcas de
-// mordiscos. Solo dibuja: no llama a display_flush().
+// Dibuja una comida o bebida con su centro en (cx, cy). "tamano" agranda o
+// achica el dibujo (1 = unos 30 pixeles de alto). "mordidas" (0 a 2) le dibuja
+// marcas de mordiscos a la comida; en las bebidas son los sorbos (0 a 3): el
+// liquido va bajando. Solo dibuja: no llama a display_flush().
 void eyes_dibujar_comida(eyes_comida_t comida, float cx, float cy, float tamano, int mordidas);
+
+// Animacion de Pitri tomando: la bebida llega, toma 3 sorbos y dice "Ahh!"
+void eyes_tomar(eyes_comida_t bebida);
 
 // Animacion de Pitri comiendo: la comida entra, Pitri la muerde 3 veces,
 // mastica y dice "¡Rico!"

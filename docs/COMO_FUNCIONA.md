@@ -202,6 +202,20 @@ hora**, esta lleno: mueve la cabeza diciendo que no. A medida que pasa el tiempo
 comidas viejas dejan de contar y puede volver a comer. Si no le dan de comer, no le pasa
 nada malo: **Pitri nunca muere**.
 
+### Darle de tomar
+
+**Tomar** funciona igual que comer, con **agua** (en botella), **cafe** (en taza) y
+**mate**. La botella y la taza se dibujan con el **borde blanco y el adentro negro**, y el
+liquido es la parte blanca de adentro. En cada sorbo ("Glu") el liquido baja un poco; con
+el tercero queda vacio, se lo llevan y Pitri dice "Ahh!". La taza de cafe, cuando esta
+llena, tiene vapor.
+
+En el mate no se ve el liquido: es una calabacita redonda con la yerba asomando y la
+bombilla. Por eso, en vez de bajar el liquido, en el ultimo sorbo hace el ruidito de
+cuando se termina: "Slurp".
+
+Pitri lleva dos cuentas separadas: puede comer 3 veces y tomar 3 veces por hora.
+
 ### Disfraces: los personajes de los modos
 
 En los modos especiales, Pitri se "disfraza". Hay dos clases de disfraces:

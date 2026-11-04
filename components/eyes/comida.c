@@ -119,6 +119,82 @@ static void dibujar_hamburguesa(float cx, float cy, float s)
     rect_redondo(cx - 13 * s, cy + 9 * s, 26 * s, 5 * s, 2 * s, true);   // pan de abajo
 }
 
+// ─── Las bebidas ─────────────────────────────────────────────────────────────
+// Los recipientes se dibujan con borde blanco y adentro negro; el liquido es la
+// parte blanca de adentro, y su altura depende de cuantos sorbos tomo (0 a 3).
+
+static float cuanto_queda(int sorbos)
+{
+    if (sorbos < 0) sorbos = 0;
+    if (sorbos > 3) sorbos = 3;
+    return (3 - sorbos) / 3.0f;
+}
+
+// 🍼 Botella: tapita, pico, cuerpo y el liquido adentro
+static void dibujar_botella(float cx, float cy, float s, int sorbos)
+{
+    cy += 1 * s;
+
+    rect(cx - 4 * s, cy - 19 * s, 8 * s, 3 * s, true);                     // tapita
+    rect(cx - 3 * s, cy - 15 * s, 6 * s, 8 * s, true);                     // pico
+    rect(cx - 1.5f * s, cy - 15 * s, 3 * s, 7 * s, false);
+    rect_redondo(cx - 8 * s, cy - 8 * s, 16 * s, 24 * s, 4 * s, true);     // cuerpo
+    rect_redondo(cx - 6 * s, cy - 6 * s, 12 * s, 20 * s, 3 * s, false);
+
+    float alto = 18 * s * cuanto_queda(sorbos);                            // liquido
+    if (alto >= 1) rect(cx - 5 * s, cy + 13 * s - alto, 10 * s, alto, true);
+}
+
+// ☕ Taza: con asa, platito, el liquido adentro y vapor si esta llena
+static void dibujar_taza(float cx, float cy, float s, int sorbos)
+{
+    cy += 2 * s;
+
+    circulo(cx + 10 * s, cy + 1 * s, 6 * s, true);                         // asa
+    circulo(cx + 10 * s, cy + 1 * s, 3.5f * s, false);
+    rect_redondo(cx - 12 * s, cy - 8 * s, 20 * s, 19 * s, 3 * s, true);    // taza
+    rect(cx - 10 * s, cy - 8 * s, 16 * s, 17 * s, false);                  // adentro (abierta arriba)
+    rect(cx - 16 * s, cy + 12 * s, 30 * s, 2 * s, true);                   // platito
+
+    float alto = 14 * s * cuanto_queda(sorbos);                            // liquido
+    if (alto >= 1) rect(cx - 9 * s, cy + 8 * s - alto, 14 * s, alto, true);
+
+    // Vapor: dos lineas onduladas arriba (solo si esta llena y se ve grande)
+    if (sorbos == 0 && s >= 1) {
+        for (float dy = 0; dy < 8 * s; dy += 1) {
+            rect(cx - 5 * s + 1.5f * s * sinf(dy / s * 0.8f), cy - 11 * s - dy, 1, 1, true);
+            rect(cx + 2 * s + 1.5f * s * sinf(dy / s * 0.8f + 1.5f), cy - 11 * s - dy, 1, 1, true);
+        }
+    }
+}
+
+// 🧉 Mate: calabacita redonda, virola, yerba asomando y la bombilla.
+// (En el mate no se ve el liquido, asi que los sorbos no cambian el dibujo)
+static void dibujar_mate(float cx, float cy, float s)
+{
+    cy += 2.5f * s;
+
+    circulo(cx, cy + 4 * s, 9.5f * s, true);                              // panza
+    rect_redondo(cx - 7 * s, cy - 8 * s, 14 * s, 10 * s, 3 * s, true);    // cuello
+    rect(cx - 7 * s, cy - 4 * s, 14 * s, 1, false);                       // virola (una rayita)
+    rect(cx - 6 * s, cy + 14 * s, 12 * s, 2 * s, true);                   // base
+
+    // Boca del mate con la yerba asomando
+    rect_redondo(cx - 5.5f * s, cy - 8 * s, 11 * s, 3.5f * s, 1.5f * s, false);
+    rect(cx - 3 * s, cy - 7 * s, s, s, true);
+    rect(cx - 0.5f * s, cy - 6.5f * s, s, s, true);
+
+    // Bombilla: sale de la yerba en diagonal y termina en la boquilla
+    for (float t = 0; t <= 1; t += 0.05f)
+        rect(cx + 2 * s + 6 * s * t, cy - 7 * s - 11 * s * t, 1.5f * s, 1.5f * s, true);
+    rect(cx + 6 * s, cy - 19 * s, 5 * s, 1.5f * s, true);
+}
+
+static bool es_bebida(eyes_comida_t c)
+{
+    return c == COMIDA_BOTELLA || c == COMIDA_TAZA || c == COMIDA_MATE;
+}
+
 // Medio ancho de cada comida: ahi van las marcas de los mordiscos (lado izquierdo)
 static float medio_ancho(eyes_comida_t c)
 {
@@ -136,6 +212,9 @@ void eyes_dibujar_comida(eyes_comida_t comida, float cx, float cy, float s, int 
     case COMIDA_TORTA:       dibujar_torta(cx, cy, s);       break;
     case COMIDA_PAPAS:       dibujar_papas(cx, cy, s);       break;
     case COMIDA_HAMBURGUESA: dibujar_hamburguesa(cx, cy, s); break;
+    case COMIDA_BOTELLA:     dibujar_botella(cx, cy, s, mordidas); return;   // en las bebidas, "mordidas"
+    case COMIDA_TAZA:        dibujar_taza(cx, cy, s, mordidas);    return;   // son los sorbos
+    case COMIDA_MATE:        dibujar_mate(cx, cy, s);              return;
     default:                 return;
     }
 
@@ -168,7 +247,7 @@ void comida_reiniciar(void)
 
 void eyes_comer(eyes_comida_t comida)
 {
-    if (comida == COMIDA_NINGUNA) return;
+    if (comida == COMIDA_NINGUNA || es_bebida(comida)) return;   // las bebidas usan eyes_tomar()
     empezar_accion();
     disfraz_actual = DISFRAZ_NINGUNO;      // para comer se saca el disfraz
     ESP_LOGI(TAG, "¡A comer!");
@@ -227,6 +306,72 @@ void eyes_comer(eyes_comida_t comida)
     // 5. ¡Rico!
     d.feliz = 1;
     globo_texto = "¡Rico!";
+    animar(d, 250);
+    esperar(1200);
+    comida_reiniciar();
+    animar(CARA_NORMAL, 400);
+}
+
+// ─── La animacion de tomar ───────────────────────────────────────────────────
+
+void eyes_tomar(eyes_comida_t bebida)
+{
+    if (!es_bebida(bebida)) return;
+    empezar_accion();
+    disfraz_actual = DISFRAZ_NINGUNO;      // para tomar se saca el disfraz
+    ESP_LOGI(TAG, "¡A tomar!");
+
+    // Igual que al comer: Pitri se corre a la izquierda y mira a la derecha
+    cara_t d = CARA_NORMAL;
+    d.x = -18;
+    d.y = -6;
+    d.mira = 1.5f;
+    d.comida_x = 150;
+    d.comida_y = 32;
+    cara.comida_x = d.comida_x;
+    cara.comida_y = d.comida_y;
+    mordidas_actuales = 0;                 // aca cuenta los sorbos
+    globo_texto = NULL;
+    comida_actual = bebida;
+    animar(d, 300);
+
+    // 1. Llega la bebida
+    d.comida_x = 106;
+    d.asombro = 0.5f;
+    animar(d, 500);
+    globo_texto = "Sed!";
+    esperar(500);
+
+    // 2. Se la acerca a la boca, con la boquita chiquita para tomar
+    globo_texto = NULL;
+    float boca_x = LCD_H_RES / 2.0f + d.x;
+    d.comida_x = boca_x + 20;
+    d.comida_y = 53;
+    d.asombro = 0.35f;
+    animar(d, 400);
+
+    // 3. Tres sorbos: la levanta un poquito, "glu", y el liquido baja
+    for (int sorbo = 1; sorbo <= 3; sorbo++) {
+        // El ultimo sorbo del mate hace el ruidito de cuando se termina
+        globo_texto = (bebida == COMIDA_MATE && sorbo == 3) ? "Slurp" : "Glu";
+        d.comida_y = 49;
+        animar(d, 200);
+        mordidas_actuales = sorbo;
+        d.comida_y = 53;
+        animar(d, 200);
+        globo_texto = NULL;
+        esperar(150);
+    }
+
+    // 4. Se llevan el recipiente vacio
+    d.comida_x = 150;
+    d.asombro = 0;
+    animar(d, 400);
+    comida_actual = COMIDA_NINGUNA;
+
+    // 5. ¡Ahh!
+    d.feliz = 1;
+    globo_texto = "Ahh!";
     animar(d, 250);
     esperar(1200);
     comida_reiniciar();

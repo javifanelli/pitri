@@ -60,13 +60,17 @@ Cuando esta tranquilo, lleva una sonrisita chiquita.
 ## 🎭 Los modos
 
 Con el **boton 1** se abre el menu. El **boton 2** baja a la opcion siguiente y el
-**boton 1** elige. El menu tiene cinco opciones: **Modo**, **Comer**, **Hora**, **Sensor** y **Salir**.
+**boton 1** elige. El menu tiene seis opciones: **Modo**, **Comer**, **Tomar**, **Hora**, **Sensor** y **Salir**.
 
 - **Comer**: aparecen los dibujos de una **torta**, unas **papas fritas** y una
   **hamburguesa** (con el boton 2 se pasa de una a otra, y al final esta **Atras** para
   volver al menu). Al elegir una, Pitri se la come a mordiscos y dice "¡Rico!". Puede
   comer hasta **3 veces por hora**: si ya comio, mueve la cabeza diciendo que no porque
   esta lleno. Si no come, no le pasa nada: **Pitri nunca muere**.
+- **Tomar**: aparecen **agua** (en botella), **cafe** (en taza) y **mate** (y **Atras**).
+  Pitri toma 3 sorbos, el liquido va bajando y dice "Ahh!" (el mate, al terminarse, hace
+  "Slurp"). Tambien puede tomar hasta **3 veces por hora**; si ya
+  tomo, dice que no.
 - **Sensor** muestra la temperatura grande y la humedad durante 5 segundos.
 - **Hora** muestra la hora grande, el dia y la fecha durante 5 segundos, y despues Pitri
   vuelve a lo que estaba haciendo.

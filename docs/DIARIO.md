@@ -14,6 +14,20 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-03 — Agua, cafe y mate 🧉
+
+**Que hicimos:** Las bebidas ahora tienen nombre: la botella es **agua** y la taza es **cafe**. Y agregamos el **mate**, con su calabacita, la yerba y la bombilla. Cuando Pitri lo termina, hace "Slurp", como cuando el mate se acaba.
+
+---
+
+## 2026-11-03 — ¡A tomar! 🍼☕
+
+**Que hicimos:** El menu tiene una opcion nueva debajo de Comer: **Tomar**. Pitri puede tomar de una **botella** o de una **taza**: toma 3 sorbos ("Glu"), el liquido va bajando y dice "Ahh!". Puede tomar hasta 3 veces por hora, y si ya tomo, dice que no.
+
+**Que aprendimos:** Para que se vea el liquido, el recipiente tiene **borde blanco y adentro negro**, y el liquido es un rectangulo blanco adentro que se va achicando en cada sorbo.
+
+---
+
 ## 2026-11-03 — En punto ⏰
 
 **Que hicimos:**

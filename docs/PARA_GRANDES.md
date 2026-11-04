@@ -107,12 +107,15 @@ sensor DHT, rotacion de pantalla, pines reservados para audio. Ver
 - API publica: `eyes_init`, `eyes_jugar`, `eyes_parpadear`, `eyes_saludar`,
   `eyes_dormirse`, `eyes_dormido`, `eyes_despertar`, `eyes_mostrar_datos`, `eyes_actuar`,
   `eyes_sacar_disfraz`, `eyes_set_interrupcion`, `eyes_dibujar_comida`, `eyes_comer`,
-  `eyes_decir_que_no`.
+  `eyes_tomar`, `eyes_decir_que_no`.
+- Bebidas: son valores de `eyes_comida_t` (`COMIDA_BOTELLA` = agua, `COMIDA_TAZA` = cafe,
+  `COMIDA_MATE`). En `eyes_dibujar_comida` el parametro `mordidas` es la cantidad de sorbos
+  (0 a 3) y define la altura del liquido (el mate no lo usa).
 - Comida: `comida_actual` + `cara.comida_x/y` (interpolados por `animar`) dibujan la comida
   durante la animacion; `comida_reiniciar()` la saca (lo llama `eyes_init`).
   `eyes_dibujar_comida(c, cx, cy, tamano, mordidas)` es solo dibujo (lo usa el menu).
 - Archivos: `eyes.c` (cara, animacion, emociones, juegos), `disfraces.c` (personajes),
-  `comida.c` (dibujos de comida y animacion de comer) y
+  `comida.c` (dibujos de comida y bebida, animaciones de comer y tomar) y
   `eyes_interno.h` (lo que comparten: `cara_t`, `cara`, `animar`, `mover_a`, `esperar`...).
 - Disfraces: `disfraz_actual` decide que se dibuja. Los que `tapa_cara` reemplazan todo el
   dibujo; los otros dibujan los ojos de Pitri y agregan sus partes en lugar de la boca.
@@ -214,9 +217,10 @@ app_main
 El boton 1 corta cualquier animacion al instante (ver interrupcion en `eyes`). La llegada
 de alguien, en cambio, todavia espera a que termine el juego actual (hasta ~5 s).
 
-Menu principal: Modo / Comer / Hora / Sensor / Salir. Comer: Torta / Papas fritas / Hamburguesa /
-Atras. El limite de comidas (`COMIDAS_POR_HORA`) es una ventana movil de 60 minutos con
-`esp_timer` (no necesita la hora de internet) y se reinicia al apagar. Modos: `modo_t` en `main.c`, con una tabla de 3
+Menu principal: Modo / Comer / Tomar / Hora / Sensor / Salir. Comer: Torta / Papas fritas /
+Hamburguesa / Atras. Tomar: Agua / Cafe / Mate / Atras. Los limites (`COMIDAS_POR_HORA`,
+`BEBIDAS_POR_HORA`) son ventanas moviles de 60 minutos con `esp_timer` (no necesitan la hora
+de internet), separadas, y se reinician al apagar. Modos: `modo_t` en `main.c`, con una tabla de 3
 personajes por modo. El modo no se guarda:
 al reiniciar, Pitri arranca en Normal.
 
