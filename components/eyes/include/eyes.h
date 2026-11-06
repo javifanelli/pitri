@@ -99,4 +99,9 @@ void eyes_decir_que_no(void);
 // el menu apenas se aprieta el boton). NULL = no cortar nunca.
 void eyes_set_interrupcion(bool (*funcion)(void));
 
+// ─── Sobrecito de mensaje ────────────────────────────────────────────────────
+// "funcion" se consulta en cada cuadro. Mientras devuelva true (por ejemplo, si
+// hay un mensaje de Telegram sin leer), arriba a la derecha aparece un sobrecito.
+void eyes_set_sobre(bool (*funcion)(void));
+
 #endif // EYES_H

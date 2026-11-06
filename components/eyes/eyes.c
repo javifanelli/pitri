@@ -50,6 +50,14 @@ void eyes_set_interrupcion(bool (*funcion)(void))
     hay_que_cortar = funcion;
 }
 
+// ¿Hay que mostrar el sobrecito de mensaje? (main.c le pasa la funcion)
+static bool (*hay_sobre)(void) = NULL;
+
+void eyes_set_sobre(bool (*funcion)(void))
+{
+    hay_sobre = funcion;
+}
+
 void empezar_accion(void)
 {
     cortado = false;
@@ -356,6 +364,21 @@ static void dibujar_boca(float cy, float perspectiva)
     }
 }
 
+// Sobrecito arriba a la derecha (cuando hay un mensaje sin leer).
+// Tiene un borde negro para que se vea aunque los ojos esten detras.
+static void dibujar_sobre(void)
+{
+    if (hay_sobre == NULL || !hay_sobre()) return;
+    const int x = LCD_H_RES - 15, y = 0, w = 15, h = 11;
+    display_fill_rect(x - 1, y, w + 1, h + 1, false);       // borde negro
+    display_fill_rect(x, y, w, h, true);                     // el sobre
+    display_fill_rect(x + 1, y + 1, w - 2, h - 2, false);
+    for (int i = 0; i < 6; i++) {                            // la solapa en "V"
+        display_set_pixel(x + 1 + i, y + 1 + i, true);
+        display_set_pixel(x + w - 2 - i, y + 1 + i, true);
+    }
+}
+
 static void dibujar(void)
 {
     // Perspectiva: el ojo del lado hacia donde mira se ve un poquito mas grande.
@@ -374,6 +397,7 @@ static void dibujar(void)
     // el disfraz dibuja todo, con sus propios ojos y boca
     if (disfraz_tapa_cara()) {
         dibujar_disfraz(cy);
+        dibujar_sobre();
         display_flush();
         return;
     }
@@ -429,6 +453,7 @@ static void dibujar(void)
         dibujar_z(zx, zy, s);
     }
 
+    dibujar_sobre();
     display_flush();
 }
 

@@ -14,6 +14,29 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-06 — Leer los mensajes con el boton 2 📖
+
+**Que hicimos:** Cambiamos como se leen los mensajes. Ahora el **boton 1** siempre abre el menu, y el **boton 2** muestra el mensaje (tambien se puede leer desde el menu, en **Mensaje**). El boton 2 va bajando por el mensaje, y al final aparece **Salir**: al elegirla, el mensaje **se borra**, y cuando ya no queda ninguno se va el sobrecito.
+
+**Que aprendimos:**
+- Pitri primero **mira** el mensaje sin sacarlo, y lo **borra** recien cuando Sofi lo leyo hasta el final. Si lo cierra antes, queda guardado para despues.
+- Si pasan **30 segundos** sin que nadie apriete un boton, el mensaje se cierra solo y se borra. Cada apretada vuelve a empezar la cuenta, como un **cronometro** que se reinicia.
+
+---
+
+## 2026-11-06 — ¡Pitri recibe mensajes! ✉️
+
+**Que hicimos:** Le creamos a Pitri un **bot de Telegram**. Ahora papa le puede mandar mensajes desde el celular y Sofi los lee en la pantalla de Pitri. Cuando llega uno, Pitri se sorprende, avisa **"¡Mensaje nuevo!"** y aparece un **sobrecito** arriba a la derecha. Con el boton 1 se lee, y si es largo, con el boton 2 se pasa de pagina. Si Pitri esta dormido, el mensaje lo despierta.
+
+**Que aprendimos:**
+- Un **bot** es una cuenta de Telegram manejada por un programa en vez de por una persona.
+- Pitri le pregunta a Telegram "¿hay mensajes para mi?" y Telegram **se queda esperando** hasta que llegue uno (o pasen 25 segundos) antes de contestar. Asi el mensaje aparece casi enseguida.
+- La conexion es **segura** (HTTPS): el mensaje viaja "en un sobre cerrado" que nadie en el camino puede abrir.
+- Para que ningun desconocido le escriba a Sofi, Pitri **solo acepta mensajes de papa**: mira el numero de quien lo manda y, si no es el de papa, lo ignora.
+- Las letras de Pitri no tienen tildes ni emojis: las cambiamos por la letra sola, y algunos emojis por caritas como `<3` o `:)`.
+
+---
+
 ## 2026-11-03 — ¡Cinco personajes por modo! 🦇🧙🦌⛄🧝🐱🐶
 
 **Que hicimos:** Pensamos personajes nuevos que sean tiernos y que **usen los ojos de Pitri**, y ahora cada modo tiene 5:

@@ -41,6 +41,12 @@
 #define COMIDAS_POR_HORA  3        // cuantas veces puede comer en una hora
 #define BEBIDAS_POR_HORA  3        // cuantas veces puede tomar en una hora
 
+// ─── Mensajes de Telegram ────────────────────────────────────────────────────
+// Los datos del bot van en components/telegram/telegram_secretos.h (no se sube al repo)
+#define MENSAJE_TITULO            "Mensaje de papa"   // arriba del mensaje (hasta 15 letras)
+#define MOSTRAR_AVISO_MENSAJE_MS  4000                // cuanto se ve el aviso "¡Mensaje nuevo!"
+#define LEER_MENSAJE_MAX_MS       (30 * 1000)         // si nadie toca ningun boton, el mensaje se cierra solo y se borra
+
 // ─── Menu (boton 1 lo abre, boton 2 baja, boton 1 elige) ────────────────────
 #define MENU_ESPERA_MAX_MS  (20 * 1000)   // si nadie toca nada, se cierra solo
 

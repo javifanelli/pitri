@@ -46,7 +46,8 @@ pitri/
 │   ├── wifi/              ← conexion WiFi (datos privados en wifi_secretos.h)
 │   ├── botones/           ← los 2 botones (con anti-rebote)
 │   ├── menu/              ← menu en pantalla manejado con los botones
-│   └── reloj/             ← hora por internet (SNTP)
+│   ├── reloj/             ← hora por internet (SNTP)
+│   └── telegram/          ← mensajes de un bot de Telegram (datos privados en telegram_secretos.h)
 ├── docs/                  ← documentacion, diagrama y datasheets
 └── managed_components/    ← librerias descargadas (no se tocan a mano)
 ```
@@ -190,6 +191,64 @@ historial de git.
 
 Otros datos que tampoco se suben: `sdkconfig` y `build/` (ya ignorados), porque el binario
 compilado contiene la contraseña.
+
+---
+
+## Telegram
+
+Pitri recibe mensajes de un bot de Telegram para que Sofi los lea. **Solo lee**: no contesta.
+
+### Armar el bot (una sola vez)
+
+1. En Telegram, abrir un chat con **@BotFather** y mandarle `/newbot`.
+2. Elegir el nombre que se ve (por ejemplo `Pitri`) y despues el **usuario** del bot, que tiene
+   que ser unico y terminar en `bot` (por ejemplo `pitri_de_sofi_bot`).
+3. BotFather contesta con el **token** (algo como `123456789:AAH...`). Es la llave del bot:
+   **no se comparte ni se sube al repo**.
+4. Recomendado: mandarle a BotFather `/setjoingroups`, elegir el bot y `Disable`, para que
+   nadie pueda meterlo en un grupo.
+
+### Configurar Pitri
+
+1. Copiar `components/telegram/telegram_secretos.ejemplo.h` como
+   `components/telegram/telegram_secretos.h` (en la misma carpeta).
+2. Completar `TELEGRAM_TOKEN` con el token. Dejar `TELEGRAM_IDS_PERMITIDOS` en `{ 0 }`.
+3. Compilar, cargar y abrir el monitor (`idf.py -p COMx flash monitor`). Debe aparecer
+   `TELEGRAM: ¡Conectado con Telegram! Esperando mensajes...`.
+4. Desde el celular, buscar el bot por su usuario, tocar **Iniciar** y mandarle cualquier
+   cosa. En el monitor aparece `Me escribio el usuario 123456789...`: ese es tu numero.
+5. Ponerlo en `TELEGRAM_IDS_PERMITIDOS`, por ejemplo `{ 123456789 }`, y volver a compilar.
+   Desde ahi, los mensajes que le mandes al bot aparecen en Pitri.
+
+Para que otra persona tambien le pueda escribir, agregar su numero: `{ 111111111, 222222222 }`.
+
+### Como funciona por dentro
+
+- La tarea de `telegram.c` espera WiFi y llama a `getUpdates` con *long polling*
+  (`timeout=25`): Telegram retiene la respuesta hasta que llega un mensaje o pasan 25 s, asi
+  que los mensajes aparecen en uno o dos segundos sin estar preguntando todo el tiempo.
+- HTTPS con `esp_http_client` y el paquete de certificados de ESP-IDF (`esp_crt_bundle`),
+  que verifica que del otro lado este Telegram de verdad.
+- La respuesta es JSON y se lee con cJSON (en ESP-IDF v6 ya no viene incluido: se baja solo
+  del registro de componentes, ver `components/telegram/idf_component.yml`).
+- Solo se aceptan **mensajes directos** (no de grupos) de los usuarios de
+  `TELEGRAM_IDS_PERMITIDOS`. Se ignora todo lo demas.
+- El texto se pasa a ASCII para la fuente de 5x7: vocales con tilde → vocal sola, ñ → n,
+  algunos emojis → caritas de texto, el resto se descarta. Se guardan hasta 3 mensajes sin
+  leer de hasta 400 letras (`TELEGRAM_MAX_SIN_LEER`). Si llega otro con la lista llena, se
+  descarta el nuevo: nunca se pisa uno sin leer, porque Sofi puede estar leyendolo.
+- Leer: `telegram_ver()` copia el mas viejo sin sacarlo y `telegram_borrar()` lo saca cuando
+  Sofi llega al final y elige **Salir**. Si cierra antes (boton 1), queda. Si pasan
+  `LEER_MENSAJE_MAX_MS` (30 s) sin apretar ningun boton, se cierra solo, se borra y vuelve a la
+  cara (los mensajes que siguen quedan). Cada apretada reinicia la cuenta.
+- En la pantalla principal, el boton 2 lee los mensajes (y corta el juego que se este
+  haciendo) solo si hay alguno sin leer; si no, se ignora. El boton 1 siempre abre el menu.
+- Los mensajes viven en la RAM: si Pitri se apaga antes de que Sofi los lea, se pierden
+  (Telegram ya los dio por entregados).
+- Nunca se loguea el token ni el texto de los mensajes (solo cuantas letras tienen).
+- Para que entre todo, la tabla de particiones es `SINGLE_APP_LARGE` (programa de hasta
+  1,5 MB; ver `sdkconfig.defaults`). Al cambiarla hay que cargar todo con `idf.py flash`
+  (no solo la app).
 
 ---
 

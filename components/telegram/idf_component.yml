@@ -1,0 +1,4 @@
+## cJSON: para entender lo que contesta Telegram (viene en formato JSON).
+## Desde ESP-IDF v6 no viene incluido: se baja solo del registro de componentes.
+dependencies:
+  espressif/cjson: ">=1.7.15"

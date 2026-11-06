@@ -28,7 +28,9 @@ Lo armamos entre Sofia y su papa, de a poquito, y cada vez le vamos enseñando c
 | Pasa un rato sin ver a nadie | Se duerme 😴 y le salen "Z" |
 | Cada 5 minutos en punto (x:00, x:05, x:10...) | Se corre a un costado y mira la **hora** |
 | Cada 15 minutos en punto (x:00, x:15, x:30, x:45) | Se corre a un costado y mira la **temperatura y la humedad** |
-| Apretas el boton 1 | Abre el **menu**, para elegir un **modo** (ver abajo) |
+| Le llega un **mensaje de Telegram** | Se sorprende, dice **"¡Mensaje nuevo!"** y aparece un **sobrecito** ✉️ arriba a la derecha |
+| Apretas el boton 1 | Abre el **menu** (ver abajo) |
+| Apretas el boton 2 y hay un mensaje | **Muestra el mensaje** para leerlo |
 | Se conecta al WiFi | Dice **"Tengo wifi!"** con la carita de costado y **se pone en hora** |
 
 ### Los juegos de Pitri
@@ -57,10 +59,32 @@ Cuando esta tranquilo, lleva una sonrisita chiquita.
 
 ---
 
+## ✉️ Mensajes de Telegram
+
+Papa le puede mandar mensajes a Pitri desde su celular, con **Telegram**, para que Sofi los lea:
+
+1. Cuando llega un mensaje, Pitri se sorprende y dice **"¡Mensaje nuevo! Apreta boton 2"**.
+2. Arriba a la derecha queda un **sobrecito** ✉️ mientras haya mensajes sin leer.
+3. Con el **boton 2** aparece el mensaje (tambien se puede leer desde el menu, en **Mensaje**).
+   Si es largo, el **boton 2** baja y una flechita arriba avisa que hay mas.
+4. Al terminar de bajar aparece **Salir**. Al elegirla (con cualquier boton), el mensaje
+   **se borra**, y cuando no queda ninguno se va el sobrecito.
+5. Si Sofi aprieta el **boton 1** antes de llegar al final, el mensaje se cierra pero **no se
+   borra**: queda para leerlo despues.
+6. Si pasan **30 segundos** sin apretar ningun boton, Pitri vuelve a su cara y el mensaje **se
+   borra**. Cada vez que se aprieta un boton, la cuenta empieza de nuevo.
+
+Si Pitri esta dormido, el mensaje lo despierta. Y si llega alguien y hay un mensaje sin leer,
+Pitri le avisa. Solo acepta los mensajes de papa: si le escribe otra persona, los ignora.
+Las letras de Pitri no tienen tildes ni emojis, asi que las tildes se cambian por la letra
+sola y algunos emojis por caritas: ❤️ → `<3`, 😊 → `:)`, 😘 → `:*`.
+
 ## 🎭 Los modos
 
 Con el **boton 1** se abre el menu. El **boton 2** baja a la opcion siguiente y el
-**boton 1** elige. El menu tiene seis opciones: **Modo**, **Comer**, **Tomar**, **Hora**, **Sensor** y **Salir**.
+**boton 1** elige. El menu tiene siete opciones: **Modo**, **Comer**, **Tomar**, **Hora**, **Sensor**, **Mensaje** y **Salir**.
+
+- **Mensaje**: muestra los mensajes de Telegram sin leer (si no hay, dice "No hay mensajes").
 
 - **Comer**: aparecen los dibujos de una **torta**, unas **papas fritas** y una
   **hamburguesa** (con el boton 2 se pasa de una a otra, y al final esta **Atras** para
@@ -153,5 +177,6 @@ Cada vez que cambias algo, hay que **compilar** y **cargar** el programa en Pitr
 - [x] Que se conecte al WiFi
 - [x] Que sepa la hora (la saca de internet)
 - [x] Que muestre la hora (desde el menu)
+- [x] Que reciba mensajes de Telegram para que Sofi los lea
 - [ ] Que se duerma de noche
 - [ ] Que sepa el clima de afuera

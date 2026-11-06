@@ -1,0 +1,5 @@
+# Configuracion de Pitri que no es la de fabrica
+# (sdkconfig se arma solo a partir de este archivo la primera vez que se compila)
+
+# Mas lugar para el programa (1,5 MB): la conexion segura con Telegram ocupa bastante
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y

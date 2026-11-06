@@ -1,4 +1,14 @@
 dependencies:
+  espressif/cjson:
+    component_hash: 002c6d1872ee4c97d333938ebe107a29841cc847f9de89e676714bd2844057ea
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.7.19~1
   idf:
     source:
       type: idf
@@ -11,7 +21,8 @@ dependencies:
       type: service
     version: 1.0.2
 direct_dependencies:
+- espressif/cjson
 - tny-robotics/sh1106-esp-idf
-manifest_hash: ed6fb5ccabfd4b249ac578599dd671a2c95fa2306b1c483ef320bf9a1cd57013
+manifest_hash: 25646ff4327fa4638adbf1efe2058162e2c5e42ee1530508790939f239f15226
 target: esp32
 version: 3.0.0

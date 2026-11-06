@@ -2,6 +2,7 @@
 #include "freertos/task.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "esp_log.h"
 #include "esp_random.h"
 #include "esp_timer.h"
@@ -16,6 +17,7 @@
 #include "botones.h"
 #include "menu.h"
 #include "reloj.h"
+#include "telegram.h"
 
 static const char *TAG = "PITRI";
 
@@ -76,15 +78,17 @@ static void mostrar_mensaje(const char *texto)
 }
 
 // ─── El menu ─────────────────────────────────────────────────────────────────
-//   Menu:  Modo / Comer / Tomar / Hora / Sensor / Salir
+//   Menu:  Modo / Comer / Tomar / Hora / Sensor / Mensaje / Salir
 //   Comer: Torta / Papas fritas / Hamburguesa / Atras (con dibujos)
 //   Tomar: Agua / Cafe / Mate / Atras (con dibujos)
 //   Modo:  Normal / Halloween / Navidad / Animales / Volver
 
-// Para que los ojos corten lo que estan haciendo apenas se aprieta el boton 1
-static bool boton_menu_apretado(void)
+// ¿Apretaron un boton que hay que atender? El 1 (menu) siempre; el 2 (leer el
+// mensaje) solo si hay un mensaje sin leer. Asi los ojos cortan lo que estan
+// haciendo apenas se aprieta.
+static bool hay_boton_para_atender(void)
 {
-    return botones_pendiente(1);
+    return botones_pendiente(1) || (botones_pendiente(2) && telegram_sin_leer() > 0);
 }
 
 static void cambiar_modo(modo_t nuevo)
@@ -168,6 +172,150 @@ static void mostrar_sensor(void)
     }
 }
 
+// ─── Mensajes de Telegram ────────────────────────────────────────────────────
+// Cuando llega un mensaje, Pitri avisa y aparece un sobrecito arriba a la
+// derecha. Sofi lo lee con el boton 2 (o desde el menu, en "Mensaje"). Cuando
+// lo termina de leer y elige "Salir", el mensaje se borra.
+
+#define LETRAS_POR_RENGLON   21     // con letra chica (6 pixeles cada letra)
+#define RENGLONES_POR_PAGINA 6
+#define MAX_RENGLONES        40
+
+static unsigned recibidos_avisados = 0;   // hasta que mensaje ya aviso
+
+static bool hay_mensaje_sin_leer(void)
+{
+    return telegram_sin_leer() > 0;
+}
+
+// Parte el texto en renglones de hasta LETRAS_POR_RENGLON letras, cortando en
+// los espacios para no partir las palabras. Devuelve cuantos renglones quedaron.
+static int partir_en_renglones(const char *texto, char renglones[][LETRAS_POR_RENGLON * 2 + 1], int max)
+{
+    int n = 0;
+    const char *p = texto;
+    while (*p && n < max) {
+        // Hasta donde entra en este renglon (¡ ¿ ° ocupan 2 bytes, pero son una letra)
+        const char *fin = p, *ultimo_espacio = NULL;
+        int cuenta = 0;
+        while (*fin && *fin != '\n') {
+            if (((unsigned char)*fin & 0xC0) != 0x80) {
+                if (cuenta == LETRAS_POR_RENGLON) break;
+                cuenta++;
+            }
+            if (*fin == ' ') ultimo_espacio = fin;
+            fin++;
+        }
+        const char *corte = fin;
+        if (*fin && *fin != '\n' && ultimo_espacio != NULL) corte = ultimo_espacio;
+        int bytes = (int)(corte - p);
+        memcpy(renglones[n], p, bytes);
+        renglones[n][bytes] = '\0';
+        n++;
+        p = corte;
+        if (*p == ' ' || *p == '\n') p++;     // el espacio o el enter no pasan al renglon siguiente
+    }
+    return n;
+}
+
+// Como termino la lectura de un mensaje
+typedef enum {
+    LECTURA_TERMINADA,   // llego al final y eligio "Salir": se borra
+    LECTURA_CORTADA,     // apreto el boton 1 antes del final: queda sin leer
+    LECTURA_SE_CERRO,    // nadie toco nada por LEER_MENSAJE_MAX_MS: se borra y vuelve a la cara
+} lectura_t;
+
+// Muestra un mensaje: el titulo arriba y el texto abajo, de a 6 renglones.
+// Despues del ultimo renglon aparece la opcion "Salir".
+//   Boton 2 = bajar. Cuando ya se ve "Salir", el boton 2 (o el 1) la elige.
+//   Boton 1 antes de llegar al final = cerrar sin terminar (el mensaje queda sin leer).
+//   Si pasa LEER_MENSAJE_MAX_MS sin que se apriete ningun boton, se cierra solo.
+//   Cada vez que se aprieta un boton, la cuenta vuelve a empezar.
+static lectura_t leer_mensaje(const char *texto)
+{
+    static char renglones[MAX_RENGLONES][LETRAS_POR_RENGLON * 2 + 1];
+    int n = partir_en_renglones(texto, renglones, MAX_RENGLONES);
+    int total = n + 1;                                  // los renglones y "Salir"
+    int arriba_max = (total > RENGLONES_POR_PAGINA) ? total - RENGLONES_POR_PAGINA : 0;
+
+    ESP_LOGI(TAG, "Sofi lee un mensaje");
+    botones_se_apreto(1);
+    botones_se_apreto(2);
+
+    int arriba = 0, quieto_ms = 0;                      // "arriba" = primer renglon que se ve
+    bool redibujar = true;
+    while (quieto_ms < LEER_MENSAJE_MAX_MS) {
+        bool se_ve_salir = (arriba == arriba_max);
+        if (redibujar) {
+            display_clear();
+            display_draw_text(0, 0, MENSAJE_TITULO, 1, true);
+            if (!se_ve_salir)                           // flechita: hay mas abajo
+                display_fill_triangle(LCD_H_RES - 8, 2, LCD_H_RES - 2, 2, LCD_H_RES - 5, 6, true);
+            display_fill_rect(0, 9, LCD_H_RES, 1, true);
+            for (int r = 0; r < RENGLONES_POR_PAGINA; r++) {
+                int i = arriba + r, y = 12 + r * 9;
+                if (i < n) {
+                    display_draw_text(1, y, renglones[i], 1, true);
+                } else if (i == n) {                    // "Salir", en una barra blanca
+                    display_fill_rect(0, y - 1, LCD_H_RES, 9, true);
+                    display_draw_text((LCD_H_RES - display_text_width("Salir", 1)) / 2, y, "Salir", 1, false);
+                }
+            }
+            display_flush();
+            redibujar = false;
+        }
+        if (botones_se_apreto(2)) {
+            if (se_ve_salir) return LECTURA_TERMINADA;  // eligio "Salir": lo leyo entero
+            arriba += RENGLONES_POR_PAGINA;             // baja una pagina
+            if (arriba > arriba_max) arriba = arriba_max;
+            redibujar = true;
+            quieto_ms = 0;
+        }
+        if (botones_se_apreto(1))                       // cerrar (si ya se veia "Salir", cuenta como leido)
+            return se_ve_salir ? LECTURA_TERMINADA : LECTURA_CORTADA;
+        vTaskDelay(pdMS_TO_TICKS(50));
+        quieto_ms += 50;
+    }
+    ESP_LOGI(TAG, "Nadie toco nada: el mensaje se cierra solo");
+    return LECTURA_SE_CERRO;
+}
+
+// Lee los mensajes sin leer, uno atras del otro. Cada uno que se lee entero se
+// borra (y se va el sobrecito cuando no queda ninguno). Si Sofi cierra uno antes
+// de terminarlo, ese y los que siguen quedan para despues. Si se cierra solo
+// (nadie toco nada), se borra y vuelve a la cara; los que siguen quedan.
+static void leer_mensajes_nuevos(void)
+{
+    char texto[TELEGRAM_MAX_LETRAS + 1];
+    while (telegram_ver(texto, sizeof(texto))) {
+        lectura_t como = leer_mensaje(texto);
+        if (como == LECTURA_CORTADA) break;
+        telegram_borrar();
+        ESP_LOGI(TAG, "Mensaje borrado");
+        if (como == LECTURA_SE_CERRO) break;
+    }
+    recibidos_avisados = telegram_recibidos();
+    botones_se_apreto(1);
+    botones_se_apreto(2);
+}
+
+// Desde el menu: los mensajes sin leer (o un aviso si no hay)
+static void mensajes_desde_menu(void)
+{
+    if (telegram_sin_leer() > 0) leer_mensajes_nuevos();
+    else mostrar_texto(telegram_configurado() ? "No hay\nmensajes" : "Sin\nTelegram", 2, 2000);
+}
+
+// Pitri se sorprende y avisa que hay un mensaje
+static void avisar_mensaje(void)
+{
+    recibidos_avisados = telegram_recibidos();
+    ESP_LOGI(TAG, "Aviso que hay un mensaje");
+    eyes_sacar_disfraz();
+    eyes_saludar();
+    eyes_mostrar_datos("¡Mensaje\nnuevo!\nApreta\nboton 2", 1, MOSTRAR_AVISO_MENSAJE_MS);
+}
+
 // ─── Comer y tomar ───────────────────────────────────────────────────────────
 // Pitri puede comer hasta COMIDAS_POR_HORA veces y tomar hasta BEBIDAS_POR_HORA
 // veces en una hora. Si ya llego a eso, esta lleno y dice que no. No le pasa
@@ -248,14 +396,15 @@ static void dibujar_opcion_bebida(int opcion) { dibujar_opcion(bebidas, nombres_
 
 static void abrir_menu(void)
 {
-    static const char *const opciones_menu[] = { "Modo", "Comer", "Tomar", "Hora", "Sensor", "Salir" };
+    static const char *const opciones_menu[] = { "Modo", "Comer", "Tomar", "Hora", "Sensor", "Mensaje", "Salir" };
     static const char *const opciones_modo[] = { "Normal", "Halloween", "Navidad", "Animales", "Volver" };
     const int opcion_modo = 0, opcion_comer = 1, opcion_tomar = 2, opcion_hora = 3, opcion_sensor = 4;
+    const int opcion_mensaje = 5;
     const int volver = 4;
 
     ESP_LOGI(TAG, "Abriendo el menu");
     while (1) {
-        int elegida = menu_elegir("", opciones_menu, 6, 0, -1, MENU_ESPERA_MAX_MS);
+        int elegida = menu_elegir("", opciones_menu, 7, 0, -1, MENU_ESPERA_MAX_MS);
 
         if (elegida == opcion_comer) {
             int c = menu_elegir_dibujos("Comer", CANT_COMIDAS + 1, dibujar_opcion_comida, 0, MENU_ESPERA_MAX_MS);
@@ -277,6 +426,10 @@ static void abrir_menu(void)
             mostrar_sensor();
             break;
         }
+        if (elegida == opcion_mensaje) {
+            mensajes_desde_menu();
+            break;
+        }
         if (elegida != opcion_modo) break;          // "Salir" o se cerro solo
 
         int m = menu_elegir("Modo", opciones_modo, 5, modo, modo, MENU_ESPERA_MAX_MS);
@@ -295,6 +448,10 @@ static void abrir_menu(void)
 // Cuando llega alguien: en modo normal saluda, en los otros hace un personaje
 static void recibir_visita(void)
 {
+    if (telegram_sin_leer() > 0) {      // ¡primero, el mensaje!
+        avisar_mensaje();
+        return;
+    }
     if (modo == MODO_NORMAL) eyes_saludar();
     else                     eyes_actuar(elegir_personaje());
 }
@@ -303,7 +460,7 @@ static void recibir_visita(void)
 static void descansar(int ms)
 {
     for (int t = 0; t < ms; t += 50) {
-        if (botones_pendiente(1)) return;
+        if (hay_boton_para_atender()) return;
         if (motion_alguien_llego()) {
             recibir_visita();
             return;
@@ -389,7 +546,7 @@ static void esperar_wifi_al_arrancar(void)
     if (!wifi_configurado()) return;           // sin datos de red no hay nada que esperar
 
     int64_t inicio = esp_timer_get_time();
-    while (!wifi_conectado() && !botones_pendiente(1) &&
+    while (!wifi_conectado() && !hay_boton_para_atender() &&
            esp_timer_get_time() - inicio < (int64_t)WIFI_ESPERA_ARRANQUE_MS * 1000) {
         eyes_onditas();
     }
@@ -406,11 +563,12 @@ static void dormir(void)
     eyes_dormirse();
 
     bool llego_alguien = false;
-    while (!botones_pendiente(1)) {
+    while (!hay_boton_para_atender()) {
         if (motion_alguien_llego()) {
             llego_alguien = true;
             break;
         }
+        if (telegram_recibidos() != recibidos_avisados) break;   // ¡llego un mensaje!
         eyes_dormido();
     }
 
@@ -427,22 +585,35 @@ void app_main(void)
     dht_iniciar(TIEMPO_ENTRE_LECTURAS_MS);
     wifi_iniciar();          // se conecta "de fondo", no hay que esperarlo
     reloj_iniciar(ZONA_HORARIA);   // cuando haya WiFi, pone la hora
-    botones_iniciar();       // boton 1 = menu, boton 2 = moverse en el menu
+    telegram_iniciar();      // cuando haya WiFi, busca mensajes de Telegram
+    botones_iniciar();       // boton 1 = menu, boton 2 = leer mensajes y moverse en el menu
 
     // Mensajes de bienvenida
     mostrar_mensaje(MENSAJE_ARRANQUE);
     mostrar_mensaje(MENSAJE_ARRANQUE_2);
 
-    eyes_set_interrupcion(boton_menu_apretado);
+    eyes_set_interrupcion(hay_boton_para_atender);
+    eyes_set_sobre(hay_mensaje_sin_leer);     // sobrecito si hay un mensaje sin leer
     eyes_init();
     esperar_wifi_al_arrancar();   // carita con ondas hasta que se conecta
     eyes_saludar();
 
     while (1) {
-        // Boton 1: abre el menu (el boton 2 solo sirve adentro del menu)
-        botones_se_apreto(2);
+        // Boton 1: abre el menu
         if (botones_se_apreto(1)) {
             abrir_menu();
+            continue;
+        }
+        // Boton 2: lee los mensajes (si no hay ninguno, no hace nada)
+        if (botones_se_apreto(2) && telegram_sin_leer() > 0) {
+            leer_mensajes_nuevos();
+            eyes_init();
+            continue;
+        }
+
+        // Si llego un mensaje nuevo, avisa
+        if (telegram_recibidos() != recibidos_avisados) {
+            avisar_mensaje();
             continue;
         }
 
