@@ -4,6 +4,7 @@
 #include "board_config.h"
 
 #include <math.h>
+#include <string.h>
 #include <stdio.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -787,12 +788,12 @@ static const juego_t juegos[] = {
     { "mirar",          juego_mirar,          10 },
     { "centro",         juego_centro,          4 },
     { "doble parpadeo", juego_doble_parpadeo,  3 },
-    { "guiño",          juego_guino,           2 },
+    { "guino",          juego_guino,           2 },
     { "sorpresa",       juego_sorpresa,        2 },
     { "contento",       juego_contento,        2 },
     { "girar",          juego_girar,           1 },
     { "sospecha",       juego_sospecha,        1 },
-    { "sueño",          juego_sueno,           1 },
+    { "sueno",          juego_sueno,           1 },
     { "pasear",         juego_pasear,          2 },
     { "mareado",        juego_mareado,         1 },
     { "enojado",        juego_enojado,         1 },
@@ -954,7 +955,14 @@ void eyes_saludar(void)
     juego_contento();
 }
 
-void eyes_jugar(void)
+void eyes_enamorarse(void)
+{
+    empezar_accion();
+    eyes_sacar_disfraz();
+    juego_enamorado();
+}
+
+const char *eyes_jugar(void)
 {
     empezar_accion();
     int total = 0;
@@ -965,8 +973,24 @@ void eyes_jugar(void)
         if (r < juegos[i].peso) {
             ESP_LOGI(TAG, "Juego: %s", juegos[i].nombre);
             juegos[i].hacer();
-            return;
+            return juegos[i].nombre;
         }
         r -= juegos[i].peso;
     }
+    return "";
 }
+
+bool eyes_jugar_juego(const char *nombre)
+{
+    for (int i = 0; i < CANT_JUEGOS; i++) {
+        if (strcmp(juegos[i].nombre, nombre) == 0) {
+            ESP_LOGI(TAG, "Juego (pedido): %s", juegos[i].nombre);
+            empezar_accion();
+            eyes_sacar_disfraz();
+            juegos[i].hacer();
+            return true;
+        }
+    }
+    return false;
+}
+

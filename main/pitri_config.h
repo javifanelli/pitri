@@ -41,6 +41,15 @@
 #define COMIDAS_POR_HORA  3        // cuantas veces puede comer en una hora
 #define BEBIDAS_POR_HORA  3        // cuantas veces puede tomar en una hora
 
+// ─── La familia (Pitri, Flufi, ...) ──────────────────────────────────────────
+// La palabra secreta va en components/familia/familia_secretos.h (no se sube al repo)
+#define MI_NOMBRE           "Pitri"   // como lo conocen los demas (sin espacios)
+#define MOSTRAR_FAMILIA_MS  3000      // cuanto se ve "¡Hola Flufi!", "¡Un beso de Flufi!"...
+// Cada cuanto empieza una charla o un juego con alguien de la familia (al azar
+// entre estos dos tiempos, en segundos)
+#define FAMILIA_INICIATIVA_MIN_S  (4 * 60)
+#define FAMILIA_INICIATIVA_MAX_S  (10 * 60)
+
 // ─── Mensajes de Telegram ────────────────────────────────────────────────────
 // Los datos del bot van en components/telegram/telegram_secretos.h (no se sube al repo)
 #define MENSAJE_TITULO            "Mensaje de papa"   // arriba del mensaje (hasta 15 letras)

@@ -28,6 +28,9 @@ Lo armamos entre Sofia y su papa, de a poquito, y cada vez le vamos enseñando c
 | Pasa un rato sin ver a nadie | Se duerme 😴 y le salen "Z" |
 | Cada 5 minutos en punto (x:00, x:05, x:10...) | Se corre a un costado y mira la **hora** |
 | Cada 15 minutos en punto (x:00, x:15, x:30, x:45) | Se corre a un costado y mira la **temperatura y la humedad** |
+| Se conecta **Flufi** (u otro de la familia) | La saluda: **"¡Hola Flufi!"** |
+| Flufi le manda un **beso** | Ojos de corazon, corazoncitos y **"¡Un beso de Flufi!"** 😍 |
+| Cada tanto, con Flufi conectada | **Charlan** por turnos o **juegan juntos** (ver [docs/FAMILIA.md](docs/FAMILIA.md)) |
 | Le llega un **mensaje de Telegram** | Se sorprende, dice **"¡Mensaje nuevo!"** y aparece un **sobrecito** ✉️ arriba a la derecha |
 | Apretas el boton 1 | Abre el **menu** (ver abajo) |
 | Apretas el boton 2 y hay un mensaje | **Muestra el mensaje** para leerlo |
@@ -82,7 +85,11 @@ sola y algunos emojis por caritas: ❤️ → `<3`, 😊 → `:)`, 😘 → `:*`
 ## 🎭 Los modos
 
 Con el **boton 1** se abre el menu. El **boton 2** baja a la opcion siguiente y el
-**boton 1** elige. El menu tiene siete opciones: **Modo**, **Comer**, **Tomar**, **Hora**, **Sensor**, **Mensaje** y **Salir**.
+**boton 1** elige. El menu tiene ocho opciones: **Modo**, **Comer**, **Tomar**, **Hora**, **Sensor**, **Mensaje**, **Familia** y **Salir**.
+
+- **Familia**: elegis a alguien de la familia (aparecen los que estan conectados) y que hacerle:
+  **Beso**, **Cosquis**, **Convidar**, **Charlar** o **Jugar**.
+  Como se hablan Pitri y Flufi: ver [docs/FAMILIA.md](docs/FAMILIA.md).
 
 - **Mensaje**: muestra los mensajes de Telegram sin leer (si no hay, dice "No hay mensajes").
 

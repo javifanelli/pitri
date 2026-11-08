@@ -47,7 +47,8 @@ pitri/
 │   ├── botones/           ← los 2 botones (con anti-rebote)
 │   ├── menu/              ← menu en pantalla manejado con los botones
 │   ├── reloj/             ← hora por internet (SNTP)
-│   └── telegram/          ← mensajes de un bot de Telegram (datos privados en telegram_secretos.h)
+│   ├── telegram/          ← mensajes de un bot de Telegram (datos privados en telegram_secretos.h)
+│   └── familia/           ← hablar con Flufi y los demas por UDP (ver docs/FAMILIA.md)
 ├── docs/                  ← documentacion, diagrama y datasheets
 └── managed_components/    ← librerias descargadas (no se tocan a mano)
 ```

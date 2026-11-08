@@ -6,14 +6,21 @@
 // Dibuja los ojos de Pitri en el centro de la pantalla (y le saca el disfraz)
 void eyes_init(void);
 
-// Elige un juego al azar y lo hace (la funcion vuelve cuando termina)
-void eyes_jugar(void);
+// Elige un juego al azar y lo hace (la funcion vuelve cuando termina).
+// Devuelve el nombre del juego que hizo ("llorar", "contento"...).
+const char *eyes_jugar(void);
+
+// Hace el juego que se llama "nombre" (por ejemplo "mareado"). false si no existe.
+bool eyes_jugar_juego(const char *nombre);
 
 // Un parpadeo rapido
 void eyes_parpadear(void);
 
 // Reaccion cuando alguien llega: se sorprende y se pone contento
 void eyes_saludar(void);
+
+// Ojos de corazon y corazoncitos que suben (por ejemplo, cuando le mandan un beso)
+void eyes_enamorarse(void);
 
 // Cierra los ojos de a poco hasta quedar dormido
 void eyes_dormirse(void);

@@ -18,6 +18,7 @@
 #include "menu.h"
 #include "reloj.h"
 #include "telegram.h"
+#include "familia.h"
 
 static const char *TAG = "PITRI";
 
@@ -78,17 +79,20 @@ static void mostrar_mensaje(const char *texto)
 }
 
 // ─── El menu ─────────────────────────────────────────────────────────────────
-//   Menu:  Modo / Comer / Tomar / Hora / Sensor / Mensaje / Salir
+//   Menu:  Modo / Comer / Tomar / Hora / Sensor / Mensaje / Familia / Salir
 //   Comer: Torta / Papas fritas / Hamburguesa / Atras (con dibujos)
 //   Tomar: Agua / Cafe / Mate / Atras (con dibujos)
 //   Modo:  Normal / Halloween / Navidad / Animales / Volver
 
-// ¿Apretaron un boton que hay que atender? El 1 (menu) siempre; el 2 (leer el
-// mensaje) solo si hay un mensaje sin leer. Asi los ojos cortan lo que estan
-// haciendo apenas se aprieta.
+static bool atendiendo_familia = false;   // true mientras reacciona a lo que le dijo la familia
+
+// ¿Hay que cortar lo que esta haciendo? Si aprietan el boton 1 (menu), el 2 con
+// un mensaje sin leer, o si le hablo alguien de la familia (salvo que ya este
+// contestandole a alguien). Asi los ojos cortan lo que estan haciendo enseguida.
 static bool hay_boton_para_atender(void)
 {
-    return botones_pendiente(1) || (botones_pendiente(2) && telegram_sin_leer() > 0);
+    return botones_pendiente(1) || (botones_pendiente(2) && telegram_sin_leer() > 0) ||
+           (!atendiendo_familia && familia_hay_evento());
 }
 
 static void cambiar_modo(modo_t nuevo)
@@ -311,6 +315,7 @@ static void avisar_mensaje(void)
 {
     recibidos_avisados = telegram_recibidos();
     ESP_LOGI(TAG, "Aviso que hay un mensaje");
+    familia_mandar("*", FAMILIA_MENSAJE, NULL);    // ¡que la familia tambien le avise a Sofi!
     eyes_sacar_disfraz();
     eyes_saludar();
     eyes_mostrar_datos("¡Mensaje\nnuevo!\nApreta\nboton 2", 1, MOSTRAR_AVISO_MENSAJE_MS);
@@ -394,17 +399,203 @@ static void dibujar_opcion(const eyes_comida_t *lista, const char *const *nombre
 static void dibujar_opcion_comida(int opcion) { dibujar_opcion(comidas, nombres_comidas, CANT_COMIDAS, opcion); }
 static void dibujar_opcion_bebida(int opcion) { dibujar_opcion(bebidas, nombres_bebidas, CANT_BEBIDAS, opcion); }
 
+// ─── La familia (Pitri, Flufi, ...) ──────────────────────────────────────────
+// Los personajes de la casa se hablan por la red WiFi (ver docs/FAMILIA.md).
+
+static int64_t proxima_iniciativa_us = 0;   // cuando le toca empezar una charla o un juego
+
+// Dice algo de la familia al costado de la cara
+static void decir_familia(const char *texto)
+{
+    eyes_sacar_disfraz();
+    eyes_mostrar_datos(texto, 1, MOSTRAR_FAMILIA_MS);
+}
+
+// La cara que acompaña a un renglon de una charla
+static void emocionarse(familia_emocion_t emocion)
+{
+    switch (emocion) {
+    case FAMILIA_EMOCION_CONTENTA:
+    case FAMILIA_EMOCION_RISA: eyes_jugar_juego("contento"); break;
+    case FAMILIA_EMOCION_AMOR: eyes_enamorarse();             break;
+    default:                                                  break;
+    }
+}
+
+// Dice el renglon "renglon" de la charla y le pasa el turno a "con"
+static void decir_renglon(int charla, int renglon, const char *con)
+{
+    familia_emocion_t emocion;
+    const char *texto = familia_charla(charla, renglon, &emocion);
+    if (texto == NULL) return;
+    decir_familia(texto);
+    emocionarse(emocion);
+    if (familia_charla(charla, renglon + 1, NULL) != NULL) {      // si sigue, le toca al otro
+        char dato[16];
+        snprintf(dato, sizeof(dato), "%d %d", charla, renglon + 1);
+        familia_mandar(con, FAMILIA_CHARLA, dato);
+    }
+}
+
+static void empezar_charla(const char *con)
+{
+    ESP_LOGI(TAG, "Empiezo una charla con %s", con);
+    bool antes = atendiendo_familia;
+    atendiendo_familia = true;          // que no se corte lo que dice
+    decir_renglon((int)(esp_random() % familia_cant_charlas()), 0, con);
+    atendiendo_familia = antes;
+}
+
+// Le propone un juego a "con" y lo hacen los dos a la vez
+static void jugar_con(const char *con)
+{
+    const char *juego = familia_juego_junto((int)(esp_random() % familia_cant_juegos_juntos()));
+    ESP_LOGI(TAG, "Juego a \"%s\" con %s", juego, con);
+    familia_mandar(con, FAMILIA_JUGAR, juego);
+    bool antes = atendiendo_familia;
+    atendiendo_familia = true;          // que no se corte el juego
+    eyes_jugar_juego(juego);
+    atendiendo_familia = antes;
+}
+
+// Cada tanto, si hay alguien conectado, empieza una charla o un juego
+static void iniciativa_familia(void)
+{
+    int64_t ahora = esp_timer_get_time();
+    int64_t espera = (FAMILIA_INICIATIVA_MIN_S +
+                      esp_random() % (FAMILIA_INICIATIVA_MAX_S - FAMILIA_INICIATIVA_MIN_S)) * 1000000LL;
+    if (proxima_iniciativa_us == 0) proxima_iniciativa_us = ahora + espera;
+    if (ahora < proxima_iniciativa_us) return;
+    proxima_iniciativa_us = ahora + espera;
+
+    char con[FAMILIA_MAX_NOMBRE];
+    if (!familia_alguien_al_azar(con)) return;
+    if (esp_random() % 3 == 0) jugar_con(con);       // a veces juegan, y mas seguido charlan
+    else                       empezar_charla(con);
+}
+
+// Reacciona a lo que le dijeron los demas
+static void atender_familia(void)
+{
+    familia_evento_t e;
+    char texto[64];
+    atendiendo_familia = true;          // mientras reacciona, lo que llega espera su turno
+    while (familia_proximo_evento(&e)) {
+        switch (e.tipo) {
+        case FAMILIA_HOLA:
+        case FAMILIA_SALUDO:
+            eyes_saludar();
+            snprintf(texto, sizeof(texto), "¡Hola\n%s!", e.de);
+            decir_familia(texto);
+            break;
+        case FAMILIA_BESO:
+            eyes_enamorarse();
+            snprintf(texto, sizeof(texto), "¡Un beso\nde\n%s!", e.de);
+            decir_familia(texto);
+            break;
+        case FAMILIA_CHARLA: {
+            int charla, renglon;
+            if (sscanf(e.dato, "%d %d", &charla, &renglon) == 2) decir_renglon(charla, renglon, e.de);
+            break;
+        }
+        case FAMILIA_VISITA:
+            eyes_saludar();
+            decir_familia("¡Llego\nalguien!");
+            break;
+        case FAMILIA_COMIDA:
+            snprintf(texto, sizeof(texto), "¡Gracias\n%s!", e.de);
+            decir_familia(texto);
+            eyes_comer(comidas[esp_random() % CANT_COMIDAS]);
+            break;
+        case FAMILIA_COSQUILLAS:
+            eyes_jugar_juego("contento");
+            snprintf(texto, sizeof(texto), "¡Jaja!\n¡Basta,\n%s!", e.de);
+            decir_familia(texto);
+            break;
+        case FAMILIA_JUGAR:
+            eyes_jugar_juego(e.dato);       // el mismo juego que el otro, a la vez
+            break;
+        case FAMILIA_TRISTE:                // ¡a consolarlo!
+            snprintf(texto, sizeof(texto), "¡No\nllores,\n%s!", e.de);
+            decir_familia(texto);
+            familia_mandar(e.de, FAMILIA_BESO, NULL);
+            break;
+        case FAMILIA_CLIMA: {               // el tiempo de afuera, que le cuenta otro
+            int t;
+            char cielo[20];
+            if (sscanf(e.dato, "%d %19s", &t, cielo) == 2) {
+                int grados = (t + (t >= 0 ? 5 : -5)) / 10;
+                snprintf(texto, sizeof(texto), "Afuera:\n%s\n%d°C", cielo, grados);
+                decir_familia(texto);
+            }
+            break;
+        }
+        case FAMILIA_SENSOR: {              // lo que mide el sensor de otro
+            int t, h;
+            if (sscanf(e.dato, "%d %d", &t, &h) == 2) {
+                snprintf(texto, sizeof(texto), "%s:\nHumedad\n%d%%", e.de, h);
+                decir_familia(texto);
+            }
+            break;
+        }
+        case FAMILIA_MENSAJE:
+            snprintf(texto, sizeof(texto), "¡%s\ntiene un\nmensaje!", e.de);
+            decir_familia(texto);
+            break;
+        case FAMILIA_DORMIR:
+            eyes_jugar_juego("sueno");      // le da sueño a el tambien
+            snprintf(texto, sizeof(texto), "%s se\ndurmio", e.de);
+            decir_familia(texto);
+            break;
+        default:
+            break;
+        }
+    }
+    atendiendo_familia = false;
+}
+
+// Desde el menu: elegir a alguien de la familia y que hacerle
+static void menu_familia(void)
+{
+    if (!familia_configurada()) {
+        mostrar_texto("Sin\nfamilia", 2, 2000);
+        return;
+    }
+    static char nombres[FAMILIA_MAX_MIEMBROS][FAMILIA_MAX_NOMBRE];
+    int n = familia_conectados(nombres, FAMILIA_MAX_MIEMBROS);
+    if (n == 0) {
+        mostrar_texto("No hay\nnadie\nconectado", 2, 2000);
+        return;
+    }
+    const char *opciones[FAMILIA_MAX_MIEMBROS + 1];
+    for (int i = 0; i < n; i++) opciones[i] = nombres[i];
+    opciones[n] = "Atras";
+    int quien = menu_elegir("Familia", opciones, n + 1, 0, -1, MENU_ESPERA_MAX_MS);
+    if (quien < 0 || quien >= n) return;                 // "Atras" o se cerro solo
+    const char *con = nombres[quien];
+
+    static const char *const acciones[] = { "Beso", "Cosquis", "Convidar", "Charlar", "Jugar", "Atras" };
+    switch (menu_elegir(con, acciones, 6, 0, -1, MENU_ESPERA_MAX_MS)) {
+    case 0: familia_mandar(con, FAMILIA_BESO, NULL);       mostrar_texto("¡Beso\nenviado!", 2, 1500);  break;
+    case 1: familia_mandar(con, FAMILIA_COSQUILLAS, NULL); mostrar_texto("¡Cosqui\ncosqui!", 2, 1500); break;
+    case 2: familia_mandar(con, FAMILIA_COMIDA, NULL);     mostrar_texto("¡Le\nconvide!", 2, 1500);    break;
+    case 3: eyes_init(); empezar_charla(con); break;
+    case 4: eyes_init(); jugar_con(con);      break;
+    default: break;
+    }
+}
+
 static void abrir_menu(void)
 {
-    static const char *const opciones_menu[] = { "Modo", "Comer", "Tomar", "Hora", "Sensor", "Mensaje", "Salir" };
+    static const char *const opciones_menu[] = { "Modo", "Comer", "Tomar", "Hora", "Sensor", "Mensaje", "Familia", "Salir" };
     static const char *const opciones_modo[] = { "Normal", "Halloween", "Navidad", "Animales", "Volver" };
     const int opcion_modo = 0, opcion_comer = 1, opcion_tomar = 2, opcion_hora = 3, opcion_sensor = 4;
-    const int opcion_mensaje = 5;
+    const int opcion_mensaje = 5, opcion_familia = 6;
     const int volver = 4;
 
     ESP_LOGI(TAG, "Abriendo el menu");
     while (1) {
-        int elegida = menu_elegir("", opciones_menu, 7, 0, -1, MENU_ESPERA_MAX_MS);
+        int elegida = menu_elegir("", opciones_menu, 8, 0, -1, MENU_ESPERA_MAX_MS);
 
         if (elegida == opcion_comer) {
             int c = menu_elegir_dibujos("Comer", CANT_COMIDAS + 1, dibujar_opcion_comida, 0, MENU_ESPERA_MAX_MS);
@@ -430,6 +621,10 @@ static void abrir_menu(void)
             mensajes_desde_menu();
             break;
         }
+        if (elegida == opcion_familia) {
+            menu_familia();
+            break;
+        }
         if (elegida != opcion_modo) break;          // "Salir" o se cerro solo
 
         int m = menu_elegir("Modo", opciones_modo, 5, modo, modo, MENU_ESPERA_MAX_MS);
@@ -448,6 +643,12 @@ static void abrir_menu(void)
 // Cuando llega alguien: en modo normal saluda, en los otros hace un personaje
 static void recibir_visita(void)
 {
+    // Le avisa a la familia que llego alguien (como mucho cada 2 minutos)
+    static int64_t ultimo_aviso_us = 0;
+    if (ultimo_aviso_us == 0 || esp_timer_get_time() - ultimo_aviso_us > 120LL * 1000000) {
+        familia_mandar("*", FAMILIA_VISITA, NULL);
+        ultimo_aviso_us = esp_timer_get_time();
+    }
     if (telegram_sin_leer() > 0) {      // ¡primero, el mensaje!
         avisar_mensaje();
         return;
@@ -460,7 +661,7 @@ static void recibir_visita(void)
 static void descansar(int ms)
 {
     for (int t = 0; t < ms; t += 50) {
-        if (hay_boton_para_atender()) return;
+        if (hay_boton_para_atender() || familia_hay_evento()) return;
         if (motion_alguien_llego()) {
             recibir_visita();
             return;
@@ -480,6 +681,10 @@ static void mostrar_temperatura(void)
     char texto[64];
     snprintf(texto, sizeof(texto), "Temp:\n%s%d.%d°C\nHumedad:\n%d%%",
              t < 0 ? "-" : "", abs(t) / 10, abs(t) % 10, (h + 5) / 10);
+
+    char dato[24];                                 // se lo cuenta a la familia
+    snprintf(dato, sizeof(dato), "%d %d", t, (h + 5) / 10);
+    familia_mandar("*", FAMILIA_SENSOR, dato);
 
     eyes_sacar_disfraz();
     eyes_mostrar_datos(texto, 1, MOSTRAR_SENSOR_MS);
@@ -559,6 +764,7 @@ static void esperar_wifi_al_arrancar(void)
 static void dormir(void)
 {
     ESP_LOGI(TAG, "Pasaron %d s sin movimiento", TIEMPO_SIN_MOVIMIENTO_PARA_DORMIR_MS / 1000);
+    familia_mandar("*", FAMILIA_DORMIR, NULL);   // le cuenta a la familia que se va a dormir
     eyes_sacar_disfraz();
     eyes_dormirse();
 
@@ -569,6 +775,7 @@ static void dormir(void)
             break;
         }
         if (telegram_recibidos() != recibidos_avisados) break;   // ¡llego un mensaje!
+        if (familia_hay_evento()) break;                          // ¡le hablo alguien de la familia!
         eyes_dormido();
     }
 
@@ -586,6 +793,7 @@ void app_main(void)
     wifi_iniciar();          // se conecta "de fondo", no hay que esperarlo
     reloj_iniciar(ZONA_HORARIA);   // cuando haya WiFi, pone la hora
     telegram_iniciar();      // cuando haya WiFi, busca mensajes de Telegram
+    familia_iniciar(MI_NOMBRE);   // cuando haya WiFi, saluda a la familia y la escucha
     botones_iniciar();       // boton 1 = menu, boton 2 = leer mensajes y moverse en el menu
 
     // Mensajes de bienvenida
@@ -611,6 +819,11 @@ void app_main(void)
             continue;
         }
 
+        // Lo que le dijeron los demas de la familia (saludos, besos, charlas...)
+        atender_familia();
+        // Y cada tanto, Pitri empieza una charla o un juego
+        iniciativa_familia();
+
         // Si llego un mensaje nuevo, avisa
         if (telegram_recibidos() != recibidos_avisados) {
             avisar_mensaje();
@@ -632,7 +845,9 @@ void app_main(void)
         revisar_horarios();
 
         // Juega (modo normal) o hace un personaje (los otros modos)
-        if (modo == MODO_NORMAL) eyes_jugar();
+        if (modo == MODO_NORMAL) {
+            if (strcmp(eyes_jugar(), "llorar") == 0) familia_mandar("*", FAMILIA_TRISTE, NULL);   // ¡que lo consuelen!
+        }
         else                     eyes_actuar(elegir_personaje());
 
         // Un descansito entre juego y juego, y a veces un parpadeo
