@@ -166,6 +166,7 @@ forma de los ojos:
 #define OJO_ALTO         36   // ¿ojos bajitos o altos?
 #define OJO_RADIO        9    // ¿cuadrados o redondos?
 #define OJO_SEPARACION   20   // ¿juntitos o separados?
+#define FLEQUILLO        1    // ¿con flequillito (1) o sin (0)?
 ```
 
 > 💡 **Proba:** pone `OJO_RADIO` en `15` y fijate que pasa. Despues proba con `0`.

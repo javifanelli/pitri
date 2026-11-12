@@ -14,6 +14,7 @@
 #define OJO_RADIO        9    // que tan redondeadas son las esquinas
 #define OJO_SEPARACION   20   // espacio entre los dos ojos
 #define OJO_ALTO_CERRADO 3    // grosor de la rayita cuando esta cerrado
+#define FLEQUILLO        1    // 1 = Pitri tiene flequillito, 0 = sin flequillo (¡para probar!)
 
 // Hasta donde se pueden mover los ojos sin salirse de la pantalla
 #define MAX_X  ((LCD_H_RES - 2 * OJO_ANCHO - OJO_SEPARACION) / 2)   // 24

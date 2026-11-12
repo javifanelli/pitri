@@ -365,6 +365,21 @@ static void dibujar_boca(float cy, float perspectiva)
     }
 }
 
+// El flequillito: una franja arriba y 6 mechoncitos en punta que caen un poco
+// hacia un costado. Acompaña a los ojos cuando miran para los costados (un
+// poquito menos que ellos, como una cabeza que gira) y queda detras de los ojos.
+static void dibujar_flequillo(void)
+{
+    static const int8_t largos[6] = { 6, 9, 7, 10, 8, 6 };
+    int x = (int)(LCD_H_RES / 2.0f + cara.x * (0.5f + 0.5f * cara.datos)) - 21;
+    int y = (int)(cara.y * 0.3f);
+    display_fill_rect(x, y, 42, 3, true);
+    for (int k = 0; k < 6; k++) {
+        int x0 = x + k * 7;
+        display_fill_triangle(x0, y + 2, x0 + 7, y + 2, x0 + 5, y + 2 + largos[k], true);
+    }
+}
+
 // Sobrecito arriba a la derecha (cuando hay un mensaje sin leer).
 // Tiene un borde negro para que se vea aunque los ojos esten detras.
 static void dibujar_sobre(void)
@@ -402,6 +417,9 @@ static void dibujar(void)
         display_flush();
         return;
     }
+
+    // El flequillito (si esta prendido y Pitri no tiene disfraz)
+    if (FLEQUILLO && disfraz_actual == DISFRAZ_NINGUNO) dibujar_flequillo();
 
     dibujar_ojo(cx_izq, cy, cara.ancho, cara.alto * (1 - p), cara.abre_izq, -1);
     dibujar_ojo(cx_der, cy, cara.ancho, cara.alto * (1 + p), cara.abre_der, +1);

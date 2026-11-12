@@ -14,6 +14,15 @@ Aca anotamos todo lo que le fuimos enseñando a Pitri y lo que aprendimos en el 
 
 ---
 
+## 2026-11-08 — Un flequillito para probar ✂️
+
+**Que hicimos:** Le pusimos a Pitri un **flequillito** arriba de los ojos, para ver como le queda: una franja y seis mechoncitos en punta que caen un poco hacia un costado. Se mueve cuando Pitri mira para los costados y se esconde detras de los ojos cuando mira para arriba. Cuando se disfraza, se lo saca. Si no nos gusta, se apaga cambiando `FLEQUILLO` a 0 en `components/eyes/eyes_interno.h`.
+
+**Que aprendimos:**
+- El flequillo son **triangulos** con la punta para abajo, cada uno de un largo distinto, para que parezca pelo de verdad y no un serrucho.
+
+---
+
 ## 2026-11-07 — La familia charla y juega 🗨️🎲
 
 **Que hicimos:** Pitri y Flufi ahora hacen muchas mas cosas juntos. Cada tanto **charlan**: uno pregunta "¿Como estas?" en su pantalla y el otro le contesta en la suya, por turnos. Tambien **juegan juntos** (los dos se marean, o se ponen los lentes, a la vez). Si uno llora, el otro lo **consuela** y le manda un beso. Cuando el sensor de Pitri ve a alguien, Flufi tambien saluda; cuando a Pitri le llega un mensaje, Flufi avisa; y cuando Pitri se duerme, a Flufi le da sueño. Ademas se cuentan cosas: Flufi le pasa a Pitri el tiempo de afuera y Pitri le pasa a Flufi la humedad. En el menu, **Familia** deja elegir a alguien y mandarle un beso, hacerle cosquillas, convidarle algo, charlar o jugar.
